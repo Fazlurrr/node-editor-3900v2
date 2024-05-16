@@ -4,6 +4,7 @@ using server.DAL;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace server.Controllers;
 
@@ -90,7 +91,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
 
             if (node == null)
             {
-                throw new Exception("Node with id " + id + " does not exist");
+                return NotFound("Node with id " + id + " does not exist");
             }
 
             return Ok(node);
@@ -119,15 +120,20 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
         {
             foreach (var node in data.EnumerateArray())
             {
-                var type = node.GetProperty("type").GetString();
-                var id = node.GetProperty("id").GetString();
-                var label = node.GetProperty("data").GetProperty("label").GetString();
-                var aspect = node.GetProperty("data").GetProperty("aspect").GetString();
-                var createdBy = node.GetProperty("data").GetProperty("createdBy").GetString();
+                if (!node.TryGetProperty("data", out JsonElement dataElement))
+                {
+                    return BadRequest("Node data is empty.");
+                }
+
+                var type = node.TryGetProperty("type", out var typeProp) ? typeProp.GetString() : null;
+                var id = node.TryGetProperty("id", out var idProp) ? idProp.GetString() : null;
+                var label = node.GetProperty("data").TryGetProperty("label", out var labelProp) ? labelProp.GetString() : null;
+                var aspect = node.GetProperty("data").TryGetProperty("aspect", out var aspectProp) ? aspectProp.GetString() : null;
+                var createdBy = node.GetProperty("data").TryGetProperty("createdBy", out var createdByProp) ? createdByProp.GetString() : null;
                 var position = new Position
                 {
-                    X = node.GetProperty("position").GetProperty("x").GetDouble(),
-                    Y = node.GetProperty("position").GetProperty("y").GetDouble()
+                    X = node.GetProperty("position").TryGetProperty("x", out var xPosProp) ? xPosProp.GetDouble() : 0,
+                    Y = node.GetProperty("position").TryGetProperty("y", out var yPosProp) ? yPosProp.GetDouble() : 0
                 };
 
                 var customName = node.GetProperty("data").GetProperty("customName").GetString() ?? "";
@@ -176,22 +182,22 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
     public async Task<IActionResult> CreateNode([FromBody] JsonElement data)
     {
 
-        if (data.ValueKind == JsonValueKind.Undefined)
+        if (data.ValueKind == JsonValueKind.Undefined || !data.TryGetProperty("data", out JsonElement dataElement))
         {
             return BadRequest("Node data is missing.");
         }
 
         try
         {
-            var type = data.GetProperty("type").GetString();
-            var id = data.GetProperty("id").GetString();
-            var label = data.GetProperty("data").GetProperty("label").GetString();
-            var aspect = data.GetProperty("data").GetProperty("aspect").GetString();
-            var createdBy = data.GetProperty("data").GetProperty("createdBy").GetString();
+            var type = data.TryGetProperty("type", out var typeProp) ? typeProp.GetString() : null;
+            var id = data.TryGetProperty("id", out var idProp) ? idProp.GetString() : null;
+            var label = data.GetProperty("data").TryGetProperty("label", out var labelProp) ? labelProp.GetString() : null;
+            var aspect = data.GetProperty("data").TryGetProperty("aspect", out var aspectProp) ? aspectProp.GetString() : null;
+            var createdBy = data.GetProperty("data").TryGetProperty("createdBy", out var createdByProp) ? createdByProp.GetString() : null;
             var position = new Position
             {
-                X = data.GetProperty("position").GetProperty("x").GetDouble(),
-                Y = data.GetProperty("position").GetProperty("y").GetDouble()
+                X = data.GetProperty("position").TryGetProperty("x", out var xPosProp) ? xPosProp.GetDouble() : 0,
+                Y = data.GetProperty("position").TryGetProperty("y", out var yPosProp) ? yPosProp.GetDouble() : 0
             };
 
             if (id == null || type == null || label == null || aspect == null || createdBy == null || position == null)
@@ -219,7 +225,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<IEnumerable<object>>> DeleteNode(string id)
+    public async Task<ActionResult> DeleteNode(string id)
     {
         if (id == null) return BadRequest("Node id is missing.");
 
@@ -229,7 +235,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
 
             if (node == null)
             {
-                throw new Exception("Node with id " + id + " does not exist");
+                return NotFound("Node with id " + id + " does not exist");
             }
 
             _db.Nodes.Remove(node);
@@ -250,7 +256,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
     }
 
     [HttpDelete("{id}/all")]
-    public async Task<ActionResult<IEnumerable<object>>> DeleteNodes(string id)
+    public async Task<ActionResult> DeleteNodes(string id)
     {
         if (id == null) return BadRequest("Node id is missing.");
 
@@ -276,15 +282,15 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             nodes.AddRange(terminals);
             nodes.AddRange(connectors);
 
-            if (nodes == null)
+            if (nodes.IsNullOrEmpty())
             {
-                throw new Exception("Nodes with id " + id + " do not exist");
+                return NotFound("Nodes created by id " + id + " do not exist.");
             }
 
             _db.Nodes.RemoveRange(nodes);
             await _db.SaveChangesAsync();
 
-            return Ok("Nodes with id " + id + " have been deleted.");
+            return Ok("Nodes created by id " + id + " have been deleted.");
         }
         catch (DbUpdateException dbEx)
         {
@@ -301,7 +307,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
     [HttpPut]
     public async Task<IActionResult> UpdateNode([FromBody] JsonElement data)
     {
-        if (data.ValueKind == JsonValueKind.Undefined)
+        if (data.ValueKind == JsonValueKind.Undefined || !data.TryGetProperty("data", out JsonElement dataElement))
         {
             return BadRequest("Node data is missing.");
         }
@@ -408,6 +414,5 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
-
 
 }
