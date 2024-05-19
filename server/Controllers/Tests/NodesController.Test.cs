@@ -1,10 +1,11 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using server.Controllers;
 using server.DAL;
 using server.Models;
 using Xunit;
+
+namespace server.Controllers.Tests;
 
 public class NodesControllerTest
 {
@@ -183,7 +184,9 @@ public class NodesControllerTest
   {
     // Act
     // Call the DeleteNode method on the controller with null as the id
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
     var result = await _nodesController.DeleteNode(null);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
     // Assert
     // Check that the result of the method is a BadRequestObjectResult, which indicates that the input was not valid
@@ -207,7 +210,9 @@ public class NodesControllerTest
   {
     // Act
     // Call the DeleteNodes method on the controller with null as the creator
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
     var result = await _nodesController.DeleteNodes(null);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
     // Assert
     // Check that the result of the method is a BadRequestObjectResult, which indicates that the input was not valid

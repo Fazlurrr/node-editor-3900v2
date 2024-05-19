@@ -1,12 +1,10 @@
-using Microsoft.EntityFrameworkCore.InMemory;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using server.Controllers;
 using server.DAL;
 using server.Models;
 using Xunit;
+
+namespace server.Controllers.Tests;
 
 public class AuthControllerTest
 {
@@ -14,8 +12,6 @@ public class AuthControllerTest
   private readonly ILogger<AuthController> _logger;
   private readonly IConfiguration _configuration;
   private readonly AuthController _authController;
-
-  private byte[] salt = PasswordHasher.GenerateSalt();
 
   public AuthControllerTest()
   {

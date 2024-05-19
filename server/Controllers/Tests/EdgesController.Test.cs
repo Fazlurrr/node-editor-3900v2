@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using server.Controllers;
 using server.DAL;
 using server.Models;
 using Xunit;
 using Moq;
+
+namespace server.Controllers.Tests;
 
 public class EdgesControllerTest
 {
@@ -220,7 +221,9 @@ public class EdgesControllerTest
   public async Task UploadEdges_EdgesNotProvided_ReturnsBadRequest()
   {
     // Call the UploadEdges method without providing edges
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
     var result = await _edgesController.UploadEdges(null);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
     // Assert that the result is a BadRequestObjectResult
     Assert.IsType<BadRequestObjectResult>(result);
@@ -321,7 +324,9 @@ public class EdgesControllerTest
   public async Task CreateEdge_EdgeNotProvided_ReturnsBadRequest()
   {
     // Call the CreateEdge method without providing an edge
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
     var result = await _edgesController.CreateEdge(null);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
     // Assert that the result is a BadRequestObjectResult
     Assert.IsType<BadRequestObjectResult>(result);
@@ -602,11 +607,11 @@ public class EdgesControllerTest
     var result = await _edgesController.UpdateEdge(testEdge);
 
     // Assert that the result is a CreatedAtActionResult
-    var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
+    Assert.IsType<CreatedAtActionResult>(result);
 
     // Assert that the edge was updated in the database
     var edge = await _db.Edges.FindAsync(testEdge.Id);
-    Assert.Equal("newCreator", edge.Data.CreatedBy);
+    Assert.Equal("newCreator", edge?.Data.CreatedBy);
   }
 
   [Fact]
