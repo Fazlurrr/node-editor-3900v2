@@ -152,7 +152,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
   }
 
   [HttpPut("users/{id}/password")]
-  [Authorize(Roles = "admin")]
+  [Authorize]
   public async Task<IActionResult> ChangePassword(string id, PasswordUpdateModel password)
   {
     try
@@ -164,9 +164,14 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
         return BadRequest("User with id " + id + " does not exist");
       }
 
+      if (password.CurrentPassword != "" && !PasswordHasher.VerifyPassword(password.CurrentPassword, Convert.FromBase64String(existingUser.Salt), existingUser.Password))
+      {
+        return BadRequest("Could not update password: Current password is incorrect");
+      }
+
       byte[] salt = PasswordHasher.GenerateSalt();
 
-      string hashedPassword = PasswordHasher.HashPassword(password.Password, salt);
+      string hashedPassword = PasswordHasher.HashPassword(password.NewPassword, salt);
 
       existingUser.Salt = Convert.ToBase64String(salt);
       existingUser.Password = hashedPassword;

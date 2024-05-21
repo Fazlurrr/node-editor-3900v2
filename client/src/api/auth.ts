@@ -153,7 +153,11 @@ export const deleteUser = async (id: string): Promise<boolean> => {
   }
 };
 
-export const updatePassword = async (id: string, newPassword: string) => {
+export const updatePassword = async (
+  id: string,
+  newPassword: string,
+  currentPassword = ''
+) => {
   const { token } = useSession.getState();
   const { startLoading, stopLoading } = useLoading.getState();
   startLoading();
@@ -166,7 +170,7 @@ export const updatePassword = async (id: string, newPassword: string) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ password: newPassword }),
+        body: JSON.stringify({ newPassword, currentPassword }),
       }
     );
 

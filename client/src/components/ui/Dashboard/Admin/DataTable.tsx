@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import React, { useState } from 'react';
-import { Input } from '../input';
+import { Input } from '@/components/ui/input';
 
 import {
   DropdownMenu,
@@ -27,14 +27,14 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '../button';
+import { Button } from '@/components/ui/button';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export default function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {

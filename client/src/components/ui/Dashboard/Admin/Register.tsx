@@ -24,36 +24,11 @@ import {
 } from '@/components/ui/select';
 import { Role } from '@/lib/types';
 import { queryClient } from '@/main';
-
-const formSchema = z
-  .object({
-    username: z
-      .string()
-      .min(2, 'Username must contain at least 2 character(s)')
-      .max(50, "Username can't be longer than 50 characters"),
-    password: z
-      .string()
-      .min(5, 'Password must contain at least 5 character(s)')
-      .max(50, "Password can't be longer than 50 characters"),
-    repeatPassword: z
-      .string()
-      .min(5, 'Password must contain at least 5 character(s)')
-      .max(50, "Password can't be longer than 50 characters"),
-    role: z.enum(['user', 'admin']),
-  })
-  .superRefine((data, ctx) => {
-    if (data.password !== data.repeatPassword) {
-      ctx.addIssue({
-        path: ['repeatPassword'],
-        message: 'Passwords do not match',
-        code: 'custom',
-      });
-    }
-  });
+import { registerUserSchema } from '@/lib/schemas';
 
 const Register = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof registerUserSchema>>({
+    resolver: zodResolver(registerUserSchema),
     defaultValues: {
       username: '',
       password: '',
@@ -62,7 +37,7 @@ const Register = () => {
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof registerUserSchema>) => {
     const registered = await register(
       values.username,
       values.password,

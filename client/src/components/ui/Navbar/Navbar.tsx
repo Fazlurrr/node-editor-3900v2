@@ -20,7 +20,7 @@ import {
   DownloadNodes,
   Logout,
   Reset,
-  ManageUsers,
+  ViewDashboard,
   UploadFiles,
 } from './_components';
 
@@ -121,7 +121,6 @@ const navItems: NavItem[] = [
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
-  const { user } = useSession();
   const { theme } = useTheme();
   const { currentPage, setDashboard } = useSession();
 
@@ -164,9 +163,7 @@ const Navbar = () => {
           )}
         </div>
         <div className="flex items-center justify-center">
-          {currentPage !== AppPage.Login && user?.role === 'admin' && (
-            <ManageUsers />
-          )}
+          {currentPage !== AppPage.Login && <ViewDashboard />}
           {currentPage === AppPage.Home && nodes.length > 0 && (
             <>
               <Reset />

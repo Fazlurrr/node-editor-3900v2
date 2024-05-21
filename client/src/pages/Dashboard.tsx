@@ -1,48 +1,18 @@
-import { fetchAllUsers } from '@/api/auth';
-import { useQuery } from '@tanstack/react-query';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import Register from '@/components/ui/Register';
-import { DataTable } from '@/components/ui/Users/DataTable';
-import { columns } from '@/components/ui/Users/Columns';
+import { useSession } from '@/hooks';
+import { AdminDashboard, UserDashboard } from '@/components/ui/Dashboard';
 
 const Dashboard = () => {
-  const { data, error, isRefetching, refetch } = useQuery({
-    queryKey: ['users'],
-    queryFn: fetchAllUsers,
-  });
+  const { user } = useSession();
 
-  if (isRefetching) {
-    refetch();
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        An error occured while fetching users - {error?.message ?? 'Unknown'}{' '}
-      </div>
-    );
+  if (!user || !user.role) {
+    return null;
   }
 
   return (
-    <Tabs
-      defaultValue="manage"
-      className="mt-14 flex w-screen flex-col items-center justify-start"
-    >
-      <TabsList className="bg-tansparent grid w-[300px] grid-cols-3">
-        <TabsTrigger value="manage">Manage users</TabsTrigger>
-        <Separator orientation="vertical" className="mx-auto" />
-        <TabsTrigger value="register">Register user</TabsTrigger>
-      </TabsList>
-      <TabsContent value="manage">
-        <div className="mt-4">
-          <DataTable columns={columns} data={data ?? []} />
-        </div>
-      </TabsContent>
-      <TabsContent value="register" className="h-full">
-        <Register />
-      </TabsContent>
-    </Tabs>
+    <>
+      {user.role === 'admin' && <AdminDashboard />}
+      {user.role === 'user' && <UserDashboard />}
+    </>
   );
 };
 

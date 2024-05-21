@@ -6,8 +6,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../dropdown-menu';
-import { Button } from '../button';
+} from '../../dropdown-menu';
+import { Button } from '../../button';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import {
   Select,
@@ -16,7 +16,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../select';
+} from '../../select';
 import { deleteUser, updatePassword, updateUserRole } from '@/api/auth';
 import { queryClient } from '@/main';
 import { cn } from '@/lib/utils';
@@ -39,29 +39,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '../input';
+import { Input } from '../../input';
 import { useState } from 'react';
-
-const formSchema = z
-  .object({
-    password: z
-      .string()
-      .min(5, 'Password must contain at least 5 character(s)')
-      .max(50, "Password can't be longer than 50 characters"),
-    repeatPassword: z
-      .string()
-      .min(5, 'Password must contain at least 5 character(s)')
-      .max(50, "Password can't be longer than 50 characters"),
-  })
-  .superRefine((data, ctx) => {
-    if (data.password !== data.repeatPassword) {
-      ctx.addIssue({
-        path: ['repeatPassword'],
-        message: 'Passwords do not match',
-        code: 'custom',
-      });
-    }
-  });
+import { updatePasswordAdmin } from '@/lib/schemas';
 
 const UserActions = ({ username, id }: { username: string; id: string }) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -103,27 +83,27 @@ const UserActions = ({ username, id }: { username: string; id: string }) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <UpdatePassword id={id} setDialogOpen={setDialogOpen} />
+      <UpdatePasswordAdmin id={id} setDialogOpen={setDialogOpen} />
     </Dialog>
   );
 };
 
-const UpdatePassword = ({
+const UpdatePasswordAdmin = ({
   id,
   setDialogOpen,
 }: {
   id: string;
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof updatePasswordAdmin>>({
+    resolver: zodResolver(updatePasswordAdmin),
     defaultValues: {
       password: '',
       repeatPassword: '',
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof updatePasswordAdmin>) => {
     const success = await updatePassword(id, values.password);
 
     if (success) {

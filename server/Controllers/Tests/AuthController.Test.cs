@@ -106,7 +106,7 @@ public class AuthControllerTest
     await _db.SaveChangesAsync();
 
     // Create a PasswordUpdateModel with the new password
-    var passwordUpdate = new PasswordUpdateModel { Password = "newpassword" };
+    var passwordUpdate = new PasswordUpdateModel { NewPassword = "newpassword" };
 
     // Call the ChangePassword method with the ID of the created user and the new password
     var result = await _authController.ChangePassword(testUser.Id, passwordUpdate);
@@ -179,7 +179,7 @@ public class AuthControllerTest
   public async Task ChangePassword_NonexistentUser_ReturnsBadRequestResult()
   {
     // Create a PasswordUpdateModel with a new password
-    var passwordUpdate = new PasswordUpdateModel { Password = "newpassword" };
+    var passwordUpdate = new PasswordUpdateModel { NewPassword = "newpassword" };
 
     // Call the ChangePassword method with a nonexistent user ID
     var result = await _authController.ChangePassword("nonexistent", passwordUpdate);

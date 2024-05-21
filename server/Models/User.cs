@@ -14,7 +14,8 @@ public class UserDto
 
 public class PasswordUpdateModel
 {
-  public required string Password { get; set; }
+  public string CurrentPassword { get; set; } = string.Empty;
+  public required string NewPassword { get; set; }
 }
 
 public class User
