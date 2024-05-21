@@ -13,8 +13,8 @@ export const downloadZipFile = async () => {
   const relationsStr = mapNodeRelationsToString(nodes);
 
   zip.file('relations.txt', relationsStr);
-  zip.file('nodes.json', JSON.stringify(nodes));
-  zip.file('edges.json', JSON.stringify(edges));
+  zip.file('nodes.json', JSON.stringify(nodes, null, 2));
+  zip.file('edges.json', JSON.stringify(edges, null, 2));
 
   const blob = await zip.generateAsync({ type: 'blob' });
   const url = window.URL.createObjectURL(blob);
