@@ -125,7 +125,7 @@ const Navbar = () => {
   const { currentPage, setDashboard } = useSession();
 
   return (
-    <NavigationMenu className="fixed h-12 border-b bg-white dark:bg-navbar-dark">
+    <NavigationMenu className="fixed h-12 border-b border-[#9facbc] bg-white dark:bg-navbar-dark">
       <div className="flex w-full items-center justify-between ">
         <div className="flex items-center ">
           <span className="cursor-pointer" onClick={() => setDashboard(false)}>
