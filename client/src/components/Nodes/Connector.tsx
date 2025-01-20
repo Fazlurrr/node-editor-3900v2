@@ -18,16 +18,16 @@ const Connector = (props: CustomNodeProps) => {
           <figure id={props.data.label}>
             <div
               onClick={() => openSidebar(props)}
-              className={`h-8 w-8 overflow-hidden whitespace-nowrap rounded-xl bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+              className={`h-8 w-8 overflow-hidden whitespace-nowrap rounded-full border border-black bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
             >
               <header className="flex h-full w-full items-center justify-center">
-                <p
-                  className={`truncate text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
-                >
-                  {props.data.customName === ''
-                    ? props.data.label
-                    : props.data.customName}
-                </p>
+              <p
+                className={`truncate text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
+              >
+                {props.data.customName === ''
+                ? props.data.label
+                : props.data.customName}
+              </p>
               </header>
             </div>
 
