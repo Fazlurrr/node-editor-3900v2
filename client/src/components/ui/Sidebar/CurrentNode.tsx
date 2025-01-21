@@ -215,6 +215,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                 <SelectItem value={AspectType.Function}>Function</SelectItem>
                 <SelectItem value={AspectType.Product}>Product</SelectItem>
                 <SelectItem value={AspectType.Location}>Location</SelectItem>
+                <SelectItem value={AspectType.Installed}>Installed</SelectItem>
                 <SelectItem value={AspectType.Empty}>Empty</SelectItem>
               </SelectGroup>
             </SelectContent>

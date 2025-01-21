@@ -14,6 +14,7 @@ public class AspectTypeConverter : JsonConverter<AspectType>
       "function" => AspectType.Function,
       "product" => AspectType.Product,
       "location" => AspectType.Location,
+      "installed" => AspectType.Installed,
       "empty" => AspectType.Empty,
       _ => throw new JsonException($"Value '{value}' is not recognized as a valid AspectType.")
     };
@@ -26,6 +27,7 @@ public class AspectTypeConverter : JsonConverter<AspectType>
       AspectType.Function => "function",
       AspectType.Product => "product",
       AspectType.Location => "location",
+      AspectType.Installed => "installed",
       AspectType.Empty => "empty",
       _ => throw new JsonException($"'{value}' is not a valid AspectType value.")
     };

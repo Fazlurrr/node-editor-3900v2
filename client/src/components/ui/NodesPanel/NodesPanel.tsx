@@ -73,6 +73,29 @@ const navItems: NavItem[] = [
         ],
     },
     {
+        title: 'Installed',
+        subtitle: 'Add installed node to editor',
+        children: [
+            {
+                title: 'Block',
+                description:
+                    'Any entity at any abstraction level. Abstraction mechanism',
+                nodeType: NodeType.Block,
+            },
+            {
+                title: 'Terminal',
+                description: 'Block port. Point where medium passes the block boundary',
+                nodeType: NodeType.Terminal,
+            },
+            {
+                title: 'Connector',
+                description:
+                    'Block connection. Abstracted block with infinitesimal boundary',
+                nodeType: NodeType.Connector,
+            },
+        ],
+    },
+    {
         title: 'Empty',
         subtitle: 'Add empty node to editor',
         children: [
@@ -105,6 +128,8 @@ const getAspectColor = (aspect: AspectType) => {
             return '#00ffff';
         case AspectType.Location:
             return '#ff00ff';
+        case AspectType.Installed:
+            return '#424bb2';
         case AspectType.Empty:
             return '#cccccc';
     }
