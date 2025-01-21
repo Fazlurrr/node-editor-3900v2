@@ -10,6 +10,7 @@ export enum AspectType {
   Function = 'function',
   Product = 'product',
   Location = 'location',
+  Installed = 'installed',
   Empty = 'empty',
 }
 

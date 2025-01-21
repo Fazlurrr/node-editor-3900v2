@@ -50,6 +50,7 @@ public enum AspectType
     Function,
     Product,
     Location,
+    Installed,
     Empty
 }
 
