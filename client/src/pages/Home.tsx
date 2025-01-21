@@ -4,6 +4,7 @@ import {
   type Edge,
   type Node,
   Background,
+  BackgroundVariant,
   EdgeTypes,
   NodeTypes,
 } from 'reactflow';
@@ -73,12 +74,14 @@ const Home = () => {
         nodeTypes={nodeTypes as unknown as NodeTypes}
         edgeTypes={edgeTypes as unknown as EdgeTypes}
         onNodeDragStop={(_, node) => updateNode(node.id)}
+        snapToGrid = {true}
+        snapGrid={[22, 22]}
       >
         <Sidebar />
         <SelectConnection />
         <ControlsStyled />
         <MiniMapStyled />
-        <Background gap={12} size={1} />
+        <Background gap={22} lineWidth={2} variant={BackgroundVariant.Lines}/>
       </ReactFlowStyled>
     </ThemeProvider>
   );
