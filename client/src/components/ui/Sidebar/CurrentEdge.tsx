@@ -18,6 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'; 
 import { Button } from '../button';
 import { buttonVariants } from '@/lib/config';
 import { useSidebar, useStore } from '@/hooks';
@@ -152,13 +163,30 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         </div>
       </ScrollArea>
       <SheetFooter>
-        <Button
-          className={buttonVariants.danger}
-          variant="outline"
-          onClick={handleDelete}
-        >
-          Delete
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              className={buttonVariants.danger}
+              variant="outline"
+            >
+              Delete
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure you want to delete this edge?</AlertDialogTitle>
+              <AlertDialogDescription>
+              You can undo this action if needed. 
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SheetFooter>
     </SheetContent>
   );

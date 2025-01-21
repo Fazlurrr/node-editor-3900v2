@@ -33,6 +33,17 @@ import {
   SelectGroup,
   SelectItem,
 } from '../select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'; 
 import { updateNode, deleteNode } from '@/api/nodes';
 import { ScrollArea } from '../scroll-area';
 import { z } from 'zod';
@@ -326,13 +337,30 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
         </Form>
       </ScrollArea>
       <SheetFooter>
-        <Button
-          className={buttonVariants.danger}
-          variant="outline"
-          onClick={handleDelete}
-        >
-          Delete
-        </Button>
+      <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              className={buttonVariants.danger}
+              variant="outline"
+            >
+              Delete
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure you want to delete this node?</AlertDialogTitle>
+              <AlertDialogDescription>
+              Any edges or references to this node will be deleted. You can undo this action if needed.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SheetFooter>
     </SheetContent>
   );
