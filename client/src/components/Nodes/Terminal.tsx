@@ -18,7 +18,7 @@ const Terminal = (props: CustomNodeProps) => {
           <figure id={props.data.label}>
             <div
               onClick={() => openSidebar(props)}
-              className={`h-6 w-6 overflow-hidden whitespace-nowrap border border-black bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+              className={`h-[22px] w-[22px] overflow-hidden whitespace-nowrap border border-black bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
             >
               <header className="flex h-full w-full items-center justify-center">
                 <p
