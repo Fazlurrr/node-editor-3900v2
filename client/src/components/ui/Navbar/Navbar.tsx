@@ -148,7 +148,8 @@ const Navbar = () => {
                           onClick={() =>
                             addNode(
                               node.title.toLowerCase() as AspectType,
-                              component.nodeType
+                              component.nodeType,
+                              { x: 0, y: 0 } // Add appropriate position values here
                             )
                           }
                         >
