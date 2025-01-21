@@ -76,7 +76,7 @@ const Home = () => {
         edgeTypes={edgeTypes as unknown as EdgeTypes}
         onNodeDragStop={(_, node) => updateNode(node.id)}
         snapToGrid = {true}
-        snapGrid={[22, 22]}
+        snapGrid={[11, 11]}
         onDrop={(event) => {
           event.preventDefault();
           const reactFlowBounds = event.currentTarget.getBoundingClientRect();
@@ -100,7 +100,7 @@ const Home = () => {
         <SelectConnection />
         <ControlsStyled />
         <MiniMapStyled />
-        <Background gap={22} lineWidth={2} variant={BackgroundVariant.Lines}/>
+        <Background gap={11} lineWidth={2} variant={BackgroundVariant.Lines}/>
       </ReactFlowStyled>
     </ThemeProvider>
   );
