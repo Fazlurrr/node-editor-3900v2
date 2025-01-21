@@ -27,6 +27,7 @@ import { ThemeProvider } from 'styled-components';
 import { Sidebar, SelectConnection } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
+import { addNode } from '@/lib/utils/nodes';
 
 const Home = () => {
   const nodeTypes = useMemo(
@@ -73,6 +74,24 @@ const Home = () => {
         nodeTypes={nodeTypes as unknown as NodeTypes}
         edgeTypes={edgeTypes as unknown as EdgeTypes}
         onNodeDragStop={(_, node) => updateNode(node.id)}
+        onDrop={(event) => {
+          event.preventDefault();
+          const reactFlowBounds = event.currentTarget.getBoundingClientRect();
+          const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
+        
+          if (!data) return;
+        
+          const position = {
+            x: event.clientX - reactFlowBounds.left,
+            y: event.clientY - reactFlowBounds.top,
+          };
+        
+          addNode(data.aspect, data.nodeType, position);
+        }}
+        onDragOver={(event) => {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = 'move';
+        }}
       >
         <Sidebar />
         <SelectConnection />

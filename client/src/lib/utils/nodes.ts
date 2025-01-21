@@ -50,7 +50,7 @@ export const handleNewNodeRelations = (newNodeRelations: NodeRelation[]) => {
 };
 
 // This function triggers when a node is created
-export const addNode = async (aspect: AspectType, type: NodeType) => {
+export const addNode = async (aspect: AspectType, type: NodeType, position: { x: number; y: number }) => {
   const { nodes } = useStore.getState();
   const { user } = useSession.getState();
 
@@ -73,16 +73,13 @@ export const addNode = async (aspect: AspectType, type: NodeType) => {
     type === 'block'
       ? `Block${labelNum}`
       : type === 'terminal'
-        ? `T${labelNum}`
-        : `C${labelNum}`;
+      ? `T${labelNum}`
+      : `C${labelNum}`;
 
   const newNode: Node = {
     type,
     id: `${type}-${uuidv4()}`,
-    position: {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-    },
+    position,
     data: {
       aspect,
       label,
@@ -94,6 +91,7 @@ export const addNode = async (aspect: AspectType, type: NodeType) => {
   // /api/nodes POST request
   await createNode(newNode);
 };
+
 // This function is called to update props of a node when a connection is deleted or a node connected to it is deleted
 export const updateNodeRelations = async (
   currentEdge: Edge,
