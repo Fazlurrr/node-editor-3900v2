@@ -1,6 +1,6 @@
 import { CSSTransition } from 'react-transition-group';
 import { AppPage } from '@/lib/types';
-import { Login, Home, Dashboard } from '@/pages';
+import { Login, Editor, Dashboard } from '@/pages';
 import { useEffect } from 'react';
 import { useTheme, useSession } from '@/hooks';
 import { Toaster } from 'react-hot-toast';
@@ -8,7 +8,7 @@ import { Navbar, NodesPanel, Loader } from './components/ui';
 
 const routeConfig = {
   [AppPage.Login]: Login,
-  [AppPage.Home]: Home,
+  [AppPage.Editor]: Editor,
   [AppPage.Dashboard]: Dashboard,
 };
 
@@ -27,7 +27,7 @@ const App: React.FC = () => {
     if (dashboard) {
       return setCurrentPage(AppPage.Dashboard);
     }
-    setCurrentPage(AppPage.Home);
+    setCurrentPage(AppPage.Editor);
   }, [dashboard, setCurrentPage, token]);
 
   return (

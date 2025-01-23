@@ -28,7 +28,7 @@ import { fetchNodes, updateNode } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import { addNode } from '@/lib/utils/nodes';
 
-const Home = () => {
+const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
 
@@ -119,4 +119,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Editor;
