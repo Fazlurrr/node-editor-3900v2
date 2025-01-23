@@ -1,5 +1,4 @@
-import { useEffect, useMemo } from 'react';
-
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   type Edge,
   type Node,
@@ -7,15 +6,14 @@ import {
   BackgroundVariant,
   EdgeTypes,
   NodeTypes,
+  ReactFlowProvider,
+  ReactFlowInstance,
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
-
 import 'reactflow/dist/style.css';
 import { Block, Connector, Terminal } from '@/components/Nodes';
-
 import { onConnect } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
-
 import { Connected, Fulfilled, Part, Transfer } from '@/components/Edges';
 import {
   ControlsStyled,
@@ -31,6 +29,9 @@ import { fetchEdges } from '@/api/edges';
 import { addNode } from '@/lib/utils/nodes';
 
 const Home = () => {
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+
   const nodeTypes = useMemo(
     () => ({
       block: Block,
@@ -64,44 +65,56 @@ const Home = () => {
     })();
   }, [setNodes, setEdges]);
 
+  const onLoad = (instance: ReactFlowInstance) => setReactFlowInstance(instance);
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+
+    if (!reactFlowWrapper.current || !reactFlowInstance) return;
+
+    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+    const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
+
+    if (!data) return;
+    
+    const position = reactFlowInstance.project({
+      x: event.clientX - reactFlowBounds.left,
+      y: event.clientY - reactFlowBounds.top,
+    });
+
+    addNode(data.aspect, data.nodeType, position);
+  };
+
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <ReactFlowStyled
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes as unknown as NodeTypes}
-        edgeTypes={edgeTypes as unknown as EdgeTypes}
-        onNodeDragStop={(_, node) => updateNode(node.id)}
-        snapToGrid = {true}
-        snapGrid={[11, 11]}
-        onDrop={(event) => {
-          event.preventDefault();
-          const reactFlowBounds = event.currentTarget.getBoundingClientRect();
-          const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-        
-          if (!data) return;
-        
-          const position = {
-            x: event.clientX - reactFlowBounds.left,
-            y: event.clientY - reactFlowBounds.top,
-          };
-        
-          addNode(data.aspect, data.nodeType, position);
-        }}
-        onDragOver={(event) => {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = 'move';
-        }}
-      >
-        <Sidebar />
-        <SelectConnection />
-        <ControlsStyled />
-        <MiniMapStyled />
-        <Background gap={11} lineWidth={2} variant={BackgroundVariant.Lines}/>
-      </ReactFlowStyled>
+      <ReactFlowProvider>
+        <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
+          <ReactFlowStyled
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            nodeTypes={nodeTypes as unknown as NodeTypes}
+            edgeTypes={edgeTypes as unknown as EdgeTypes}
+            onNodeDragStop={(_, node) => updateNode(node.id)}
+            onInit={onLoad}
+            snapToGrid={true}
+            snapGrid={[11, 11]}
+            onDrop={handleDrop}
+            onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = 'move';
+            }}
+          >
+            <Sidebar />
+            <SelectConnection />
+            <ControlsStyled />
+            <MiniMapStyled />
+            <Background gap={11} lineWidth={2} variant={BackgroundVariant.Lines} />
+          </ReactFlowStyled>
+        </div>
+      </ReactFlowProvider>
     </ThemeProvider>
   );
 };
