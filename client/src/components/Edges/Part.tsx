@@ -1,14 +1,16 @@
 import { useSidebar } from '@/hooks';
 import type { CustomEdgeProps } from '@/lib/types';
+import { getStraightPath } from 'reactflow';
 
 const Part = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
 
-  const firstVerticalEndY =
-    props.sourceY + (props.targetY - props.sourceY) * 0.33;
-  const secondVerticalStartY = props.targetY;
-
-  const pathData = `M${props.sourceX},${props.sourceY} L${props.sourceX},${firstVerticalEndY} L${props.targetX},${firstVerticalEndY} L${props.targetX},${secondVerticalStartY}`;
+  const [pathData] = getStraightPath({
+    sourceX: props.sourceX,
+    sourceY: props.sourceY,
+    targetX: props.targetX,
+    targetY: props.targetY,
+  });
 
   return (
     <g onClick={() => openSidebar({ ...props, type: 'part' })}>
