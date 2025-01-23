@@ -131,7 +131,7 @@ const Navbar = () => {
           <span className="cursor-pointer" onClick={() => setDashboard(false)}>
             <img src={`/logo-${theme}.png`} alt="Logo" className="h-14 p-4" />
           </span>
-          {currentPage === AppPage.Home && (
+          {currentPage === AppPage.Editor && (
             <NavigationMenuList>
               {navItems.map(node => (
                 <NavigationMenuItem key={node.title}>
@@ -165,13 +165,13 @@ const Navbar = () => {
         </div>
         <div className="flex items-center justify-center">
           {currentPage !== AppPage.Login && <ViewDashboard />}
-          {currentPage === AppPage.Home && nodes.length > 0 && (
+          {currentPage === AppPage.Editor && nodes.length > 0 && (
             <>
               <Reset />
               <DownloadNodes />
             </>
           )}
-          {currentPage === AppPage.Home && <UploadFiles />}
+          {currentPage === AppPage.Editor && <UploadFiles />}
           <ThemeToggle />
           {currentPage !== AppPage.Login && <Logout />}
         </div>

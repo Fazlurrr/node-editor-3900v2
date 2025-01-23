@@ -1,7 +1,7 @@
 import type { Edge, EdgeProps, NodeProps } from 'reactflow';
 
 export enum AppPage {
-  Home = 'home',
+  Editor = 'editor',
   Login = 'login',
   Dashboard = 'dashboard',
 }
