@@ -27,10 +27,12 @@ import { Sidebar, SelectConnection } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import { addNode } from '@/lib/utils/nodes';
+import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+  const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null); // State for selected element
 
   const nodeTypes = useMemo(
     () => ({
@@ -76,7 +78,7 @@ const Editor = () => {
     const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
 
     if (!data) return;
-    
+
     const position = reactFlowInstance.project({
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top,
@@ -85,11 +87,19 @@ const Editor = () => {
     addNode(data.aspect, data.nodeType, position);
   };
 
+  const handleNodeClick = (_: React.MouseEvent, node: Node) => {
+    setSelectedElement(node); // Update selected element with the clicked node
+  };
+
+  const handleEdgeClick = (_: React.MouseEvent, edge: Edge) => {
+    setSelectedElement(edge); // Update selected element with the clicked edge
+  };
+
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <ReactFlowProvider>
         <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
-            <ReactFlowStyled
+          <ReactFlowStyled
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
@@ -98,6 +108,8 @@ const Editor = () => {
             nodeTypes={nodeTypes as unknown as NodeTypes}
             edgeTypes={edgeTypes as unknown as EdgeTypes}
             onNodeDragStop={(_, node) => updateNode(node.id)}
+            onNodeClick={handleNodeClick} // Listen for node clicks
+            onEdgeClick={handleEdgeClick} // Listen for edge clicks
             onInit={onLoad}
             snapToGrid={true}
             snapGrid={[11, 11]}
@@ -106,8 +118,9 @@ const Editor = () => {
               event.preventDefault();
               event.dataTransfer.dropEffect = 'move';
             }}
-            >
+          >
             <Sidebar />
+            <PropertiesPanel selectedElement={selectedElement} /> {/* Pass selected element */}
             <SelectConnection />
             <ControlsStyled />
             <MiniMapStyled />
@@ -117,7 +130,7 @@ const Editor = () => {
               lineWidth={2}
               variant={BackgroundVariant.Lines}
             />
-            </ReactFlowStyled>
+          </ReactFlowStyled>
         </div>
       </ReactFlowProvider>
     </ThemeProvider>
