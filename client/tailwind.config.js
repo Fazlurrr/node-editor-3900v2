@@ -48,7 +48,7 @@ module.exports = {
         consolas: ['Consolas', 'Monaco', 'monospace'],
       },
       colors: {
-        'navbar-dark': '#0a0a0a',
+        'navbar-dark': '#232528',
         block: '#ff5f5f',
         connector: '#5f5fff',
         terminal: '#5fff5f',
