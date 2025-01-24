@@ -5,12 +5,12 @@ const Handles: FC<{
   nodeId: string;
 }> = ({ nodeId }) => {
   const handleStyle = {
-    background: 'black',  // Hvit farge på håndtakene
-    border: '1px solid white',  // Svart border rundt håndtakene
-    width: '7px',  // Bredden på håndtakene
-    height: '7px',  // Høyden på håndtakene
-    borderRadius: '50%',  // Gjør håndtakene sirkulære
-    bottom: '0.5px',  // Plasseringen av håndtakene
+    background: 'black',
+    border: '1px solid white',
+    width: '7px',
+    height: '7px', 
+    borderRadius: '50%',
+    bottom: '0.5px', 
   };
 
   return (
