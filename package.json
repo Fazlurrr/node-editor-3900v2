@@ -19,6 +19,7 @@
   "author": "Mathias Kolberg - Legalit",
   "license": "MIT",
   "dependencies": {
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "react-hotkeys": "^2.0.0"
   }
 }
