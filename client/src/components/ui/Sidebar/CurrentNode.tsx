@@ -56,8 +56,8 @@ interface Props {
 }
 
 const customAttributeSchema = z.object({
-  name: z.string().min(1, 'Name must contain at least 1 character(s)'),
-  value: z.string().min(1, 'Value must contain at least 1 character(s)'),
+  name: z.string().min(1, 'Name must contain at least 1 character(s)').max(25, 'Name cannot exceed 25 characters'),
+  value: z.string().min(1, 'Value must contain at least 1 character(s)').max(25, 'Value cannot exceed 25 characters'),
 });
 
 const CurrentNode: FC<Props> = ({ currentNode }) => {
@@ -279,6 +279,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                         <Input
                           {...field}
                           placeholder="Name"
+                          maxLength={25} // max length of 25 characters for name
                           className={cn('my-2 mr-2 flex-1', {
                             'border-red-500': form.formState.errors.value,
                           })}
@@ -301,6 +302,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                           {...field}
                           name="value"
                           placeholder="Value"
+                          maxLength={25} // max length of 25 characters for value
                           className={cn('my-2 mr-2 flex-1', {
                             'border-red-500': form.formState.errors.value,
                           })}
@@ -318,19 +320,19 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
             {currentNode.data.customAttributes.length > 0 && (
               <>
                 {currentNode.data.customAttributes.map((attr, i) => (
-                  <div
+                    <div
                     key={i}
                     className="my-2 flex items-center text-muted-foreground"
-                  >
+                    >
                     <Trash
                       onClick={() => deleteCustomAttribute(attr)}
-                      size={10}
-                      className="text-md mr-2 font-semibold hover:cursor-pointer hover:text-white"
+                      size={16}
+                      className="text-md mr-2 font-semibold hover:cursor-pointer hover:text-red-500"
                     />
                     <p className="text-sm ">
                       {attr.name}: {attr.value}
                     </p>
-                  </div>
+                    </div>
                 ))}
               </>
             )}
