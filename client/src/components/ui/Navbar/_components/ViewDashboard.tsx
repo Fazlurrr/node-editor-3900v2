@@ -12,20 +12,25 @@ const ViewDashboard = () => {
 
   if (!user) return null;
 
+  const handleSetDashboard = () => {
+    setDashboard(true);
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          <div className="flex items-center justify-center rounded-sm p-3 hover:bg-muted">
+          <div 
+            className="flex items-center justify-center rounded-sm p-3 hover:bg-muted"
+            onClick={handleSetDashboard}
+          >
             {user.role === 'admin' && (
               <Users
-                onClick={() => setDashboard(true)}
                 className="size-4 hover:cursor-pointer"
               />
             )}
             {user.role === 'user' && (
               <User
-                onClick={() => setDashboard(true)}
                 className="size-4 hover:cursor-pointer"
               />
             )}

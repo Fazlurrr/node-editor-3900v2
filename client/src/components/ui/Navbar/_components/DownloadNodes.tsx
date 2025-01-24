@@ -13,9 +13,11 @@ const DownloadNodes = () => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          <div className="flex items-center justify-center rounded-sm p-3 hover:bg-muted">
+          <div 
+            className="flex items-center justify-center rounded-sm p-3 hover:bg-muted"
+            onClick={downloadZipFile}
+          >
             <DownloadCloud
-              onClick={downloadZipFile}
               className="size-4 hover:cursor-pointer"
             />
             <span className="sr-only">Download</span>
