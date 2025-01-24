@@ -89,7 +89,7 @@ const Editor = () => {
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <ReactFlowProvider>
         <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
-          <ReactFlowStyled
+            <ReactFlowStyled
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
@@ -106,13 +106,18 @@ const Editor = () => {
               event.preventDefault();
               event.dataTransfer.dropEffect = 'move';
             }}
-          >
+            >
             <Sidebar />
             <SelectConnection />
             <ControlsStyled />
             <MiniMapStyled />
-            <Background gap={11} lineWidth={2} variant={BackgroundVariant.Lines} />
-          </ReactFlowStyled>
+            <Background
+              color={theme === 'dark' ? '#2f3237' : '#eee'}
+              gap={11}
+              lineWidth={2}
+              variant={BackgroundVariant.Lines}
+            />
+            </ReactFlowStyled>
         </div>
       </ReactFlowProvider>
     </ThemeProvider>
