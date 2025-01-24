@@ -167,7 +167,7 @@ export const updateNode = async (
 
     if (!response.ok) {
       const status = response.status;
-      toast.success(`Error updating node - Status: ${status}`);
+      toast.error(`Error updating node - Status: ${status}`);
       return null;
     }
 

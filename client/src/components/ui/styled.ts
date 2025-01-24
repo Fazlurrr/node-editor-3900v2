@@ -16,6 +16,16 @@ export const MiniMapStyled = styled(MiniMap)`
     fill: ${props => props.theme.nodeBg};
     stroke: none;
   }
+
+  /* Position the minimap 3/4 from the left at the bottom */
+  position: absolute;
+  bottom: 10px; /* Distance from the bottom */
+  left: 75%; /* Start at 75% from the left */
+  transform: translateX(-75%); /* Center-align based on the left position */
+  width: 200px; /* Adjust width */
+  height: 120px; /* Adjust height */
+  z-index: 1000; /* Ensure it's above other elements */
+  border: 1px solid ${props => props.theme.controlsBorder}; /* Optional border */
 `;
 
 export const ControlsStyled = styled(Controls)`
@@ -51,7 +61,7 @@ export const lightTheme = {
 };
 
 export const darkTheme = {
-  bg: '#000',
+  bg: '#232528',
   primary: '#ff0072',
 
   nodeBg: '#343435',

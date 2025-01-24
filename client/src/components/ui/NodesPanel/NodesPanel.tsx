@@ -146,11 +146,11 @@ const NodesPanel: React.FC = () => {
     return (
       <div className="h-full w-56 text-white border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 left-0 z-10">
         <div className="p-4 mt-14 mb-2 border-b border-[#9facbc]">
-          <h2 className="text-lg text-black font-semibold">Elements</h2>
+          <h2 className="text-lg text-black dark:text-white font-semibold">Elements</h2>
         </div>
         {navItems.map((node) => (
           <div key={node.title} className="mb-1 border-b border-[#9facbc]">
-            <h3 className="ml-4 text-black">{node.title}</h3>
+            <h3 className="ml-4 text-black dark:text-white">{node.title}</h3>
             <div className="flex justify-center gap-2 pb-2">
               {node.children.map((component) => (
                 <button
