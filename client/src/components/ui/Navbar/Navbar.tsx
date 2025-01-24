@@ -129,7 +129,7 @@ const Navbar = () => {
       <div className="flex w-full items-center justify-between ">
         <div className="flex items-center ">
           <span className="cursor-pointer" onClick={() => setDashboard(false)}>
-            <img src={`/logo-${theme}.png`} alt="Logo" className="h-14 p-4" />
+            <img src={`/logo-${theme}.png`} alt="Logo" className="h-16 p-4" />
           </span>
           {currentPage === AppPage.Editor && (
             <NavigationMenuList>
