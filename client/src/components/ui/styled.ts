@@ -19,10 +19,17 @@ export const MiniMapStyled = styled(MiniMap)`
 `;
 
 export const ControlsStyled = styled(Controls)`
+  position: absolute;
+  top: 95%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   button {
     background-color: ${props => props.theme.controlsBg};
     color: ${props => props.theme.controlsColor};
-    border-bottom: 1px solid ${props => props.theme.controlsBorder};
+    border: 1px solid ${props => props.theme.controlsBorder};
 
     &:hover {
       background-color: ${props => props.theme.controlsBgHover};
@@ -47,7 +54,7 @@ export const lightTheme = {
   controlsBg: '#fefefe',
   controlsBgHover: '#eee',
   controlsColor: '#222',
-  controlsBorder: '#ddd',
+  controlsBorder: '#9facbc',
 };
 
 export const darkTheme = {
@@ -60,8 +67,8 @@ export const darkTheme = {
 
   minimapMaskBg: '#343435',
 
-  controlsBg: '#555',
+  controlsBg: '#232528',
   controlsBgHover: '#676768',
   controlsColor: '#dddddd',
-  controlsBorder: '#676768',
+  controlsBorder: '#aeb2b7',
 };
