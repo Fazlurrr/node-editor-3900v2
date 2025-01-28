@@ -127,7 +127,7 @@ const Editor = () => {
             <Background
               color={theme === 'dark' ? '#2f3237' : '#eee'}
               gap={11}
-              lineWidth={2}
+              lineWidth={1}
               variant={BackgroundVariant.Lines}
             />
           </ReactFlowStyled>
