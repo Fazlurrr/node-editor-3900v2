@@ -12,6 +12,22 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 
+import {
+  Menubar,
+  MenubarCheckboxItem,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
+} from "@/components/ui/menubar"
+
+
+
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage, AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
@@ -24,100 +40,6 @@ import {
   UploadFiles,
 } from './_components';
 
-const navItems: NavItem[] = [
-  {
-    title: 'Function',
-    subtitle: 'Add new function to editor',
-    children: [
-      {
-        title: 'Block',
-        description:
-          'Any entity at any abstraction level. Abstraction mechanism',
-        nodeType: NodeType.Block,
-      },
-      {
-        title: 'Connector',
-        description:
-          'Block connection. Abstracted block with infinitesimal boundary',
-        nodeType: NodeType.Connector,
-      },
-      {
-        title: 'Terminal',
-        description: 'Block port. Point where medium passes the block boundary',
-        nodeType: NodeType.Terminal,
-      },
-    ],
-  },
-  {
-    title: 'Product',
-    subtitle: 'Add new product to editor',
-    children: [
-      {
-        title: 'Block',
-        description:
-          'Any entity at any abstraction level. Abstraction mechanism',
-        nodeType: NodeType.Block,
-      },
-      {
-        title: 'Connector',
-        description:
-          'Block connection. Abstracted block with infinitesimal boundary',
-        nodeType: NodeType.Connector,
-      },
-      {
-        title: 'Terminal',
-        description: 'Block port. Point where medium passes the block boundary',
-        nodeType: NodeType.Terminal,
-      },
-    ],
-  },
-  {
-    title: 'Location',
-    subtitle: 'Add new location to editor',
-    children: [
-      {
-        title: 'Block',
-        description:
-          'Any entity at any abstraction level. Abstraction mechanism',
-        nodeType: NodeType.Block,
-      },
-      {
-        title: 'Connector',
-        description:
-          'Block connection. Abstracted block with infinitesimal boundary',
-        nodeType: NodeType.Connector,
-      },
-      {
-        title: 'Terminal',
-        description: 'Block port. Point where medium passes the block boundary',
-        nodeType: NodeType.Terminal,
-      },
-    ],
-  },
-  {
-    title: 'Empty',
-    subtitle: 'Add empty node to editor',
-    children: [
-      {
-        title: 'Block',
-        description:
-          'Any entity at any abstraction level. Abstraction mechanism',
-        nodeType: NodeType.Block,
-      },
-      {
-        title: 'Connector',
-        description:
-          'Block connection. Abstracted block with infinitesimal boundary',
-        nodeType: NodeType.Connector,
-      },
-      {
-        title: 'Terminal',
-        description: 'Block port. Point where medium passes the block boundary',
-        nodeType: NodeType.Terminal,
-      },
-    ],
-  },
-];
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
@@ -132,35 +54,74 @@ const Navbar = () => {
             <img src={`/logo-${theme}.png`} alt="Logo" className="h-16 p-4" />
           </span>
           {currentPage === AppPage.Editor && (
-            <NavigationMenuList>
-              {navItems.map(node => (
-                <NavigationMenuItem key={node.title}>
-                  <NavigationMenuTrigger>{node.title}</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <h1 className="p-4 text-muted-foreground">
-                      {node.subtitle}
-                    </h1>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                      {node.children.map(component => (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          onClick={() =>
-                            addNode(
-                              node.title.toLowerCase() as AspectType,
-                              component.nodeType,
-                              { x: 0, y: 0 } // Add appropriate position values here
-                            )
-                          }
-                        >
-                          {component.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
+            <Menubar className="border-none drop-shadow-none bg-transparent">
+              <MenubarMenu>
+              <MenubarTrigger>File</MenubarTrigger>
+              <MenubarContent className="dark:bg-navbar-dark">
+                <MenubarItem>
+                New Project <MenubarShortcut>Ctrl+T</MenubarShortcut>
+                </MenubarItem>
+                <MenubarItem>Import File</MenubarItem>
+                <MenubarItem>Export File</MenubarItem>
+                <MenubarItem>
+                Rename project <MenubarShortcut>Ctrl+N</MenubarShortcut>
+                </MenubarItem>
+                <MenubarSeparator />
+                <MenubarItem>
+                Print... <MenubarShortcut>Ctrl+P</MenubarShortcut>
+                </MenubarItem>
+              </MenubarContent>
+              </MenubarMenu>
+              <MenubarMenu>
+              <MenubarTrigger>Edit</MenubarTrigger>
+              <MenubarContent className="dark:bg-navbar-dark">
+                <MenubarItem>
+                Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut>
+                </MenubarItem>
+                <MenubarItem>
+                Redo <MenubarShortcut>Shift+Ctrl+Z</MenubarShortcut>
+                </MenubarItem>
+                <MenubarSeparator />
+                <MenubarItem>
+                Cut <MenubarShortcut>Ctrl+X</MenubarShortcut>
+                </MenubarItem>
+                <MenubarItem>
+                Copy <MenubarShortcut>Ctrl+C</MenubarShortcut>
+                </MenubarItem>
+                <MenubarItem>
+                Paste <MenubarShortcut>Ctrl+V</MenubarShortcut>
+                </MenubarItem>
+              </MenubarContent>
+              </MenubarMenu>
+              <MenubarMenu>
+              <MenubarTrigger>Settings</MenubarTrigger>
+              <MenubarContent className="dark:bg-navbar-dark">
+                <MenubarSub>
+                <MenubarSubTrigger inset>Theme</MenubarSubTrigger>
+                <MenubarSubContent>
+                  <MenubarItem>Light</MenubarItem>
+                  <MenubarItem>Dark</MenubarItem>
+                  <MenubarItem>System</MenubarItem>
+                </MenubarSubContent>
+                </MenubarSub>
+                <MenubarCheckboxItem checked>Toggle Grid</MenubarCheckboxItem>
+                <MenubarCheckboxItem checked>Toggle Map</MenubarCheckboxItem>
+                <MenubarSeparator />
+                <MenubarItem inset>
+                Fullscreen <MenubarShortcut>F11</MenubarShortcut>
+                </MenubarItem>
+                <MenubarItem inset>Advanced Settings</MenubarItem>
+              </MenubarContent>
+              </MenubarMenu>
+              <MenubarMenu>
+              <MenubarTrigger>Help</MenubarTrigger>
+              <MenubarContent className="dark:bg-navbar-dark">
+                <MenubarItem>Tutorial</MenubarItem>
+                <MenubarItem>IMF Documentation</MenubarItem>
+                <MenubarItem>Credits</MenubarItem>
+              </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
           )}
         </div>
         <div className="flex items-center justify-center">
