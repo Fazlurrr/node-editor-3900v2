@@ -27,6 +27,30 @@ export enum EdgeType {
   Transfer = 'transfer',
 }
 
+export enum Provenance {
+  Specified = 'specified',
+  Calculated = 'calculated',
+  Measured = 'measured',
+}
+
+export enum Scope {
+  Design = 'design',
+  Operating = 'operating'
+}
+
+export enum Range {
+  Nominal = 'nominal',
+  Normal = 'normal',
+  Average = 'average',
+  Minimum = 'minimum',
+  Maximum = 'maximum',
+}
+
+export enum Regularity {
+  Continuous = 'continuous',
+  Absolute = 'absolute'
+}
+
 export enum RelationType {
   ConnectedTo = 'connectedTo',
   ConnectedBy = 'connectedBy',
@@ -55,6 +79,8 @@ export type Relation = {
 export type CustomAttribute = {
   name: string;
   value: string;
+  unitOfMeasure: string;
+  enumeratedTypes: EnumeratedTypes;
 };
 
 export type NodeData = {
@@ -78,6 +104,13 @@ export type NodeData = {
   customName?: string;
   createdBy: string;
 };
+
+export type EnumeratedTypes = {
+  provenance: Provenance;
+  scope: Scope;
+  range: Range;
+  regularity: Regularity;
+}
 
 export type EdgeData = {
   id: string;
