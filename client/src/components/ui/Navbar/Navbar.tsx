@@ -1,15 +1,10 @@
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
-import { addNode } from '@/lib/utils/nodes';
 
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 
 import {
@@ -29,7 +24,7 @@ import {
 
 
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
-import { AppPage, AspectType, NavItem, NodeType } from '@/lib/types';
+import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import {
   ThemeToggle,
