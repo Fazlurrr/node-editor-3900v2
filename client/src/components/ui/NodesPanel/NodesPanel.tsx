@@ -1,5 +1,6 @@
 import React from 'react';
 import { AspectType, NavItem, NodeType } from '@/lib/types';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const navItems: NavItem[] = [
     {
@@ -168,12 +169,24 @@ const NodesPanel: React.FC = () => {
       );
       event.dataTransfer.effectAllowed = 'move';
     };
+
+    const [collapseElements, setCollapseElements] = React.useState(false);
+
+    const toggleElements = () => {
+      setCollapseElements(!collapseElements);
+    }
   
     return (
       <div className="h-full w-56 text-white border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 left-0 z-10">
-        <div className="p-1 pl-4 mt-14 mb-2 border-b border-[#9facbc]">
-          <h2 className="text-lg text-black dark:text-white font-semibold">Elements</h2>
+        <div className="p-1 pl-4 mt-14 mb-2 border-b border-[#9facbc]" onClick={toggleElements}>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg text-black dark:text-white font-semibold">Elements</h2>
+            {collapseElements ? <ChevronUp className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" /> :
+            <ChevronDown className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" />}
+          </div>
         </div>
+        {!collapseElements && (
+          <>
         {navItems.map((node) => (
           <div key={node.title} className="mb-1 border-b border-[#9facbc]">
             <h3 className="ml-4 text-sm text-black dark:text-white">{node.title}</h3>
@@ -224,6 +237,8 @@ const NodesPanel: React.FC = () => {
             </div>
           </div>
         ))}
+        </>
+        )}
       </div>
     );
   };
