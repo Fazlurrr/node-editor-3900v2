@@ -80,8 +80,8 @@ const Editor = () => {
     if (!data) return;
 
     const position = reactFlowInstance.project({
-      x: event.clientX - reactFlowBounds.left,
-      y: event.clientY - reactFlowBounds.top,
+      x: event.clientX - reactFlowBounds.left - 25,
+      y: event.clientY - reactFlowBounds.top - 25,
     });
 
     addNode(data.aspect, data.nodeType, position);
