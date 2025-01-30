@@ -253,7 +253,8 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                 <SelectItem value={AspectType.Product}>Product</SelectItem>
                 <SelectItem value={AspectType.Location}>Location</SelectItem>
                 <SelectItem value={AspectType.Installed}>Installed</SelectItem>
-                <SelectItem value={AspectType.Empty}>Empty</SelectItem>
+                <SelectItem value={AspectType.NoAspect}>No Aspect</SelectItem>
+                <SelectItem value={AspectType.UnspecifiedAspect}>Unspecified Aspect</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
