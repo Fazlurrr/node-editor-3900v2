@@ -11,7 +11,8 @@ export enum AspectType {
   Product = 'product',
   Location = 'location',
   Installed = 'installed',
-  Empty = 'empty',
+  NoAspect = 'noAspect',
+  UnspecifiedAspect = 'unspecifiedAspect',
 }
 
 export enum NodeType {
@@ -147,6 +148,7 @@ export type NodeRelation = {
 
 export type NavItem = {
   title: string;
+  aspect: AspectType;
   subtitle: string;
   children: {
     title: string;
