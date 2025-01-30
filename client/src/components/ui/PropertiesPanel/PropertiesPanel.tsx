@@ -1,5 +1,5 @@
 import { deleteNode, updateNode } from '@/api/nodes';
-import { Trash, Plus } from 'lucide-react';
+import { Trash, Plus, Edit2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Node, Edge } from 'reactflow';
@@ -12,19 +12,50 @@ interface PropertiesPanelProps {
 interface CustomAttribute {
   name: string;
   value: string;
+  unitOfMeasure?: string;
+  aspectType?: string;
 }
+
+export const AspectType = {
+  Function: 'Function',
+  Product: 'Product',
+  Location: 'Location',
+  Installed: 'Installed',
+  Empty: 'Empty'
+};
 
 const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) => {
 
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>([]);
   const { register, handleSubmit, reset } = useForm<CustomAttribute>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editLabel, setEditLabel] = useState(false);
+  const [label, setLabel] = useState('');
 
   useEffect(() => {
     if (selectedElement && 'data' in selectedElement) {
+      setLabel(selectedElement.data.label || '');
       setCustomAttributes(selectedElement.data.customAttributes || []);
+    } else {
+      setLabel('');
     }
   }, [selectedElement]);
+
+  const handleUpdateLabel = async () => {
+    if (selectedElement && 'data' in selectedElement) {
+      console.log('Updating label for:', selectedElement.id, 'New label:', label);
+      const updated = await updateNode(selectedElement.id, { label });
+      console.log('Label update successful:', updated);
+      if (updated) {
+        selectedElement.data.label = label;
+      }
+      setEditLabel(false);
+    }
+  };
+
+  const handleLabelChange = (e) => {
+    setLabel(e.target.value);
+  };
 
   const handleDeleteAttribute = async (attr: CustomAttribute) => {
     const updatedAttributes = customAttributes.filter(a => a !== attr);
@@ -34,6 +65,19 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
       await updateNode(selectedElement.id, { customAttributes: updatedAttributes });
     }
   };
+
+  const handleAspectChange = async (e) => {
+    const newAspectType = e.target.value;
+    console.log('Aspect type changed to:', newAspectType);
+  
+    const updated = await updateNode(selectedElement.id, { aspect: newAspectType });
+    if (updated) {
+      console.log('Aspect update successful');
+    } else {
+      console.log('Failed to update aspect type');
+    }
+  };
+  
 
   const handleDeleteElement = async () => {
     if (selectedElement) {
@@ -60,17 +104,36 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
       <div className="p-4 overflow-auto">
         {selectedElement ? (
           <>
-            <p className="mb-2 text-black dark:text-white">
+            {/* <p className="mb-2 text-black dark:text-white">
               <strong>ID:</strong> {selectedElement.id}
-            </p>
+            </p> */}
             {'data' in selectedElement && (
                 <>
+                  <div className="mb-2 text-black dark:text-white">
+                    <strong>Name:</strong>
+                    {editLabel ? (
+                      <input
+                        type="text"
+                        value={label}
+                        onChange={handleLabelChange}
+                        onBlur={handleUpdateLabel}
+                        autoFocus
+                      />
+                    ) : (
+                      <span onClick={() => setEditLabel(true)} className="ml-2 cursor-pointer flex items-center text-black dark:text-white boder-b black ">
+                          {label || 'N/A'}
+                        <Edit2 size={18} className="ml-1 text-black-500 hover:text-black-700"/>
+                    </span>
+                    )}
+                  </div>
                   <p className="mb-2 text-black dark:text-white">
-                    <strong>Label:</strong> {selectedElement.data.label || 'N/A'}
+                    <strong>Aspect:</strong>
                   </p>
-                  <p className="mb-2 text-black dark:text-white">
-                    <strong>Type:</strong> {selectedElement.type}
-                  </p>
+                  <select onChange={handleAspectChange} className="border p-1 text-sm bg-white" value={selectedElement.data.aspect}>
+                    {Object.values(AspectType).map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
                   <p className="mb-2 text-black dark:text-white">
                     <strong>Created:</strong> {new Date(selectedElement.data.createdAt).toLocaleString()}
                   </p>
@@ -87,12 +150,13 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
                     <div className="flex flex-col gap-1 mb-1">
                       <input {...register('name')} placeholder="Name" className="border p-1 text-sm" required />
                       <input {...register('value')} placeholder="Value" className="border p-1 text-sm" required />
+                      <input {...register('unitOfMeasure')} placeholder="Unit of Measure" className="border p-1 text-sm" />
                       <button type="submit" className="bg-blue-500 hover:bg-blue-700 p-1 text-sm rounded font-bold text-white dark:text-white">Add</button>
                     </div>
                   </form>
                   {customAttributes.map((attr, index) => (
                     <div key={index} className="flex justify-between items-center mb-1 text-black dark:text-white">
-                    <span className="text-sm w-40 break-words">{attr.name}: {attr.value}</span>
+                    <span className="text-sm w-40 break-words">{attr.name}: {attr.value}: {attr.unitOfMeasure}</span>
                     <Trash size={16} onClick={() => handleDeleteAttribute(attr)} className="cursor-pointer text-red-500"/>
                     </div>
                   ))}
