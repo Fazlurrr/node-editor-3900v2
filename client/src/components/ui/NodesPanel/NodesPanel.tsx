@@ -162,13 +162,38 @@ const getAspectColor = (aspect: AspectType) => {
 }
 
 const NodesPanel: React.FC = () => {
-    const onDragStart = (event: React.DragEvent, nodeType: NodeType, aspect: AspectType) => {
-      event.dataTransfer.setData(
-        'application/reactflow',
-        JSON.stringify({ nodeType, aspect })
-      );
-      event.dataTransfer.effectAllowed = 'move';
-    };
+  const onDragStart = (event: React.DragEvent, nodeType: NodeType, aspect: AspectType) => {
+    // Custom drag preview
+    const dragPreview = document.createElement("div");
+    if (nodeType === NodeType.Block) {
+      dragPreview.style.width = "110px";
+      dragPreview.style.height = "66px";
+    }
+    else if (nodeType === NodeType.Terminal) {
+      dragPreview.style.width = "22px";
+      dragPreview.style.height = "22px";
+    } else if (nodeType === NodeType.Connector) {
+      dragPreview.style.width = "44px";
+      dragPreview.style.height = "44px";
+    }
+    dragPreview.style.backgroundColor = getAspectColor(aspect);
+    dragPreview.style.border = "1px solid black";
+    dragPreview.style.borderRadius = nodeType === NodeType.Connector ? "50%" : "0";
+    dragPreview.style.opacity = "0.7";
+  
+    document.body.appendChild(dragPreview);
+  
+    event.dataTransfer.setDragImage(dragPreview, 25, 25);
+  
+    setTimeout(() => document.body.removeChild(dragPreview), 0);
+  
+    // Set the drag data
+    event.dataTransfer.setData(
+      "application/reactflow",
+      JSON.stringify({ nodeType, aspect })
+    );
+    event.dataTransfer.effectAllowed = "move";
+  };
 
     const [collapseElements, setCollapseElements] = React.useState(false);
 
