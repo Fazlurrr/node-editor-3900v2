@@ -2,7 +2,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "vite": ["node_modules/vite"],
+      "@vitejs/plugin-react": ["node_modules/@vitejs/plugin-react"],
+      "vite-plugin-compression": ["node_modules/vite-plugin-compression"]
     },
     "target": "ES2020",
     "useDefineForClassFields": true,

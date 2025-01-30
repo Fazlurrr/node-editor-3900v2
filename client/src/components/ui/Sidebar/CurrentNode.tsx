@@ -4,12 +4,16 @@ import {
   type CustomNodeProps,
   RelationType,
   CustomAttribute,
+  Provenance,
+  Scope,
+  Range,
+  Regularity
 } from '@/lib/types';
 import {
   capitalizeFirstLetter,
   getReadableRelation,
   displayNode,
-  cn,
+  cn
 } from '@/lib/utils';
 import { getNodeRelations } from '@/lib/utils/nodes';
 import { FC, useState } from 'react';
@@ -54,11 +58,18 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
 interface Props {
   currentNode: CustomNodeProps;
 }
-
 const customAttributeSchema = z.object({
-  name: z.string().min(1, 'Name must contain at least 1 character(s)'),
-  value: z.string().min(1, 'Value must contain at least 1 character(s)'),
+  name: z.string().min(1).max(25),
+  value: z.string().min(1).max(25),
+  unitOfMeasure: z.string().optional(),
+  enumeratedTypes: z.object({
+    provenance: z.enum(['specified', 'calculated', 'measured']).optional(),
+    scope: z.enum(['design', 'operating']).optional(),
+    range: z.enum(['nominal', 'normal', 'average', 'minimum', 'maximum']).optional(),
+    regularity: z.enum(['continuous', 'absolute']).optional(),
+  }).optional(),
 });
+
 
 const CurrentNode: FC<Props> = ({ currentNode }) => {
   const displayName = capitalizeFirstLetter(
@@ -83,12 +94,19 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       {
         name: values.name,
         value: values.value,
+        unitOfMeasure: values.unitOfMeasure || '',
+        enumeratedTypes: {
+          provenance: values.enumeratedTypes?.provenance as Provenance,
+          scope: values.enumeratedTypes?.scope as Scope,
+          range: values.enumeratedTypes?.range as Range,
+          regularity: values.enumeratedTypes?.regularity as Regularity,
+        },
       },
     ];
     const updated = await updateNode(currentNode.id, {
       customAttributes: newAttributes,
     });
-
+  
     if (updated) {
       currentNode.data.customAttributes = newAttributes;
       closeSidebar();
@@ -98,6 +116,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       form.reset();
     }
   };
+  
 
   const handleAspectChange = async (newAspectType: AspectType) => {
     const updated = await updateNode(currentNode.id, {
@@ -142,6 +161,13 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
     defaultValues: {
       name: '',
       value: '',
+      unitOfMeasure: '',
+      enumeratedTypes: {
+        provenance: undefined,
+        scope: undefined,
+        range: undefined,
+        regularity: undefined,
+      },
     },
   });
 
@@ -279,6 +305,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                         <Input
                           {...field}
                           placeholder="Name"
+                          maxLength={25} // max length of 25 characters for name
                           className={cn('my-2 mr-2 flex-1', {
                             'border-red-500': form.formState.errors.value,
                           })}
@@ -289,28 +316,164 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                   </FormControl>
                 )}
               />
-
               <FormField
                 control={form.control}
-                name="value"
+                name="value" // This should be a single field name, but we'll handle unitOfMeasure separately
                 render={({ field }) => (
                   <FormControl>
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          name="value"
-                          placeholder="Value"
-                          className={cn('my-2 mr-2 flex-1', {
-                            'border-red-500': form.formState.errors.value,
-                          })}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs text-red-600" />
-                    </FormItem>
+                    {/* Wrap inputs in a flex container */}
+                    <div className="flex gap-2">
+                      {/* Value Input */}
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Value"
+                            maxLength={25}
+                            className={cn('my-2', {
+                              'border-red-500': form.formState.errors.value,
+                            })}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-600" />
+                      </FormItem>
+
+                      {/* Unit of Measure Input */}
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input
+                            {...form.register('unitOfMeasure')}
+                            placeholder="Unit"
+                            maxLength={10}
+                            className={cn('my-2', {
+                              'border-red-500': form.formState.errors.unitOfMeasure,
+                            })}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-600" />
+                      </FormItem>
+                    </div>
                   </FormControl>
                 )}
               />
+              {/* New: Enumerated Types Section */}
+            <div className="mt-4">
+              <p className="text-sm text-muted-foreground mb-2">Enumerated Types</p>
+              <div className="grid grid-cols-1 gap-4">
+                {/* Provenance */}
+                <FormField
+                  control={form.control}
+                  name="enumeratedTypes.provenance"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Provenance" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="specified">Specified</SelectItem>
+                              <SelectItem value="calculated">Calculated</SelectItem>
+                              <SelectItem value="measured">Measured</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Scope */}
+                <FormField
+                  control={form.control}
+                  name="enumeratedTypes.scope"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Scope" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="design">Design</SelectItem>
+                              <SelectItem value="operating">Operating</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Range */}
+                <FormField
+                  control={form.control}
+                  name="enumeratedTypes.range"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Range" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="nominal">Nominal</SelectItem>
+                              <SelectItem value="normal">Normal</SelectItem>
+                              <SelectItem value="average">Average</SelectItem>
+                              <SelectItem value="minimum">Minimum</SelectItem>
+                              <SelectItem value="maximum">Maximum</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Regularity */}
+                <FormField
+                  control={form.control}
+                  name="enumeratedTypes.regularity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Regularity" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="continuous">Continuous</SelectItem>
+                              <SelectItem value="absolute">Absolute</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            {/* End of Enumerated Types Section */}
               <Button type="submit" className="w-25 my-2" size="sm">
                 Add
               </Button>
@@ -318,19 +481,19 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
             {currentNode.data.customAttributes.length > 0 && (
               <>
                 {currentNode.data.customAttributes.map((attr, i) => (
-                  <div
+                    <div
                     key={i}
                     className="my-2 flex items-center text-muted-foreground"
-                  >
+                    >
                     <Trash
                       onClick={() => deleteCustomAttribute(attr)}
-                      size={10}
-                      className="text-md mr-2 font-semibold hover:cursor-pointer hover:text-white"
+                      size={16}
+                      className="text-md mr-2 font-semibold hover:cursor-pointer hover:text-red-500"
                     />
                     <p className="text-sm ">
                       {attr.name}: {attr.value}
                     </p>
-                  </div>
+                    </div>
                 ))}
               </>
             )}

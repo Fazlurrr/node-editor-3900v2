@@ -189,8 +189,10 @@ public class Utils
         {
           var name = attribute.Name;
           var value = attribute.Value;
+          var unitOfMeasure = attribute.UnitOfMeasure;
+          var enumeratedTypes = attribute.EnumeratedTypes;
 
-          customAttributes.Add(new CustomAttribute() { Name = name, Value = value });
+          customAttributes.Add(new CustomAttribute() { Name = name, Value = value , UnitOfMeasure = unitOfMeasure, EnumeratedTypes = enumeratedTypes});
         }
       }
     }

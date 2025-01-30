@@ -122,12 +122,12 @@ const Editor = () => {
             <Sidebar />
             <PropertiesPanel selectedElement={selectedElement} /> {/* Pass selected element */}
             <SelectConnection />
-            <ControlsStyled />
+            <ControlsStyled style={{ position: 'absolute', top: '95%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             <MiniMapStyled />
             <Background
               color={theme === 'dark' ? '#2f3237' : '#eee'}
               gap={11}
-              lineWidth={2}
+              lineWidth={1}
               variant={BackgroundVariant.Lines}
             />
           </ReactFlowStyled>

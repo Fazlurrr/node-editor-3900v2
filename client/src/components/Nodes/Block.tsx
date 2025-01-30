@@ -12,7 +12,7 @@ const Block = (props: CustomNodeProps) => {
         onClick={() => openSidebar(props)}
         className={`h-[66px] w-[110px] border border-black bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
       >
-        <header className="flex min-h-12 w-full items-center justify-center">
+        <header className="flex min-h-16 w-full items-center justify-center">
           <p
             className={`text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
           >
