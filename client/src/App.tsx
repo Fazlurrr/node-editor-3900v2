@@ -4,7 +4,7 @@ import { Login, Editor, Dashboard } from '@/pages';
 import { useEffect } from 'react';
 import { useTheme, useSession } from '@/hooks';
 import { Toaster } from 'react-hot-toast';
-import { Navbar, NodesPanel, Loader } from './components/ui';
+import { Navbar, Loader } from './components/ui';
 
 const routeConfig = {
   [AppPage.Login]: Login,
@@ -34,7 +34,6 @@ const App: React.FC = () => {
     <>
       <Toaster />
       <Navbar />
-      <NodesPanel />
       {Object.entries(routeConfig).map(([page, Component]) => (
         <CSSTransition
           key={page}
