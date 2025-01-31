@@ -23,7 +23,7 @@ import {
   lightTheme,
 } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
-import { Sidebar, SelectConnection } from '@/components/ui';
+import { Sidebar, SelectConnection, NodesPanel } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import { addNode } from '@/lib/utils/nodes';
@@ -80,8 +80,8 @@ const Editor = () => {
     if (!data) return;
 
     const position = reactFlowInstance.project({
-      x: event.clientX - reactFlowBounds.left,
-      y: event.clientY - reactFlowBounds.top,
+      x: event.clientX - reactFlowBounds.left - 25,
+      y: event.clientY - reactFlowBounds.top - 25,
     });
 
     addNode(data.aspect, data.nodeType, position);
@@ -119,6 +119,7 @@ const Editor = () => {
               event.dataTransfer.dropEffect = 'move';
             }}
           >
+            <NodesPanel />
             <Sidebar />
             <PropertiesPanel selectedElement={selectedElement} /> {/* Pass selected element */}
             <SelectConnection />

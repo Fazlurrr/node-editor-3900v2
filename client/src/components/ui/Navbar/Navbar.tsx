@@ -93,7 +93,7 @@ const Navbar = () => {
               <MenubarContent className="dark:bg-navbar-dark">
                 <MenubarSub>
                 <MenubarSubTrigger inset>Theme</MenubarSubTrigger>
-                <MenubarSubContent>
+                <MenubarSubContent className="dark:bg-navbar-dark">
                   <MenubarItem>Light</MenubarItem>
                   <MenubarItem>Dark</MenubarItem>
                   <MenubarItem>System</MenubarItem>
