@@ -311,8 +311,6 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
         {
             return BadRequest("Node data is missing.");
         }
-        _logger.LogInformation("FILIP: Updating node with data: {Data}", data);
-        Console.WriteLine("FILIP: Updating node with data: {0}", data);
         try
         {
             var type = data.GetProperty("type").GetString();
