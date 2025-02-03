@@ -52,7 +52,7 @@ public enum AspectType
     Location,
     Installed,
     NoAspect,
-    UnspecifiedAspect,
+    UnspecifiedAspect
 }
 
 [JsonConverter(typeof(NodeTypeConverter))]
