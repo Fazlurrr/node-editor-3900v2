@@ -26,27 +26,27 @@ const Fulfilled = (props: CustomEdgeProps) => {
           markerUnits="strokeWidth"
         >
           <svg
-            className="fill-white stroke-fulfilled dark:fill-black"
-            width="5px"
-            height="5px"
-            viewBox="0 0 5 5"
-            role="img"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-labelledby="rectangleIconTitle"
-            strokeLinecap="square"
-            strokeLinejoin="miter"
+          className="fill-white stroke-black dark:fill-black"
+          width="5px"
+          height="5px"
+          viewBox="0 0 5 5"
+          role="img"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-labelledby="rectangleIconTitle"
+          strokeLinecap="square"
+          strokeLinejoin="miter"
           >
-            {' '}
-            <title id="rectangleIconTitle">Rectangle</title>{' '}
-            <rect width="5" height="5" x="0" y="0" />{' '}
+          {' '}
+          <title id="rectangleIconTitle">Rectangle</title>{' '}
+          <rect width="5" height="5" x="0" y="0" />{' '}
           </svg>
         </marker>
       </defs>
       <path
-        className="stroke-fulfilled stroke-2"
-        d={pathData}
-        fill="none"
-        markerEnd="url(#fulfilledhead)"
+      className="stroke-black stroke-2"
+      d={pathData}
+      fill="none"
+      markerEnd="url(#fulfilledhead)"
       />
     </g>
   );
