@@ -311,7 +311,6 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
         {
             return BadRequest("Node data is missing.");
         }
-
         try
         {
             var type = data.GetProperty("type").GetString();

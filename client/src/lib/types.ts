@@ -11,8 +11,8 @@ export enum AspectType {
   Product = 'product',
   Location = 'location',
   Installed = 'installed',
-  NoAspect = 'noAspect',
-  UnspecifiedAspect = 'unspecifiedAspect',
+  NoAspect = 'noaspect',
+  UnspecifiedAspect = 'unspecifiedaspect',
 }
 
 export enum NodeType {
