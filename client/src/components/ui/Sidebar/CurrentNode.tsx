@@ -62,7 +62,7 @@ const customAttributeSchema = z.object({
   name: z.string().min(1).max(25),
   value: z.string().min(1).max(25),
   unitOfMeasure: z.string().optional(),
-  enumeratedTypes: z.object({
+  quantityDatums: z.object({
     provenance: z.enum(['specified', 'calculated', 'measured']).optional(),
     scope: z.enum(['design', 'operating']).optional(),
     range: z.enum(['nominal', 'normal', 'average', 'minimum', 'maximum']).optional(),
@@ -95,11 +95,11 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
         name: values.name,
         value: values.value,
         unitOfMeasure: values.unitOfMeasure || '',
-        enumeratedTypes: {
-          provenance: values.enumeratedTypes?.provenance as Provenance,
-          scope: values.enumeratedTypes?.scope as Scope,
-          range: values.enumeratedTypes?.range as Range,
-          regularity: values.enumeratedTypes?.regularity as Regularity,
+        quantityDatums: {
+          provenance: values.quantityDatums?.provenance as Provenance,
+          scope: values.quantityDatums?.scope as Scope,
+          range: values.quantityDatums?.range as Range,
+          regularity: values.quantityDatums?.regularity as Regularity,
         },
       },
     ];
@@ -162,7 +162,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       name: '',
       value: '',
       unitOfMeasure: '',
-      enumeratedTypes: {
+      quantityDatums: {
         provenance: undefined,
         scope: undefined,
         range: undefined,
@@ -357,14 +357,14 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                   </FormControl>
                 )}
               />
-              {/* New: Enumerated Types Section */}
+              {/* New: Quantity Datums Section */}
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground mb-2">Enumerated Types</p>
+              <p className="text-sm text-muted-foreground mb-2">Quantity Datums</p>
               <div className="grid grid-cols-1 gap-4">
                 {/* Provenance */}
                 <FormField
                   control={form.control}
-                  name="enumeratedTypes.provenance"
+                  name="quantityDatums.provenance"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
@@ -392,7 +392,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                 {/* Scope */}
                 <FormField
                   control={form.control}
-                  name="enumeratedTypes.scope"
+                  name="quantityDatums.scope"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
@@ -419,7 +419,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                 {/* Range */}
                 <FormField
                   control={form.control}
-                  name="enumeratedTypes.range"
+                  name="quantityDatums.range"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
@@ -449,7 +449,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                 {/* Regularity */}
                 <FormField
                   control={form.control}
-                  name="enumeratedTypes.regularity"
+                  name="quantityDatums.regularity"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
@@ -474,7 +474,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                 />
               </div>
             </div>
-            {/* End of Enumerated Types Section */}
+            {/* End of Quantity Datums Section */}
               <Button type="submit" className="w-25 my-2" size="sm">
                 Add
               </Button>
