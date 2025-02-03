@@ -81,7 +81,7 @@ export type CustomAttribute = {
   name: string;
   value: string;
   unitOfMeasure: string;
-  enumeratedTypes: EnumeratedTypes;
+  quantityDatums: QuantityDatums;
 };
 
 export type NodeData = {
@@ -106,7 +106,7 @@ export type NodeData = {
   createdBy: string;
 };
 
-export type EnumeratedTypes = {
+export type QuantityDatums = {
   provenance: Provenance;
   scope: Scope;
   range: Range;

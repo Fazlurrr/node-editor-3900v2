@@ -68,10 +68,10 @@ public class CustomAttribute
     public required string Name { get; set; }
     public required string Value { get; set; }
     public string UnitOfMeasure { get; set; } = string.Empty;
-    public EnumeratedTypes EnumeratedTypes { get; set; } = new EnumeratedTypes();
+    public QuantityDatum QuantityDatums { get; set; } = new QuantityDatum();
 }
 
-public class EnumeratedTypes
+public class QuantityDatum
 {
     public string Provenance { get; set; } = string.Empty;
     public string Scope { get; set; } = string.Empty;
