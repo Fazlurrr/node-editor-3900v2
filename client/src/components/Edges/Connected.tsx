@@ -14,7 +14,7 @@ const Connected = (props: CustomEdgeProps) => {
 
   return (
     <g onClick={() => openSidebar({ ...props, type: 'connected' })}>
-      <path className="stroke-connected stroke-2" d={pathData} fill="none" />
+      <path stroke="black" strokeWidth="2" d={pathData} fill="none" />
     </g>
   );
 };

@@ -24,11 +24,12 @@ const Transfer = (props: CustomEdgeProps) => {
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <polygon points="0 0, 7 3.5, 0 7" className="stroke-transfer" />
+          <polygon points="0 0, 7 3.5, 0 7" fill="black" />
         </marker>
       </defs>
       <path
-        className="stroke-transfer stroke-2"
+        stroke="black"
+        strokeWidth="2"
         d={pathData}
         fill="none"
         markerEnd="url(#transferhead)"
