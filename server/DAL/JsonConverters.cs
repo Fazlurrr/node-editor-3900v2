@@ -15,8 +15,8 @@ public class AspectTypeConverter : JsonConverter<AspectType>
       "product" => AspectType.Product,
       "location" => AspectType.Location,
       "installed" => AspectType.Installed,
-      "noAspect" => AspectType.NoAspect,
-      "unspecifiedAspect" => AspectType.UnspecifiedAspect,
+      "noaspect" => AspectType.NoAspect,
+      "unspecifiedaspect" => AspectType.UnspecifiedAspect,
       _ => throw new JsonException($"Value '{value}' is not recognized as a valid AspectType.")
     };
   }
@@ -29,8 +29,8 @@ public class AspectTypeConverter : JsonConverter<AspectType>
       AspectType.Product => "product",
       AspectType.Location => "location",
       AspectType.Installed => "installed",
-      AspectType.NoAspect => "noAspect",
-      AspectType.UnspecifiedAspect => "unspecifiedAspect",
+      AspectType.NoAspect => "noaspect",
+      AspectType.UnspecifiedAspect => "unspecifiedaspect",
       _ => throw new JsonException($"'{value}' is not a valid AspectType value.")
     };
     writer.WriteStringValue(stringValue);

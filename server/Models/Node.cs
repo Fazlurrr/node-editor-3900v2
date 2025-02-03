@@ -60,7 +60,7 @@ public enum NodeType
 {
     Block,
     Terminal,
-    Connector,
+    Connector
 }
 
 public class CustomAttribute
