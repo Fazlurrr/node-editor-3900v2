@@ -1,5 +1,5 @@
 import { storeSelector, useConnection, useStore } from '@/hooks';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle} from './dialog';
 
 import { EdgeType, NodeRelation } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -112,7 +112,7 @@ const SelectConnection = () => {
   }, [dialogOpen, setEdgeType]);
 
   return (
-    <Dialog open={dialogOpen}>
+    <Dialog open={dialogOpen} onOpenChange={closeDialog}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-center text-muted-foreground">
