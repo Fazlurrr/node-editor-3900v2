@@ -120,26 +120,26 @@ const SelectConnection = () => {
           </DialogTitle>
         </DialogHeader>
         <div className="flex h-full w-full flex-col items-center justify-center">
-          <button
+            <button
             className={cn(
-              `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
+              `${buttonVariants.edge} border-[#1A8923] text-[#1A8923] hover:bg-[#1A8923]`,
               {
-                'border-transparent bg-green-400 text-white':
-                  edgeType === EdgeType.Part,
+              'border-transparent bg-[#1A8923] text-white':
+                edgeType === EdgeType.Part,
               }
             )}
             onClick={() => setEdgeType(EdgeType.Part)}
-          >
+            >
             Part of
-          </button>
+            </button>
           {!blockConnection && (
             <button
               className={cn(
-                `${buttonVariants.edge} border-2 border-connected text-connected hover:bg-connected`,
-                {
-                  'border-transparent bg-connected text-white':
-                    edgeType === EdgeType.Connected,
-                }
+              `${buttonVariants.edge} border-[#016EF4] text-[#016EF4] hover:bg-[#016EF4]`,
+              {
+                'border-transparent bg-[#016EF4] text-white':
+                edgeType === EdgeType.Connected,
+              }
               )}
               onClick={() => setEdgeType(EdgeType.Connected)}
             >
@@ -149,11 +149,11 @@ const SelectConnection = () => {
           {blockConnection && (
             <button
               className={cn(
-                `${buttonVariants.edge} border-dotted border-amber-300 text-amber-300 hover:bg-amber-300`,
-                {
-                  'border-transparent bg-amber-300 text-white':
-                    edgeType === EdgeType.Fulfilled,
-                }
+              `${buttonVariants.edge} border-dotted border-[#D14600] text-[#D14600] hover:bg-[#D14600]`,
+              {
+                'border-transparent bg-[#D14600] text-white':
+                edgeType === EdgeType.Fulfilled,
+              }
               )}
               onClick={() => setEdgeType(EdgeType.Fulfilled)}
             >
