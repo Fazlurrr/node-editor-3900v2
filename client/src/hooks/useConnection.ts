@@ -4,9 +4,9 @@ import { create } from 'zustand';
 
 type ConnectionState = {
   connecting: boolean;
-  openDialog: (blockConnection: boolean) => void;
+  startConnection: (blockConnection: boolean) => void;
   blockConnection: boolean;
-  closeDialog: () => void;
+  endConnection: () => void;
   edgeType: EdgeType | null;
   setEdgeType: (edgeType: EdgeType | null) => void;
   params: Edge | Connection | null;
@@ -20,12 +20,12 @@ const useConnection = create<ConnectionState>()(set => ({
   params: null,
   setEdgeType: edgeType => set({ edgeType }),
   setParams: params => set({ params }),
-  openDialog: blockConnection =>
+  startConnection: blockConnection =>
     set({
       blockConnection,
       connecting: true,
     }),
-  closeDialog: () => set({ connecting: false }),
+  endConnection: () => set({ connecting: false }),
 }));
 
 export default useConnection;

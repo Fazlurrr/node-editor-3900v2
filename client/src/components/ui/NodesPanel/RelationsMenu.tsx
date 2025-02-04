@@ -11,7 +11,7 @@ const RelationsMenu: React.FC = () => {
         edgeType,
         setEdgeType,
         params,
-        closeDialog,
+        endConnection,
       } = useConnection();
     
       const { nodes } = useStore(storeSelector, shallow);
@@ -33,6 +33,7 @@ const RelationsMenu: React.FC = () => {
             toast.error(
               `${sourceNode.data.customName === '' ? sourceNode.data.label : sourceNode.data.customName} is already part of ${partOfNode?.data?.customName === '' ? sourceNode?.data?.label : partOfNode?.data?.customName}`
             );
+            endConnection();
             return;
           }
     
@@ -98,7 +99,7 @@ const RelationsMenu: React.FC = () => {
         }
     
         await addEdge(edgeType as EdgeType, newNodeRelations, false);
-        closeDialog();
+        endConnection();
       };
     
       useEffect(() => {
