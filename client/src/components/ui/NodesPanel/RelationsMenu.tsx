@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 
 const RelationsMenu: React.FC = () => {
     const {
-        dialogOpen,
+        connecting,
         edgeType,
         setEdgeType,
         params,
@@ -102,10 +102,10 @@ const RelationsMenu: React.FC = () => {
       };
     
       useEffect(() => {
-        if (dialogOpen && edgeType) {
+        if (connecting && edgeType) {
           createNewConnection();
         }
-      }, [dialogOpen, edgeType]);
+      }, [connecting, edgeType]);
   const handleEdgeTypeSelection = (edgeType: EdgeType) => {
     setEdgeType(edgeType);
   };
