@@ -114,14 +114,14 @@ const RelationsMenu: React.FC = () => {
   return (
     <div className="flex flex-wrap justify-between">
       <button
-        className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200"
+        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Part ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Part)}
       >
         Topology
         <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
       </button>
       <button
-        className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200"
+        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Connected ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Connected)}
       >
         Media Transfer
@@ -141,13 +141,13 @@ const RelationsMenu: React.FC = () => {
         Specialization
         <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
       </button>
-      <button
-        className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200"
-        onClick={() => handleEdgeTypeSelection(EdgeType.Fulfilled)}
-      >
-        Fulfills
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
-      </button>
+    <button
+      className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Fulfilled ? 'bg-gray-200' : ''}`}
+      onClick={() => handleEdgeTypeSelection(EdgeType.Fulfilled)}
+    >
+      Fulfills
+      <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
+    </button>
       <button
         className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200"
         onClick={() => handleEdgeTypeSelection(EdgeType.Part)}
