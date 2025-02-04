@@ -196,13 +196,24 @@ const NodesPanel: React.FC = () => {
   };
 
     const [collapseElements, setCollapseElements] = React.useState(false);
+    const [collapseRelations, setCollapseRelations] = React.useState(false);
 
     const toggleElements = () => {
       setCollapseElements(!collapseElements);
     }
+
+    const toggleRelations = () => {
+      setCollapseRelations(!collapseRelations);
+    }
   
     return (
-      <div className="h-full w-56 text-white border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 left-0 z-10">
+      <div className="h-full w-56 text-white border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 left-0 z-10
+        overflow-y-auto
+        [&::-webkit-scrollbar]:w-1
+        [&::-webkit-scrollbar-track]:bg-white
+        [&::-webkit-scrollbar-thumb]:bg-gray-200
+        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
         <div className="p-1 pl-4 mt-14 mb-2 border-b border-[#9facbc]" onClick={toggleElements}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg text-black dark:text-white font-semibold">Elements</h2>
@@ -263,6 +274,52 @@ const NodesPanel: React.FC = () => {
           </div>
         ))}
         </>
+        )}
+        <div className="p-1 pl-4 mt-0 mb-2 border-b border-[#9facbc]" onClick={toggleRelations}>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg text-black dark:text-white font-semibold">Relations</h2>
+            {collapseElements ? <ChevronUp className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" /> :
+            <ChevronDown className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" />}
+          </div>
+        </div>
+        {!collapseRelations && (
+          <>
+            <div className="flex flex-wrap justify-between">
+            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
+              Topology
+              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+            </button>
+            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
+              Media Transfer
+              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+            </button>
+            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
+              Partonomy
+              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+            </button>
+            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
+              Specialization
+              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+            </button>
+            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
+              Fulfills
+              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
+            </button>
+            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
+              Proxy
+              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
+            </button>
+            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
+              Projection
+              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
+            </button>
+            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
+              Equality
+              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+              <span className="block mx-auto w-8 h-0.5 border-t border-black"></span>
+            </button>
+            </div>
+          </>
         )}
       </div>
     );
