@@ -1,6 +1,7 @@
 import React from 'react';
 import { AspectType, NavItem, NodeType } from '@/lib/types';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import RelationsMenu from './RelationsMenu';
 
 const navItems: NavItem[] = [
     {
@@ -284,41 +285,7 @@ const NodesPanel: React.FC = () => {
         </div>
         {!collapseRelations && (
           <>
-            <div className="flex flex-wrap justify-between">
-            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
-              Topology
-              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
-            </button>
-            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
-              Media Transfer
-              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
-            </button>
-            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
-              Partonomy
-              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
-            </button>
-            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
-              Specialization
-              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
-            </button>
-            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
-              Fulfills
-              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
-            </button>
-            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
-              Proxy
-              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
-            </button>
-            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
-              Projection
-              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
-            </button>
-            <button className="w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200">
-              Equality
-              <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
-              <span className="block mx-auto w-8 h-0.5 border-t border-black"></span>
-            </button>
-            </div>
+            <RelationsMenu />
           </>
         )}
       </div>

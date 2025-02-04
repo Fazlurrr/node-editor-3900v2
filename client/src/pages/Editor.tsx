@@ -23,7 +23,7 @@ import {
   lightTheme,
 } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
-import { Sidebar, SelectConnection, NodesPanel } from '@/components/ui';
+import { Sidebar, NodesPanel } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import { addNode } from '@/lib/utils/nodes';
@@ -122,7 +122,6 @@ const Editor = () => {
             <NodesPanel />
             <Sidebar />
             <PropertiesPanel selectedElement={selectedElement} /> {/* Pass selected element */}
-            <SelectConnection />
             <ControlsStyled style={{ position: 'absolute', top: '95%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             <MiniMapStyled />
             <Background

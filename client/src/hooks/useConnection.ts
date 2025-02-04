@@ -16,8 +16,8 @@ type ConnectionState = {
 const useConnection = create<ConnectionState>()(set => ({
   dialogOpen: false,
   blockConnection: false,
-  params: null,
   edgeType: null,
+  params: null,
   setEdgeType: edgeType => set({ edgeType }),
   setParams: params => set({ params }),
   openDialog: blockConnection =>
