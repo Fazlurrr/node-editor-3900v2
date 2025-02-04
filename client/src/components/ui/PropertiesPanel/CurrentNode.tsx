@@ -215,6 +215,124 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                 </FormItem>
               )}
             />
+             {/* New: Quanity Datums Section */}
+             <div className="mt-4">
+                <p className="text-sm text-muted-foreground mb-3">Quantity Datums</p>
+                <div className="grid grid-cols-1 gap-4">
+                    {/* Provenance */}
+                    <FormField
+                    control={form.control}
+                    name="quantityDatums.provenance"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormControl>
+                            <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Provenance" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                <SelectItem value="specified">Specified</SelectItem>
+                                <SelectItem value="calculated">Calculated</SelectItem>
+                                <SelectItem value="measured">Measured</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+
+                    {/* Scope */}
+                    <FormField
+                    control={form.control}
+                    name="quantityDatums.scope"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormControl>
+                            <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Scope" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                <SelectItem value="design">Design</SelectItem>
+                                <SelectItem value="operating">Operating</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+
+                    {/* Range */}
+                    <FormField
+                    control={form.control}
+                    name="quantityDatums.range"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormControl>
+                            <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Range" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                <SelectItem value="nominal">Nominal</SelectItem>
+                                <SelectItem value="normal">Normal</SelectItem>
+                                <SelectItem value="average">Average</SelectItem>
+                                <SelectItem value="minimum">Minimum</SelectItem>
+                                <SelectItem value="maximum">Maximum</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+
+                    {/* Regularity */}
+                    <FormField
+                    control={form.control}
+                    name="quantityDatums.regularity"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormControl>
+                            <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Regularity" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                <SelectItem value="continuous">Continuous</SelectItem>
+                                <SelectItem value="absolute">Absolute</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                </div>
+                </div>
+                {/* End of Quantity Datums Section */}
             <Button type="submit" className="mt-2" size="sm">
               Add Attribute
             </Button>
