@@ -3,10 +3,10 @@ import { Connection, Edge } from 'reactflow';
 import { create } from 'zustand';
 
 type ConnectionState = {
-  dialogOpen: boolean;
-  openDialog: (blockConnection: boolean) => void;
+  connecting: boolean;
+  startConnection: (blockConnection: boolean) => void;
   blockConnection: boolean;
-  closeDialog: () => void;
+  endConnection: () => void;
   edgeType: EdgeType | null;
   setEdgeType: (edgeType: EdgeType | null) => void;
   params: Edge | Connection | null;
@@ -14,18 +14,18 @@ type ConnectionState = {
 };
 
 const useConnection = create<ConnectionState>()(set => ({
-  dialogOpen: false,
+  connecting: false,
   blockConnection: false,
-  params: null,
   edgeType: null,
+  params: null,
   setEdgeType: edgeType => set({ edgeType }),
   setParams: params => set({ params }),
-  openDialog: blockConnection =>
+  startConnection: blockConnection =>
     set({
       blockConnection,
-      dialogOpen: true,
+      connecting: true,
     }),
-  closeDialog: () => set({ dialogOpen: false }),
+  endConnection: () => set({ connecting: false }),
 }));
 
 export default useConnection;

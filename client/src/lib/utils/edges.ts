@@ -9,7 +9,7 @@ import { handleNewNodeRelations } from './nodes';
 // Triggered when a connection is made between two nodes
 export const onConnect = async (params: Edge | Connection) => {
   const { nodes } = useStore.getState();
-  const { setParams, openDialog } = useConnection.getState();
+  const { setParams, startConnection } = useConnection.getState();
   // Store params in app state to use in other functions
   setParams(params);
 
@@ -183,7 +183,7 @@ export const onConnect = async (params: Edge | Connection) => {
   }
 
   // If none of the above conditions are met, open dialog to select edge type
-  return openDialog(
+  return startConnection(
     isBlock(params.source as string) && isBlock(params.target as string)
   );
 };
