@@ -19,7 +19,7 @@ import {
     FormItem, 
     FormMessage 
 } from '../form';
-import { Trash, Edit2 } from 'lucide-react';
+import { Trash, Edit2, ChevronUp, ChevronDown } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -39,6 +39,7 @@ import {
     Range, 
     Regularity 
 } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -138,6 +139,12 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     }
   };
 
+  const [isAttributesVisible, setIsAttributesVisible] = useState(false);
+
+  const toogleAttributes = () => {
+    setIsAttributesVisible(!isAttributesVisible);
+  };
+
   return (
     <div>
       <div className="mb-2">
@@ -175,167 +182,198 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       </div>
       <div className="mb-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(addCustomAttribute)}>
-            <div className="mb-2">
-              <strong>Custom Attributes:</strong>
+          <form className="my-4" onSubmit={form.handleSubmit(addCustomAttribute)}>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-black dark:text-white"><strong>Custom attributes:</strong></p>
+              {isAttributesVisible ?
+                <ChevronUp onClick={() => setIsAttributesVisible(false)} className="text-black dark:text-white size-5 hover:cursor-pointer" /> :
+                <ChevronDown onClick={() => setIsAttributesVisible(true)} className="text-black dark:text-white size-5 hover:cursor-pointer" />
+              }
             </div>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input {...field} placeholder="Name" maxLength={25} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input {...field} placeholder="Value" maxLength={25} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="unitOfMeasure"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input {...field} placeholder="Unit" maxLength={10} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             {/* New: Quanity Datums Section */}
-             <div className="mt-4">
-                <p className="text-sm text-muted-foreground mb-3">Quantity Datums</p>
-                <div className="grid grid-cols-1 gap-4">
+            {isAttributesVisible && (
+              <div className="form-select w-full text-black dark:text-white px-4 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <p className="text-sm text-muted-foreground mb-3">Create Custom attributes</p>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormControl>
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Name"
+                            maxLength={25}
+                            className={cn('my-2 mr-2 flex-1', {
+                              'border-red-500': form.formState.errors.value,
+                            })}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-600" />
+                      </FormItem>
+                    </FormControl>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormControl>
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Value"
+                            maxLength={25}
+                            className={cn('my-2', {
+                              'border-red-500': form.formState.errors.value,
+                            })}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-600" />
+                      </FormItem>
+                    </FormControl>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="unitOfMeasure"
+                  render={({ field }) => (
+                    <FormControl>
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Unit"
+                            maxLength={25}
+                            className="my-2"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-600" />
+                      </FormItem>
+                    </FormControl>
+                  )}
+                />
+                {/* New: Quantity Datums Section */}
+                <div className="mt-4">
+                  <p className="text-sm text-muted-foreground mb-3">Quantity Datums</p>
+                  <div className="grid grid-cols-1 gap-4">
                     {/* Provenance */}
                     <FormField
-                    control={form.control}
-                    name="quantityDatums.provenance"
-                    render={({ field }) => (
+                      control={form.control}
+                      name="quantityDatums.provenance"
+                      render={({ field }) => (
                         <FormItem>
-                        <FormControl>
+                          <FormControl>
                             <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
+                              value={field.value}
+                              onValueChange={field.onChange}
                             >
-                            <SelectTrigger>
+                              <SelectTrigger>
                                 <SelectValue placeholder="Select Provenance" />
-                            </SelectTrigger>
-                            <SelectContent>
+                              </SelectTrigger>
+                              <SelectContent>
                                 <SelectGroup>
-                                <SelectItem value="specified">Specified</SelectItem>
-                                <SelectItem value="calculated">Calculated</SelectItem>
-                                <SelectItem value="measured">Measured</SelectItem>
+                                  <SelectItem value="specified">Specified</SelectItem>
+                                  <SelectItem value="calculated">Calculated</SelectItem>
+                                  <SelectItem value="measured">Measured</SelectItem>
                                 </SelectGroup>
-                            </SelectContent>
+                              </SelectContent>
                             </Select>
-                        </FormControl>
-                        <FormMessage />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
-                    )}
+                      )}
                     />
-
                     {/* Scope */}
                     <FormField
-                    control={form.control}
-                    name="quantityDatums.scope"
-                    render={({ field }) => (
+                      control={form.control}
+                      name="quantityDatums.scope"
+                      render={({ field }) => (
                         <FormItem>
-                        <FormControl>
+                          <FormControl>
                             <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
+                              value={field.value}
+                              onValueChange={field.onChange}
                             >
-                            <SelectTrigger>
+                              <SelectTrigger>
                                 <SelectValue placeholder="Select Scope" />
-                            </SelectTrigger>
-                            <SelectContent>
+                              </SelectTrigger>
+                              <SelectContent>
                                 <SelectGroup>
-                                <SelectItem value="design">Design</SelectItem>
-                                <SelectItem value="operating">Operating</SelectItem>
+                                  <SelectItem value="design">Design</SelectItem>
+                                  <SelectItem value="operating">Operating</SelectItem>
                                 </SelectGroup>
-                            </SelectContent>
+                              </SelectContent>
                             </Select>
-                        </FormControl>
-                        <FormMessage />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
-                    )}
+                      )}
                     />
-
                     {/* Range */}
                     <FormField
-                    control={form.control}
-                    name="quantityDatums.range"
-                    render={({ field }) => (
+                      control={form.control}
+                      name="quantityDatums.range"
+                      render={({ field }) => (
                         <FormItem>
-                        <FormControl>
+                          <FormControl>
                             <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
+                              value={field.value}
+                              onValueChange={field.onChange}
                             >
-                            <SelectTrigger>
+                              <SelectTrigger>
                                 <SelectValue placeholder="Select Range" />
-                            </SelectTrigger>
-                            <SelectContent>
+                              </SelectTrigger>
+                              <SelectContent>
                                 <SelectGroup>
-                                <SelectItem value="nominal">Nominal</SelectItem>
-                                <SelectItem value="normal">Normal</SelectItem>
-                                <SelectItem value="average">Average</SelectItem>
-                                <SelectItem value="minimum">Minimum</SelectItem>
-                                <SelectItem value="maximum">Maximum</SelectItem>
+                                  <SelectItem value="nominal">Nominal</SelectItem>
+                                  <SelectItem value="normal">Normal</SelectItem>
+                                  <SelectItem value="average">Average</SelectItem>
+                                  <SelectItem value="minimum">Minimum</SelectItem>
+                                  <SelectItem value="maximum">Maximum</SelectItem>
                                 </SelectGroup>
-                            </SelectContent>
+                              </SelectContent>
                             </Select>
-                        </FormControl>
-                        <FormMessage />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
-                    )}
+                      )}
                     />
-
                     {/* Regularity */}
                     <FormField
-                    control={form.control}
-                    name="quantityDatums.regularity"
-                    render={({ field }) => (
+                      control={form.control}
+                      name="quantityDatums.regularity"
+                      render={({ field }) => (
                         <FormItem>
-                        <FormControl>
+                          <FormControl>
                             <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
+                              value={field.value}
+                              onValueChange={field.onChange}
                             >
-                            <SelectTrigger>
+                              <SelectTrigger>
                                 <SelectValue placeholder="Select Regularity" />
-                            </SelectTrigger>
-                            <SelectContent>
+                              </SelectTrigger>
+                              <SelectContent>
                                 <SelectGroup>
-                                <SelectItem value="continuous">Continuous</SelectItem>
-                                <SelectItem value="absolute">Absolute</SelectItem>
+                                  <SelectItem value="continuous">Continuous</SelectItem>
+                                  <SelectItem value="absolute">Absolute</SelectItem>
                                 </SelectGroup>
-                            </SelectContent>
+                              </SelectContent>
                             </Select>
-                        </FormControl>
-                        <FormMessage />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
-                    )}
+                      )}
                     />
-                </div>
+                  </div>
                 </div>
                 {/* End of Quantity Datums Section */}
-            <Button type="submit" className="mt-2" size="sm">
-              Add Attribute
-            </Button>
+                <Button type="submit" className="w-full my-2 bg-blue-500 hover:bg-blue-700 text-white" size="sm">
+                  Add
+                </Button>
+              </div>
+            )}
           </form>
         </Form>
       </div>
