@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { Node, Edge } from 'reactflow';
 import Modal from '@/components/ui/Modal';
 import { GlobalHotKeys } from 'react-hotkeys';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import {
   AspectType,
   type CustomNodeProps,
@@ -29,6 +31,10 @@ import {
   SelectGroup,
   SelectItem, 
 } from '../select';
+import { set, z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
+import { Input } from '../input';
+import { Button } from '../button';
 // import {
 //   AlertDialog,
 //   AlertDialogAction,
@@ -64,7 +70,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
     }
   }, [selectedElement]);
 
-
   const handleDeleteAttribute = async (attr: CustomAttribute) => {
     const updatedAttributes = customAttributes.filter(a => a !== attr);
     setCustomAttributes(updatedAttributes);
@@ -73,7 +78,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
       await updateNode(selectedElement.id, { customAttributes: updatedAttributes });
     }
   }
-  
+
   const keyMap = {
     DELETE_NODE: ['del', 'backspace'],
   };
@@ -95,6 +100,64 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
         return;
       }
     },
+  };
+
+  const customAttributeSchema = z.object({
+    name: z.string().min(1).max(25),
+    value: z.string().min(1).max(25),
+    unitOfMeasure: z.string().optional(),
+    quanityDatums: z.object({
+      provenance: z.enum(['specified', 'calculated', 'measured']).optional(),
+      scope: z.enum(['design', 'operating']).optional(),
+      range: z.enum(['nominal', 'normal', 'average', 'minimum', 'maximum']).optional(),
+      regularity: z.enum(['continuous', 'absolute']).optional(),
+    }).optional(),
+  });
+
+  const addCustomAttribute = async (
+      values: z.infer<typeof customAttributeSchema>
+    ) => {
+      const newAttributes = [
+        ...selectedElement.data.customAttributes,
+        {
+          name: values.name,
+          value: values.value,
+          unitOfMeasure: values.unitOfMeasure || '',
+          quanityDatums: {
+            provenance: values.quanityDatums?.provenance as Provenance,
+            scope: values.quanityDatums?.scope as Scope,
+            range: values.quanityDatums?.range as Range,
+            regularity: values.quanityDatums?.regularity as Regularity,
+          },
+        },
+      ];
+      const updated = await updateNode(selectedElement.id, {
+        customAttributes: newAttributes,
+      });
+      if (updated) {
+        selectedElement.data.customAttributes = newAttributes;
+      }
+    };
+
+    const form = useForm<z.infer<typeof customAttributeSchema>>({
+        resolver: zodResolver(customAttributeSchema),
+        defaultValues: {
+          name: '',
+          value: '',
+          unitOfMeasure: '',
+          quanityDatums: {
+            provenance: undefined,
+            scope: undefined,
+            range: undefined,
+            regularity: undefined,
+          },
+        },
+      });
+
+  const [isAttributesVisible, setIsAttributesVisible] = useState(false);
+
+  const toogleAttributes = () => {
+    setIsAttributesVisible(!isAttributesVisible);
   };
 
   const handleAspectChange = async (newAspectType: AspectType) => {
@@ -220,22 +283,214 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
                       </p>
                     )}
                   )} */}
-                  <p className="mb-2 text-black dark:text-white"><strong>Custom Attributes:</strong></p>
-                  <form onSubmit={handleSubmit(onSubmit)} className="my-2">
-                    <div className="flex flex-col gap-1 mb-1">
-                      <input {...register('name')} placeholder="Name" className="border p-1 text-sm" required />
-                      <input {...register('value')} placeholder="Value" className="border p-1 text-sm" required />
-                      <input {...register('unitOfMeasure')} placeholder="Unit of Measure" className="border p-1 text-sm" />
-                      <button type="submit" className="bg-blue-500 hover:bg-blue-700 p-1 text-sm rounded font-bold text-white dark:text-white">Add</button>
-                    </div>
-                  </form>
+                  <Form {...form}>
+                    <form className="my-4" onSubmit={form.handleSubmit(addCustomAttribute)}>
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-black dark:text-white"><strong>Custom attributes:</strong></p>
+                        {isAttributesVisible ?
+                          <ChevronUp onClick={() => setIsAttributesVisible(false)} className="text-black dark:text-white size-5 hover:cursor-pointer" /> :
+                          <ChevronDown onClick={() => setIsAttributesVisible(true)} className="text-black dark:text-white size-5 hover:cursor-pointer" />
+                        }
+                      </div>
+                      {isAttributesVisible && (
+                       <div className="form-select w-full text-black dark:text-white px-4 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                         <p className="text-sm text-muted-foreground mb-3">Create Custom attributes</p>
+                          <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormControl>
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="Name"
+                                      maxLength={25}
+                                      className={cn('my-2 mr-2 flex-1', {
+                                        'border-red-500': form.formState.errors.value,
+                                      })}
+                                    />
+                                  </FormControl>
+                                  <FormMessage className="text-xs text-red-600" />
+                                </FormItem>
+                              </FormControl>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="value"
+                            render={({ field }) => (
+                              <FormControl>
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="Value"
+                                      maxLength={25}
+                                      className={cn('my-2', {
+                                        'border-red-500': form.formState.errors.value,
+                                      })}
+                                    />
+                                  </FormControl>
+                                  <FormMessage className="text-xs text-red-600" />
+                                </FormItem>
+                              </FormControl>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="unitOfMeasure"
+                            render={({ field }) => (
+                              <FormControl>
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="Unit"
+                                      maxLength={25}
+                                      className="my-2"
+                                    />
+                                  </FormControl>
+                                  <FormMessage className="text-xs text-red-600" />
+                                </FormItem>
+                              </FormControl>
+                            )}
+                          />
+
+                          {/* New: Quanity Datums Section */}
+                          <div className="mt-4">
+                            <p className="text-sm text-muted-foreground mb-3">Quanity Datums</p>
+                            <div className="grid grid-cols-1 gap-4">
+                              {/* Provenance */}
+                              <FormField
+                                control={form.control}
+                                name="quanityDatums.provenance"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Select
+                                        value={field.value}
+                                        onValueChange={field.onChange}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select Provenance" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectGroup>
+                                            <SelectItem value="specified">Specified</SelectItem>
+                                            <SelectItem value="calculated">Calculated</SelectItem>
+                                            <SelectItem value="measured">Measured</SelectItem>
+                                          </SelectGroup>
+                                        </SelectContent>
+                                      </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              {/* Scope */}
+                              <FormField
+                                control={form.control}
+                                name="quanityDatums.scope"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Select
+                                        value={field.value}
+                                        onValueChange={field.onChange}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select Scope" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectGroup>
+                                            <SelectItem value="design">Design</SelectItem>
+                                            <SelectItem value="operating">Operating</SelectItem>
+                                          </SelectGroup>
+                                        </SelectContent>
+                                      </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              {/* Range */}
+                              <FormField
+                                control={form.control}
+                                name="quanityDatums.range"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Select
+                                        value={field.value}
+                                        onValueChange={field.onChange}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select Range" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectGroup>
+                                            <SelectItem value="nominal">Nominal</SelectItem>
+                                            <SelectItem value="normal">Normal</SelectItem>
+                                            <SelectItem value="average">Average</SelectItem>
+                                            <SelectItem value="minimum">Minimum</SelectItem>
+                                            <SelectItem value="maximum">Maximum</SelectItem>
+                                          </SelectGroup>
+                                        </SelectContent>
+                                      </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              {/* Regularity */}
+                              <FormField
+                                control={form.control}
+                                name="quanityDatums.regularity"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Select
+                                        value={field.value}
+                                        onValueChange={field.onChange}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select Regularity" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectGroup>
+                                            <SelectItem value="continuous">Continuous</SelectItem>
+                                            <SelectItem value="absolute">Absolute</SelectItem>
+                                          </SelectGroup>
+                                        </SelectContent>
+                                      </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+                          {/* End of Quanity Datums Section */}
+                          <Button type="submit" className="w-full my-2 bg-blue-500 hover:bg-blue-700 text-white" size="sm">
+                            Add
+                          </Button>
+                        </div>
+                      )}
+                    </form>
+                  </Form>
+
                   {customAttributes.map((attr, index) => (
-                    <div key={index} className="flex justify-between items-center mb-1 text-black dark:text-white">
-                    <span className="text-sm w-40 break-words">{attr.name}: {attr.value}: {attr.unitOfMeasure}</span>
-                    <Trash size={16} onClick={() => handleDeleteAttribute(attr)} className="cursor-pointer text-red-500"/>
+                    <div key={index} className="flex justify-between items-center mb-1 p-2 border border-gray-300 rounded-lg text-black dark:text-white">
+                      <span className="text-sm w-full break-words">{attr.name}: {attr.value}: {attr.unitOfMeasure}:</span>
+                      <Trash size={16} onClick={() => handleDeleteAttribute(attr)} className="cursor-pointer text-red-500"/>
                     </div>
                   ))}
-
                     <button onClick={() => setIsModalOpen(true)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 
                     rounded hover:bg-red-700 justify-center w-full mt-16">
                       Delete Node
@@ -275,7 +530,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
                       </AlertDialogContent>
                     </AlertDialog> */}
                 </>
-              )}
+              )}  
             </>
           ) : (
             <p>No element selected</p>
@@ -287,6 +542,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
 };
 
 export default PropertiesPanel;
+
 
 
 
