@@ -71,6 +71,7 @@ export type UpdateNode = {
   customName?: string;
   aspect?: AspectType;
   customAttributes?: CustomAttribute[];
+  label?: string;
 };
 
 export type Relation = {
