@@ -34,7 +34,8 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
   const form = useForm<z.infer<typeof customAttributeSchema>>({
     resolver: zodResolver(customAttributeSchema),
     defaultValues: {
@@ -42,10 +43,10 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       value: '',
       unitOfMeasure: '',
       quantityDatums: {
-        provenance: undefined,
-        scope: undefined,
-        range: undefined,
-        regularity: undefined,
+        provenance: '',
+        scope: '',
+        range: '',
+        regularity: '',
       },
     },
   });
@@ -63,28 +64,56 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     setEditLabel(false);
   };
 
-  const addCustomAttribute = async (values: z.infer<typeof customAttributeSchema>) => {
-    const newAttributes = [
-      ...currentNode.data.customAttributes,
-      {
-        name: values.name,
-        value: values.value,
-        unitOfMeasure: values.unitOfMeasure || '',
-        quantityDatums: {
-          provenance: values.quantityDatums?.provenance as Provenance,
-          scope: values.quantityDatums?.scope as Scope,
-          range: values.quantityDatums?.range as Range,
-          regularity: values.quantityDatums?.regularity as Regularity,
+  const onSubmitAttribute = async (values: z.infer<typeof customAttributeSchema>) => {
+    if (editingIndex === null) {
+      const newAttributes = [
+        ...customAttributes,
+        {
+          name: values.name,
+          value: values.value,
+          unitOfMeasure: values.unitOfMeasure || '',
+          quantityDatums: {
+            provenance: values.quantityDatums?.provenance as Provenance,
+            scope: values.quantityDatums?.scope as Scope,
+            range: values.quantityDatums?.range as Range,
+            regularity: values.quantityDatums?.regularity as Regularity,
+          },
         },
-      },
-    ];
-    const updated = await updateNode(currentNode.id, { customAttributes: newAttributes });
-    if (updated) {
-      currentNode.data.customAttributes = newAttributes;
-      setCustomAttributes(newAttributes);
-      form.reset();
-      setIsAttributesVisible(false);
-      toast.success('Attribute added');
+      ];
+      const updated = await updateNode(currentNode.id, { customAttributes: newAttributes });
+      if (updated) {
+        currentNode.data.customAttributes = newAttributes;
+        setCustomAttributes(newAttributes);
+        toast.success('Attribute added');
+        form.reset();
+        setIsAttributesVisible(false);
+      }
+    } else {
+      const newAttributes = customAttributes.map((attr, idx) => {
+        if (idx === editingIndex) {
+          return {
+            name: values.name,
+            value: values.value,
+            unitOfMeasure: values.unitOfMeasure || '',
+            quantityDatums: {
+              provenance: values.quantityDatums?.provenance as Provenance,
+              scope: values.quantityDatums?.scope as Scope,
+              range: values.quantityDatums?.range as Range,
+              regularity: values.quantityDatums?.regularity as Regularity,
+            },
+          };
+        }
+        return attr;
+      });
+      const updated = await updateNode(currentNode.id, { customAttributes: newAttributes });
+      if (updated) {
+        currentNode.data.customAttributes = newAttributes;
+        setCustomAttributes(newAttributes);
+        toast.success('Attribute updated');
+        form.reset();
+        setEditingIndex(null);
+        setIsAttributesVisible(false);
+      }
     }
   };
 
@@ -96,6 +125,23 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       currentNode.data.customAttributes = updatedAttributes;
       toast.success('Attribute deleted');
     }
+  };
+
+  const handleEditAttribute = (index: number) => {
+    setEditingIndex(index);
+    const attribute = customAttributes[index];
+    form.reset({
+      name: attribute.name,
+      value: attribute.value,
+      unitOfMeasure: attribute.unitOfMeasure,
+      quantityDatums: {
+        provenance: attribute.quantityDatums?.provenance || '',
+        scope: attribute.quantityDatums?.scope || '',
+        range: attribute.quantityDatums?.range || '',
+        regularity: attribute.quantityDatums?.regularity || '',
+      },
+    });
+    setIsAttributesVisible(true);
   };
 
   const handleDeleteNode = async () => {
@@ -115,7 +161,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
 
   return (
     <div className="">
-      {/* Node Name and Edit */}
       <div className="mb-2 p-4">
         <strong>Name:</strong>{' '}
         {editLabel ? (
@@ -144,54 +189,59 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           size="small"
           fullWidth
         >
-            <MenuItem value={AspectType.Function}>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ height: '10px', width: '10px', backgroundColor: '#fff000', borderRadius: '50%', marginRight: '10px' }}></span>
-                Function
-              </span>
-            </MenuItem>
-            <MenuItem value={AspectType.Product}>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ height: '10px', width: '10px', backgroundColor: '#00ffff', borderRadius: '50%', marginRight: '10px' }}></span>
-                Product
-              </span>
-            </MenuItem>
-            <MenuItem value={AspectType.Location}>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ height: '10px', width: '10px', backgroundColor: '#ff00ff', borderRadius: '50%', marginRight: '10px' }}></span>
-                Location
-              </span>
-            </MenuItem>
-            <MenuItem value={AspectType.Installed}>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ height: '10px', width: '10px', backgroundColor: '#424bb2', borderRadius: '50%', marginRight: '10px' }}></span>
-                Installed
-              </span>
-            </MenuItem>
-            <MenuItem value={AspectType.NoAspect}>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ height: '10px', width: '10px', backgroundColor: '#E0E0E0', borderRadius: '50%', marginRight: '10px' }}></span>
-                No Aspect
-              </span>
-            </MenuItem>
-            <MenuItem value={AspectType.UnspecifiedAspect}>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ height: '10px', width: '10px', backgroundColor: '#9E9E9E', borderRadius: '50%', marginRight: '10px' }}></span>
-                Unspecified Aspect
-              </span>
-            </MenuItem>
+          <MenuItem value={AspectType.Function}>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ height: '10px', width: '10px', backgroundColor: '#fff000', borderRadius: '50%', marginRight: '10px' }}></span>
+              Function
+            </span>
+          </MenuItem>
+          <MenuItem value={AspectType.Product}>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ height: '10px', width: '10px', backgroundColor: '#00ffff', borderRadius: '50%', marginRight: '10px' }}></span>
+              Product
+            </span>
+          </MenuItem>
+          <MenuItem value={AspectType.Location}>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ height: '10px', width: '10px', backgroundColor: '#ff00ff', borderRadius: '50%', marginRight: '10px' }}></span>
+              Location
+            </span>
+          </MenuItem>
+          <MenuItem value={AspectType.Installed}>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ height: '10px', width: '10px', backgroundColor: '#424bb2', borderRadius: '50%', marginRight: '10px' }}></span>
+              Installed
+            </span>
+          </MenuItem>
+          <MenuItem value={AspectType.NoAspect}>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ height: '10px', width: '10px', backgroundColor: '#E0E0E0', borderRadius: '50%', marginRight: '10px' }}></span>
+              No Aspect
+            </span>
+          </MenuItem>
+          <MenuItem value={AspectType.UnspecifiedAspect}>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ height: '10px', width: '10px', backgroundColor: '#9E9E9E', borderRadius: '50%', marginRight: '10px' }}></span>
+              Unspecified Aspect
+            </span>
+          </MenuItem>
         </TextField>
       </div>
 
       {/* Custom Attributes Section */}
       <div className="mb-4 px-4 border-b border-[#9facbc]">
         <Form {...form}>
-          <form className="my-4" onSubmit={form.handleSubmit(addCustomAttribute)}>
+          <form className="my-4" onSubmit={form.handleSubmit(onSubmitAttribute)}>
             <div className="flex justify-between items-center mb-2">
-              <p className="text-black dark:text-white"><strong>Custom attributes</strong></p>
+              <p className="text-black dark:text-white">
+                <strong>Custom attributes</strong>
+              </p>
               {!isAttributesVisible ? (
                 <Plus
-                  onClick={() => setIsAttributesVisible(true)}
+                  onClick={() => {
+                    setEditingIndex(null);
+                    setIsAttributesVisible(true);
+                  }}
                   className="text-black dark:text-white hover:cursor-pointer"
                   size={18}
                 />
@@ -200,6 +250,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                   onClick={() => {
                     form.reset();
                     setIsAttributesVisible(false);
+                    setEditingIndex(null);
                   }}
                   className="text-red-500 hover:cursor-pointer"
                   size={18}
@@ -216,14 +267,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <TextField
-                            {...field}
-                            label="Name"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2 }}
-                          />
+                          <TextField {...field} label="Name" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} />
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
                       </FormItem>
@@ -237,14 +281,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <TextField
-                            {...field}
-                            label="Value"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2 }}
-                          />
+                          <TextField {...field} label="Value" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} />
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
                       </FormItem>
@@ -258,14 +295,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <TextField
-                            {...field}
-                            label="Unit"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2 }}
-                          />
+                          <TextField {...field} label="Unit" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} />
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
                       </FormItem>
@@ -282,14 +312,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <TextField
-                              select
-                              {...field}
-                              label="Provenance"
-                              variant="outlined"
-                              size="small"
-                              fullWidth
-                            >
+                            <TextField select {...field} label="Provenance" variant="outlined" size="small" fullWidth>
                               <MenuItem value="">
                                 <em>None</em>
                               </MenuItem>
@@ -308,14 +331,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <TextField
-                              select
-                              {...field}
-                              label="Scope"
-                              variant="outlined"
-                              size="small"
-                              fullWidth
-                            >
+                            <TextField select {...field} label="Scope" variant="outlined" size="small" fullWidth>
                               <MenuItem value="">
                                 <em>None</em>
                               </MenuItem>
@@ -333,14 +349,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <TextField
-                              select
-                              {...field}
-                              label="Range"
-                              variant="outlined"
-                              size="small"
-                              fullWidth
-                            >
+                            <TextField select {...field} label="Range" variant="outlined" size="small" fullWidth>
                               <MenuItem value="">
                                 <em>None</em>
                               </MenuItem>
@@ -361,14 +370,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <TextField
-                              select
-                              {...field}
-                              label="Regularity"
-                              variant="outlined"
-                              size="small"
-                              fullWidth
-                            >
+                            <TextField select {...field} label="Regularity" variant="outlined" size="small" fullWidth>
                               <MenuItem value="">
                                 <em>None</em>
                               </MenuItem>
@@ -383,15 +385,17 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                   </div>
                 </div>
                 <Button type="submit" className="w-full my-2 bg-blue-500 hover:bg-blue-700 text-white" size="sm">
-                  Add
+                  {editingIndex === null ? 'Add' : 'Update'}
                 </Button>
               </div>
             )}
           </form>
         </Form>
-        {/* List existing custom attributes with quantity datum info */}
+
+        {/* List existing custom attributes */}
         {customAttributes.length > 0 && (
-          <div className="mb-4 border border-[#9facbc] max-h-80
+          <div
+            className="mb-4 border border-[#9facbc] max-h-80
             overflow-y-auto
             [&::-webkit-scrollbar]:w-1
             [&::-webkit-scrollbar-track]:bg-white
@@ -399,13 +403,21 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             dark:[&::-webkit-scrollbar-track]:bg-neutral-700
             dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
             [scrollbar-width:thin] 
-            [scrollbar-color:lightGray_transparent]">
+            [scrollbar-color:lightGray_transparent]"
+          >
             {customAttributes.map((attr, index) => (
               <div key={index} className="flex border-b p-2">
                 <div className="flex w-full items-center justify-between">
                   <div className="w-full">
                     <div className="flex items-center justify-between">
-                      <strong className="text-sm break-words">{attr.name}</strong>
+                      <div className="flex items-center">
+                        <strong className="text-sm break-words">{attr.name}</strong>
+                        <Edit2
+                          size={16}
+                          className="cursor-pointer ml-2 text-blue-500"
+                          onClick={() => handleEditAttribute(index)}
+                        />
+                      </div>
                       <Minus
                         size={20}
                         onClick={() => handleDeleteAttribute(attr)}
@@ -453,7 +465,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           Delete Node
         </Button>
       </div>
-      {/* Delete Node Alert */}
       <DeleteConfirmationDialog
         open={showDeleteDialog}
         elementType="edge"

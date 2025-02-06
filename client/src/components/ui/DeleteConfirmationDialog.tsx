@@ -56,7 +56,6 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
               : 'This edge will be deleted. You can undo this action if needed.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {/* Attach the keydown handler to the footer where both buttons reside */}
         <AlertDialogFooter onKeyDown={handleKeyDown}>
           <AlertDialogCancel onClick={onCancel} ref={cancelButtonRef}>
             Cancel
