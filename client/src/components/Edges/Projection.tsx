@@ -2,21 +2,21 @@ import { useSidebar } from '@/hooks';
 import type { CustomEdgeProps } from '@/lib/types';
 import { getStraightPath } from 'reactflow';
 
-const Transfer = (props: CustomEdgeProps) => {
-  const { openSidebar } = useSidebar();
-
-  const [pathData] = getStraightPath({
-    sourceX: props.sourceX,
-    sourceY: props.sourceY,
-    targetX: props.targetX,
-    targetY: props.targetY,
-  });
-
-  return (
-    <g onClick={() => openSidebar({ ...props, type: 'transfer' })}>
+const Projection = (props: CustomEdgeProps) => {
+    const { openSidebar } = useSidebar();
+  
+    const [pathData] = getStraightPath({
+      sourceX: props.sourceX,
+      sourceY: props.sourceY,
+      targetX: props.targetX,
+      targetY: props.targetY,
+    });
+  
+    return (
+      <g onClick={() => openSidebar({ ...props, type: 'projection' })}>
       <defs>
         <marker
-        id="transferhead"
+        id="projectionhead"
         markerWidth="8"
         markerHeight="5.6"
         refX="6"
@@ -32,10 +32,10 @@ const Transfer = (props: CustomEdgeProps) => {
         strokeWidth="2"
         d={pathData}
         fill="none"
-        markerEnd="url(#transferhead)"
+        strokeDasharray={2}
+        markerEnd="url(#projectionhead)"
       />
-    </g>
-  );
-};
-
-export default Transfer;
+      </g>
+    );
+  };
+export default Projection;

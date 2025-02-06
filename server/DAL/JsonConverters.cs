@@ -51,7 +51,7 @@ public class EdgeTypeConverter : JsonConverter<EdgeType>
       "topology" => EdgeType.Topology,
       "specialization" => EdgeType.Specialization,
       "proxy" => EdgeType.Proxy,
-      "projection" => EdgeType.Projecton,
+      "projection" => EdgeType.Projection,
       "equality" => EdgeType.Equality,
       _ => throw new JsonException($"Value '{value}' is not recognized as a valid EdgeType.")
     };
@@ -68,7 +68,7 @@ public class EdgeTypeConverter : JsonConverter<EdgeType>
       EdgeType.Topology => "topology",
       EdgeType.Specialization => "specialization",
       EdgeType.Proxy => "proxy",
-      EdgeType.Projecton => "projection",
+      EdgeType.Projection => "projection",
       EdgeType.Equality => "equality",
       _ => throw new JsonException($"'{value}' is not a valid EdgeType value.")
     };
