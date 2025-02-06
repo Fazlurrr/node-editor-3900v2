@@ -1,4 +1,4 @@
-import React from 'react';
+import { useRef } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,10 +23,28 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+
+      if (document.activeElement === cancelButtonRef.current) {
+        deleteButtonRef.current?.focus();
+      } else {
+        cancelButtonRef.current?.focus();
+      }
+    }
+  };
+
   return (
-    <AlertDialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen) onCancel();
-    }}>
+    <AlertDialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onCancel();
+      }}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
@@ -38,9 +56,14 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
               : 'This edge will be deleted. You can undo this action if needed.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Delete</AlertDialogAction>
+        {/* Attach the keydown handler to the footer where both buttons reside */}
+        <AlertDialogFooter onKeyDown={handleKeyDown}>
+          <AlertDialogCancel onClick={onCancel} ref={cancelButtonRef}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} ref={deleteButtonRef}>
+            Delete
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Node, Edge } from 'reactflow';
 import CurrentNode from './CurrentNode';
 import CurrentEdge from './CurrentEdge';

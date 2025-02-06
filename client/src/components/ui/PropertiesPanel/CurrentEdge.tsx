@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../select';
 import { deleteEdge, updateEdge } from '@/api/edges';
