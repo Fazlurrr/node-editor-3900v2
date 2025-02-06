@@ -36,6 +36,6 @@ public enum EdgeType
     Transfer,
     Specialization,
     Proxy,
-    Projecton,
+    Projection,
     Equality
 }

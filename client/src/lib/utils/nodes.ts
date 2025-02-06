@@ -54,20 +54,17 @@ export const addNode = async (aspect: AspectType, type: NodeType, position: { x:
   const { nodes } = useStore.getState();
   const { user } = useSession.getState();
 
-  // Label num is 0 or the highest node number even though nodes are deleted
-  const labelNum =
-    nodes.length === 0
-      ? '0'
-      : nodes
-          .reduce(
-            (max, obj) =>
-              Math.max(
-                max,
-                Number(obj.data.label.charAt(obj.data.label.length - 1)) + 1
-              ),
-            0
-          )
-          .toString();
+ // Filter nodes by type and find the maximum number for each type
+ const getMaxNumber = (nodeType: string | undefined) => {
+  return nodes.filter(node => node.type === nodeType).reduce((max, node) => {
+    const match = node.data.label.match(/\d+$/);
+    const currentNumber = match ? parseInt(match[0], 10) : 0;
+    return Math.max(max, currentNumber);
+  }, 0);
+};
+
+// Determine label number based on type
+const labelNum = getMaxNumber(type) + 1; // Increment the max number found by 1 for the new node
 
   const label =
     type === 'block'

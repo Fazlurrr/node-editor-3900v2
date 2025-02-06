@@ -33,7 +33,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
             <CurrentNode currentNode={selectedElement} />
           )
         ) : (
-          <p>No element selected</p>
+          <p className="p-4"> No element selected</p>
         )}
       </div>
     </div>
