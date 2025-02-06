@@ -214,7 +214,9 @@ const NodesPanel: React.FC = () => {
         [&::-webkit-scrollbar-track]:bg-white
         [&::-webkit-scrollbar-thumb]:bg-gray-200
         dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+        [scrollbar-width:thin] 
+        [scrollbar-color:lightGray_transparent]">
         <div className="p-1 pl-4 mt-14 mb-2 border-b border-[#9facbc]" onClick={toggleElements}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg text-black dark:text-white font-semibold">Elements</h2>
