@@ -5,14 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { Input } from '../input';
 import { Button } from '../button';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-} from '../select';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
 import { Trash, Edit2, Plus, Minus } from 'lucide-react';
 import {
@@ -154,6 +146,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       {/* Aspect Type */}
       <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
         <strong>Aspect type:</strong>
+        <div className="mb-2"></div>
         <TextField
           select
           variant="outlined"
@@ -162,12 +155,42 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           size="small"
           fullWidth
         >
-          <MenuItem value={AspectType.Function}>Function</MenuItem>
-          <MenuItem value={AspectType.Product}>Product</MenuItem>
-          <MenuItem value={AspectType.Location}>Location</MenuItem>
-          <MenuItem value={AspectType.Installed}>Installed</MenuItem>
-          <MenuItem value={AspectType.NoAspect}>No Aspect</MenuItem>
-          <MenuItem value={AspectType.UnspecifiedAspect}>Unspecified Aspect</MenuItem>
+            <MenuItem value={AspectType.Function}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ height: '10px', width: '10px', backgroundColor: '#fff000', borderRadius: '50%', marginRight: '10px' }}></span>
+                Function
+              </span>
+            </MenuItem>
+            <MenuItem value={AspectType.Product}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ height: '10px', width: '10px', backgroundColor: '#00ffff', borderRadius: '50%', marginRight: '10px' }}></span>
+                Product
+              </span>
+            </MenuItem>
+            <MenuItem value={AspectType.Location}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ height: '10px', width: '10px', backgroundColor: '#ff00ff', borderRadius: '50%', marginRight: '10px' }}></span>
+                Location
+              </span>
+            </MenuItem>
+            <MenuItem value={AspectType.Installed}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ height: '10px', width: '10px', backgroundColor: '#424bb2', borderRadius: '50%', marginRight: '10px' }}></span>
+                Installed
+              </span>
+            </MenuItem>
+            <MenuItem value={AspectType.NoAspect}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ height: '10px', width: '10px', backgroundColor: '#E0E0E0', borderRadius: '50%', marginRight: '10px' }}></span>
+                No Aspect
+              </span>
+            </MenuItem>
+            <MenuItem value={AspectType.UnspecifiedAspect}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ height: '10px', width: '10px', backgroundColor: '#9E9E9E', borderRadius: '50%', marginRight: '10px' }}></span>
+                Unspecified Aspect
+              </span>
+            </MenuItem>
         </TextField>
       </div>
 
@@ -387,8 +410,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           ))}
         </div>
       </div>
-
-      
 
       {/* Delete Node Alert */}
       <AlertDialog>
