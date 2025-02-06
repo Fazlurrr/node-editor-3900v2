@@ -31,10 +31,10 @@ const customAttributeSchema = z.object({
   value: z.string().min(1).max(25),
   unitOfMeasure: z.string().optional(),
   quantityDatums: z.object({
-    provenance: z.enum(['specified', 'calculated', 'measured']).optional(),
-    scope: z.enum(['design', 'operating']).optional(),
-    range: z.enum(['nominal', 'normal', 'average', 'minimum', 'maximum']).optional(),
-    regularity: z.enum(['continuous', 'absolute']).optional(),
+    provenance: z.enum(['','specified', 'calculated', 'measured']).optional(),
+    scope: z.enum(['','design', 'operating']).optional(),
+    range: z.enum(['','nominal', 'normal', 'average', 'minimum', 'maximum']).optional(),
+    regularity: z.enum(['','continuous', 'absolute']).optional(),
   }).optional(),
 });
 
@@ -42,8 +42,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const [label, setLabel] = useState(currentNode.data.label || '');
   const [editLabel, setEditLabel] = useState(false);
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
-
-  // Controls whether the custom attribute creation form is visible.
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
 
   const form = useForm<z.infer<typeof customAttributeSchema>>({
@@ -93,8 +91,8 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     if (updated) {
       currentNode.data.customAttributes = newAttributes;
       setCustomAttributes(newAttributes);
-      form.reset(); 
-      setIsAttributesVisible(false); 
+      form.reset();
+      setIsAttributesVisible(false);
       toast.success('Attribute added');
     }
   };
@@ -200,23 +198,22 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           <form className="my-4" onSubmit={form.handleSubmit(addCustomAttribute)}>
             <div className="flex justify-between items-center mb-2">
               <p className="text-black dark:text-white"><strong>Custom attributes</strong></p>
-              {/* When the form is not visible, show the Plus button; when visible, show the Minus */}
-                {!isAttributesVisible ? (
+              {!isAttributesVisible ? (
                 <Plus
                   onClick={() => setIsAttributesVisible(true)}
                   className="text-black dark:text-white hover:cursor-pointer"
                   size={18}
                 />
-                ) : (
+              ) : (
                 <Minus
                   onClick={() => {
-                  form.reset(); 
-                  setIsAttributesVisible(false);
+                    form.reset();
+                    setIsAttributesVisible(false);
                   }}
                   className="text-red-500 hover:cursor-pointer"
                   size={18}
                 />
-                )}
+              )}
             </div>
 
             {isAttributesVisible && (
@@ -288,7 +285,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                 <div className="mt-4">
                   <p className="text-sm text-muted-foreground mb-3">Quantity Datums</p>
                   <div className="grid grid-cols-1 gap-4">
-                    {/* Provenance */}
                     <FormField
                       control={form.control}
                       name="quantityDatums.provenance"
@@ -303,6 +299,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                               size="small"
                               fullWidth
                             >
+                              <MenuItem value="">
+                                <em>None</em>
+                              </MenuItem>
                               <MenuItem value="specified">Specified</MenuItem>
                               <MenuItem value="calculated">Calculated</MenuItem>
                               <MenuItem value="measured">Measured</MenuItem>
@@ -312,7 +311,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                         </FormItem>
                       )}
                     />
-                    {/* Scope */}
                     <FormField
                       control={form.control}
                       name="quantityDatums.scope"
@@ -327,6 +325,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                               size="small"
                               fullWidth
                             >
+                              <MenuItem value="">
+                                <em>None</em>
+                              </MenuItem>
                               <MenuItem value="design">Design</MenuItem>
                               <MenuItem value="operating">Operating</MenuItem>
                             </TextField>
@@ -335,7 +336,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                         </FormItem>
                       )}
                     />
-                    {/* Range */}
                     <FormField
                       control={form.control}
                       name="quantityDatums.range"
@@ -350,6 +350,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                               size="small"
                               fullWidth
                             >
+                              <MenuItem value="">
+                                <em>None</em>
+                              </MenuItem>
                               <MenuItem value="nominal">Nominal</MenuItem>
                               <MenuItem value="normal">Normal</MenuItem>
                               <MenuItem value="average">Average</MenuItem>
@@ -361,7 +364,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                         </FormItem>
                       )}
                     />
-                    {/* Regularity */}
                     <FormField
                       control={form.control}
                       name="quantityDatums.regularity"
@@ -376,6 +378,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                               size="small"
                               fullWidth
                             >
+                              <MenuItem value="">
+                                <em>None</em>
+                              </MenuItem>
                               <MenuItem value="continuous">Continuous</MenuItem>
                               <MenuItem value="absolute">Absolute</MenuItem>
                             </TextField>
@@ -386,7 +391,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     />
                   </div>
                 </div>
-                {/* End of Quantity Datums Section */}
                 <Button type="submit" className="w-full my-2 bg-blue-500 hover:bg-blue-700 text-white" size="sm">
                   Add
                 </Button>
@@ -394,18 +398,63 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             )}
           </form>
         </Form>
-        {/* List existing custom attributes */}
-        <div className='pb-4'>
+        {/* List existing custom attributes with quantity datum info */}
+        <div className="mb-4 border border-[#9facbc] max-h-80
+        overflow-y-auto
+        [&::-webkit-scrollbar]:w-1
+        [&::-webkit-scrollbar-track]:bg-white
+        [&::-webkit-scrollbar-thumb]:bg-gray-200
+        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+        [scrollbar-width:thin] 
+        [scrollbar-color:lightGray_transparent]">
           {customAttributes.map((attr, index) => (
-            <div key={index} className="flex items-center justify-between mt-1 p-2 border ">
-              <span className="text-sm">
-                {attr.name}: {attr.value} {attr.unitOfMeasure && `(${attr.unitOfMeasure})`}
-              </span>
-              <Trash
-                size={16}
-                onClick={() => handleDeleteAttribute(attr)}
-                className="cursor-pointer text-red-500"
-              />
+            <div key={index} className="flex border-b p-2">
+                <div className="flex w-full items-center justify-between">
+                <div className='w-full'>
+                  <div className='flex items-center justify-between'>
+                  <strong className="text-sm break-words">{attr.name}</strong>
+                  <Minus
+                    size={20}
+                    onClick={() => handleDeleteAttribute(attr)}
+                    className="cursor-pointer text-red-500 ml-2"
+                  />
+                  </div>
+                  <div className="text-sm break-words">
+                  {attr.value}
+                  </div>
+                  <div className="text-sm break-words">
+                  {attr.unitOfMeasure ? ` (${attr.unitOfMeasure})` : ''}
+                  </div>
+                  {(attr.quantityDatums?.provenance ||
+                    attr.quantityDatums?.scope ||
+                    attr.quantityDatums?.range ||
+                    attr.quantityDatums?.regularity) && (
+                    <div className="text-sm text-gray-600">
+                      {attr.quantityDatums.provenance && (
+                        <div>
+                          <span className="font-medium">Provenance:</span> {attr.quantityDatums.provenance}
+                        </div>
+                      )}
+                      {attr.quantityDatums.scope && (
+                        <div>
+                          <span className="font-medium">Scope:</span> {attr.quantityDatums.scope}
+                        </div>
+                      )}
+                      {attr.quantityDatums.range && (
+                        <div>
+                          <span className="font-medium">Range:</span> {attr.quantityDatums.range}
+                        </div>
+                      )}
+                      {attr.quantityDatums.regularity && (
+                        <div>
+                          <span className="font-medium">Regularity:</span> {attr.quantityDatums.regularity}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -414,11 +463,11 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       {/* Delete Node Alert */}
       <AlertDialog>
         <AlertDialogTrigger asChild>
-            <div className="mx-4 mb-4">
-              <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline">
+          <div className="mx-4 mb-4">
+            <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline">
               Delete Node
-              </Button>
-            </div>
+            </Button>
+          </div>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>

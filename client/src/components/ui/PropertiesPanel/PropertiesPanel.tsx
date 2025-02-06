@@ -19,7 +19,9 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
         [&::-webkit-scrollbar-track]:bg-white
         [&::-webkit-scrollbar-thumb]:bg-gray-200
         dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+        [scrollbar-width:thin] 
+        [scrollbar-color:lightGray_transparent]">
       <div className="p-4 mt-14 mb-2 border-b border-[#9facbc]">
         <h2 className="text-lg font-semibold text-black dark:text-white">Properties</h2>
       </div>
