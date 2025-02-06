@@ -48,6 +48,11 @@ public class EdgeTypeConverter : JsonConverter<EdgeType>
       "fulfilled" => EdgeType.Fulfilled,
       "part" => EdgeType.Part,
       "transfer" => EdgeType.Transfer,
+      "topology" => EdgeType.Topology,
+      "specialization" => EdgeType.Specialization,
+      "proxy" => EdgeType.Proxy,
+      "projection" => EdgeType.Projecton,
+      "equality" => EdgeType.Equality,
       _ => throw new JsonException($"Value '{value}' is not recognized as a valid EdgeType.")
     };
   }
@@ -60,6 +65,11 @@ public class EdgeTypeConverter : JsonConverter<EdgeType>
       EdgeType.Fulfilled => "fulfilled",
       EdgeType.Part => "part",
       EdgeType.Transfer => "transfer",
+      EdgeType.Topology => "topology",
+      EdgeType.Specialization => "specialization",
+      EdgeType.Proxy => "proxy",
+      EdgeType.Projecton => "projection",
+      EdgeType.Equality => "equality",
       _ => throw new JsonException($"'{value}' is not a valid EdgeType value.")
     };
     writer.WriteStringValue(stringValue);

@@ -26,6 +26,11 @@ export enum EdgeType {
   Fulfilled = 'fulfilled',
   Part = 'part',
   Transfer = 'transfer',
+  Topology = 'topology',
+  Specialization = 'specialization',
+  Proxy = 'proxy',
+  Projection = 'projection',
+  Equality = 'equality',
 }
 
 export enum Provenance {
@@ -63,6 +68,16 @@ export enum RelationType {
   TransfersTo = 'transfersTo',
   TransferedBy = 'transferedBy',
   Fulfills = 'fulfills',
+  Topology = 'topology',
+  TopologyOf = 'topologyOf',
+  Specialization = 'specialization',
+  SpecializationOf = 'specializationOf',
+  Proxy = 'proxy',
+  ProxyOf = 'proxyOf',
+  Projection = 'projection',
+  ProjectionOf = 'projectionOf',
+  Equality = 'equality',
+  EqualityOf = 'equalityOf',
 }
 
 export type Role = 'admin' | 'user';
@@ -168,7 +183,17 @@ export type RelationKeys =
   | 'transfersTo'
   | 'transferedBy'
   | 'fulfills'
-  | 'connectedBy';
+  | 'connectedBy'
+  | 'topology'
+  | 'topologyOf'
+  | 'specialization'
+  | 'specializationOf'
+  | 'proxy'
+  | 'proxyOf'
+  | 'projection'
+  | 'projectionOf'
+  | 'equality'
+  | 'equalityOf';
 
 export type RelationKeysWithChildren = {
   key: RelationKeys;
