@@ -1,33 +1,40 @@
+import React from 'react';
 import { Button } from '../button';
 import { 
-    Select,
-    SelectTrigger,
-    SelectValue, 
-    SelectContent, 
-    SelectGroup, 
-    SelectItem 
+  Select,
+  SelectTrigger,
+  SelectValue, 
+  SelectContent, 
+  SelectGroup, 
+  SelectItem 
 } from '../select';
 import { deleteEdge, updateEdge } from '@/api/edges';
 import { updateNodeConnectionData } from '@/lib/utils/nodes';
 import { EdgeType } from '@/lib/types';
 import toast from 'react-hot-toast';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-  } from '@/components/ui/alert-dialog'; 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useStore } from '@/hooks';
 
 interface CurrentEdgeProps {
   currentEdge: any;
 }
 
 const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
+  
+  const { nodes } = useStore();
+  const sourceNode = nodes.find((node: any) => node.id === currentEdge.source);
+  const targetNode = nodes.find((node: any) => node.id === currentEdge.target);
+
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
     const updatedEdge = await updateEdge(currentEdge.id, newEdgeType);
     if (updatedEdge) {
@@ -44,21 +51,24 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
   const handleDeleteEdge = async () => {
     const deleted = await deleteEdge(currentEdge.id);
     if (deleted) {
-        toast.success('Edge deleted');
-      }
+      toast.success('Edge deleted');
+    }
   };
 
   return (
-    <div>
-    <div className="mb-2">
-      <strong>Edge from</strong>
-      <div>{currentEdge.source}</div>
-      <strong>To</strong>
-      <div>{currentEdge.target}</div>
-    </div>
+    <div className='px-4'>
+      <div className="mb-2">
+        <strong>Edge from</strong>
+        <div>{sourceNode ? sourceNode.data.label : currentEdge.source}</div>
+        <strong>To</strong>
+        <div>{targetNode ? targetNode.data.label : currentEdge.target}</div>
+      </div>
       <div className="mb-4">
         <strong>Connection Type:</strong>
-        <Select value={currentEdge.type} onValueChange={(value) => handleConnectionTypeChange(value as EdgeType)}>
+        <Select 
+          value={currentEdge.type} 
+          onValueChange={(value) => handleConnectionTypeChange(value as EdgeType)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue>{currentEdge.type}</SelectValue>
           </SelectTrigger>
@@ -73,26 +83,23 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
       </div>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-        <Button
-            className="mt-4 bg-red-500 text-white w-full"
-            variant="outline"
-        >
+          <Button className="mt-4 bg-red-500 text-white w-full" variant="outline">
             Delete
-        </Button>
+          </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
-        <AlertDialogHeader>
+          <AlertDialogHeader>
             <AlertDialogTitle>Are you sure you want to delete this Edge?</AlertDialogTitle>
             <AlertDialogDescription>
-            You can undo this action if needed.
+              You can undo this action if needed.
             </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteEdge}>
-            Delete
+              Delete
             </AlertDialogAction>
-        </AlertDialogFooter>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
