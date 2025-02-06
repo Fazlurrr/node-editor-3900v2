@@ -38,11 +38,16 @@ import { fetchNodes, updateNode } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import { addNode } from '@/lib/utils/nodes';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
+import { deleteNode } from '@/api/nodes';
+import { deleteEdge } from '@/api/edges';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const nodeTypes = useMemo(
     () => ({
@@ -110,6 +115,25 @@ const Editor = () => {
     setSelectedElement(edge);
   };
 
+  const handleTriggerDelete = () => {
+    if (selectedElement) {
+      setShowDeleteDialog(true);
+    }
+  };
+
+  useKeyboardShortcuts(selectedElement, handleTriggerDelete);
+
+  const handleConfirmDelete = async () => {
+    if (!selectedElement) return;
+    if ('source' in selectedElement) {
+      await deleteEdge(selectedElement.id as string);
+    } else {
+      await deleteNode(selectedElement.id);
+    }
+    setShowDeleteDialog(false);
+    setSelectedElement(null);
+  };
+
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <ReactFlowProvider>
@@ -137,7 +161,6 @@ const Editor = () => {
           >
             <NodesPanel />
             <Sidebar />
-            {/* Pass the selected element to the properties panel */}
             <PropertiesPanel selectedElement={selectedElement} />
             <ControlsStyled
               style={{
@@ -156,6 +179,12 @@ const Editor = () => {
             />
           </ReactFlowStyled>
         </div>
+        <DeleteConfirmationDialog
+          open={showDeleteDialog}
+          elementType={selectedElement && 'source' in selectedElement ? 'edge' : 'node'}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setShowDeleteDialog(false)}
+        />
       </ReactFlowProvider>
     </ThemeProvider>
   );

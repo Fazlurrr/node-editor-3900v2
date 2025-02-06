@@ -6,18 +6,8 @@ import toast from 'react-hot-toast';
 import { Input } from '../input';
 import { Button } from '../button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
-import { Trash, Edit2, Plus, Minus } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import { Edit2, Plus, Minus } from 'lucide-react';
+import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode, deleteNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
 import { TextField, MenuItem } from '@mui/material';
@@ -43,7 +33,8 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const [editLabel, setEditLabel] = useState(false);
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
-
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
   const form = useForm<z.infer<typeof customAttributeSchema>>({
     resolver: zodResolver(customAttributeSchema),
     defaultValues: {
@@ -399,89 +390,76 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           </form>
         </Form>
         {/* List existing custom attributes with quantity datum info */}
-        <div className="mb-4 border border-[#9facbc] max-h-80
-        overflow-y-auto
-        [&::-webkit-scrollbar]:w-1
-        [&::-webkit-scrollbar-track]:bg-white
-        [&::-webkit-scrollbar-thumb]:bg-gray-200
-        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
-        [scrollbar-width:thin] 
-        [scrollbar-color:lightGray_transparent]">
-          {customAttributes.map((attr, index) => (
-            <div key={index} className="flex border-b p-2">
+        {customAttributes.length > 0 && (
+          <div className="mb-4 border border-[#9facbc] max-h-80
+            overflow-y-auto
+            [&::-webkit-scrollbar]:w-1
+            [&::-webkit-scrollbar-track]:bg-white
+            [&::-webkit-scrollbar-thumb]:bg-gray-200
+            dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+            [scrollbar-width:thin] 
+            [scrollbar-color:lightGray_transparent]">
+            {customAttributes.map((attr, index) => (
+              <div key={index} className="flex border-b p-2">
                 <div className="flex w-full items-center justify-between">
-                <div className='w-full'>
-                  <div className='flex items-center justify-between'>
-                  <strong className="text-sm break-words">{attr.name}</strong>
-                  <Minus
-                    size={20}
-                    onClick={() => handleDeleteAttribute(attr)}
-                    className="cursor-pointer text-red-500 ml-2"
-                  />
-                  </div>
-                  <div className="text-sm break-words">
-                  {attr.value}
-                  </div>
-                  <div className="text-sm break-words">
-                  {attr.unitOfMeasure ? ` (${attr.unitOfMeasure})` : ''}
-                  </div>
-                  {(attr.quantityDatums?.provenance ||
-                    attr.quantityDatums?.scope ||
-                    attr.quantityDatums?.range ||
-                    attr.quantityDatums?.regularity) && (
-                    <div className="text-sm text-gray-600">
-                      {attr.quantityDatums.provenance && (
-                        <div>
-                          <span className="font-medium">Provenance:</span> {attr.quantityDatums.provenance}
-                        </div>
-                      )}
-                      {attr.quantityDatums.scope && (
-                        <div>
-                          <span className="font-medium">Scope:</span> {attr.quantityDatums.scope}
-                        </div>
-                      )}
-                      {attr.quantityDatums.range && (
-                        <div>
-                          <span className="font-medium">Range:</span> {attr.quantityDatums.range}
-                        </div>
-                      )}
-                      {attr.quantityDatums.regularity && (
-                        <div>
-                          <span className="font-medium">Regularity:</span> {attr.quantityDatums.regularity}
-                        </div>
-                      )}
+                  <div className="w-full">
+                    <div className="flex items-center justify-between">
+                      <strong className="text-sm break-words">{attr.name}</strong>
+                      <Minus
+                        size={20}
+                        onClick={() => handleDeleteAttribute(attr)}
+                        className="cursor-pointer text-red-500 ml-2"
+                      />
                     </div>
-                  )}
+                    <div className="text-sm break-words">{attr.value}</div>
+                    <div className="text-sm break-words">{attr.unitOfMeasure ? ` (${attr.unitOfMeasure})` : ''}</div>
+                    {(attr.quantityDatums?.provenance ||
+                      attr.quantityDatums?.scope ||
+                      attr.quantityDatums?.range ||
+                      attr.quantityDatums?.regularity) && (
+                      <div className="text-sm text-gray-600">
+                        {attr.quantityDatums.provenance && (
+                          <div>
+                            <span className="font-medium">Provenance:</span> {attr.quantityDatums.provenance}
+                          </div>
+                        )}
+                        {attr.quantityDatums.scope && (
+                          <div>
+                            <span className="font-medium">Scope:</span> {attr.quantityDatums.scope}
+                          </div>
+                        )}
+                        {attr.quantityDatums.range && (
+                          <div>
+                            <span className="font-medium">Range:</span> {attr.quantityDatums.range}
+                          </div>
+                        )}
+                        {attr.quantityDatums.regularity && (
+                          <div>
+                            <span className="font-medium">Regularity:</span> {attr.quantityDatums.regularity}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Delete Node Alert */}
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <div className="mx-4 mb-4">
-            <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline">
-              Delete Node
-            </Button>
+            ))}
           </div>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this node?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Any edges or references to this node will be deleted. You can undo this action if needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteNode}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        )}
+      </div>
+      <div className="mx-4 mb-4">
+        <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline">
+          Delete Node
+        </Button>
+      </div>
+      {/* Delete Node Alert */}
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        elementType="edge"
+        onConfirm={handleDeleteNode}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 };

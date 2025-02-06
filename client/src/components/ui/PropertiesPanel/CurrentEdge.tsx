@@ -1,39 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../button';
-import { 
-  Select,
-  SelectTrigger,
-  SelectValue, 
-  SelectContent, 
-  SelectGroup, 
-  SelectItem 
-} from '../select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../select';
 import { deleteEdge, updateEdge } from '@/api/edges';
 import { updateNodeConnectionData } from '@/lib/utils/nodes';
 import { EdgeType } from '@/lib/types';
 import toast from 'react-hot-toast';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { useStore } from '@/hooks';
+import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 
 interface CurrentEdgeProps {
   currentEdge: any;
 }
 
 const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
-  
   const { nodes } = useStore();
   const sourceNode = nodes.find((node: any) => node.id === currentEdge.source);
   const targetNode = nodes.find((node: any) => node.id === currentEdge.target);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
     const updatedEdge = await updateEdge(currentEdge.id, newEdgeType);
@@ -53,10 +36,11 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
     if (deleted) {
       toast.success('Edge deleted');
     }
+    setShowDeleteDialog(false);
   };
 
   return (
-    <div className='px-4'>
+    <div className="px-4">
       <div className="mb-2">
         <strong>Edge from</strong>
         <div>{sourceNode ? sourceNode.data.label : currentEdge.source}</div>
@@ -81,27 +65,19 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           </SelectContent>
         </Select>
       </div>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button className="mt-4 bg-red-500 text-white w-full" variant="outline">
-            Delete
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this Edge?</AlertDialogTitle>
-            <AlertDialogDescription>
-              You can undo this action if needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteEdge}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Button
+        className="mt-4 bg-red-500 text-white w-full"
+        variant="outline"
+        onClick={() => setShowDeleteDialog(true)}
+      >
+        Delete
+      </Button>
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        elementType="edge"
+        onConfirm={handleDeleteEdge}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 };
