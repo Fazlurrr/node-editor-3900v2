@@ -5,41 +5,30 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { Input } from '../input';
 import { Button } from '../button';
-import { Select, 
-    SelectTrigger, 
-    SelectValue, 
-    SelectContent, 
-    SelectGroup, 
-    SelectItem 
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
 } from '../select';
-import { 
-    Form, 
-    FormControl, 
-    FormField, 
-    FormItem, 
-    FormMessage 
-} from '../form';
-import { Trash, Edit2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
+import { Trash, Edit2, Plus, Minus } from 'lucide-react';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-  } from '@/components/ui/alert-dialog'; 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { updateNode, deleteNode } from '@/api/nodes';
-import {
-    AspectType, 
-    CustomAttribute, 
-    Provenance, Scope, 
-    Range, 
-    Regularity 
-} from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
+import { TextField, MenuItem } from '@mui/material';
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -61,6 +50,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const [label, setLabel] = useState(currentNode.data.label || '');
   const [editLabel, setEditLabel] = useState(false);
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
+
+  // Controls whether the custom attribute creation form is visible.
+  const [isAttributesVisible, setIsAttributesVisible] = useState(false);
 
   const form = useForm<z.infer<typeof customAttributeSchema>>({
     resolver: zodResolver(customAttributeSchema),
@@ -109,7 +101,8 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     if (updated) {
       currentNode.data.customAttributes = newAttributes;
       setCustomAttributes(newAttributes);
-      form.reset();
+      form.reset(); 
+      setIsAttributesVisible(false); 
       toast.success('Attribute added');
     }
   };
@@ -139,15 +132,10 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     }
   };
 
-  const [isAttributesVisible, setIsAttributesVisible] = useState(false);
-
-  const toogleAttributes = () => {
-    setIsAttributesVisible(!isAttributesVisible);
-  };
-
   return (
-    <div>
-      <div className="mb-2">
+    <div className="">
+      {/* Node Name and Edit */}
+      <div className="mb-2 p-4">
         <strong>Name:</strong>{' '}
         {editLabel ? (
           <Input
@@ -162,37 +150,54 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           </span>
         )}
       </div>
-      <div className="mb-4">
+
+      {/* Aspect Type */}
+      <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
         <strong>Aspect type:</strong>
-        <Select value={currentNode.data.aspect} onValueChange={handleAspectChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue>{currentNode.data.aspect || 'Select aspect'}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value={AspectType.Function}>Function</SelectItem>
-              <SelectItem value={AspectType.Product}>Product</SelectItem>
-              <SelectItem value={AspectType.Location}>Location</SelectItem>
-              <SelectItem value={AspectType.Installed}>Installed</SelectItem>
-              <SelectItem value={AspectType.NoAspect}>No Aspect</SelectItem>
-              <SelectItem value={AspectType.UnspecifiedAspect}>Unspecified Aspect</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <TextField
+          select
+          variant="outlined"
+          value={currentNode.data.aspect}
+          onChange={(e) => handleAspectChange(e.target.value as AspectType)}
+          size="small"
+          fullWidth
+        >
+          <MenuItem value={AspectType.Function}>Function</MenuItem>
+          <MenuItem value={AspectType.Product}>Product</MenuItem>
+          <MenuItem value={AspectType.Location}>Location</MenuItem>
+          <MenuItem value={AspectType.Installed}>Installed</MenuItem>
+          <MenuItem value={AspectType.NoAspect}>No Aspect</MenuItem>
+          <MenuItem value={AspectType.UnspecifiedAspect}>Unspecified Aspect</MenuItem>
+        </TextField>
       </div>
-      <div className="mb-4">
+
+      {/* Custom Attributes Section */}
+      <div className="mb-4 px-4 border-b border-[#9facbc]">
         <Form {...form}>
           <form className="my-4" onSubmit={form.handleSubmit(addCustomAttribute)}>
             <div className="flex justify-between items-center mb-2">
-              <p className="text-black dark:text-white"><strong>Custom attributes:</strong></p>
-              {isAttributesVisible ?
-                <ChevronUp onClick={() => setIsAttributesVisible(false)} className="text-black dark:text-white size-5 hover:cursor-pointer" /> :
-                <ChevronDown onClick={() => setIsAttributesVisible(true)} className="text-black dark:text-white size-5 hover:cursor-pointer" />
-              }
+              <p className="text-black dark:text-white"><strong>Custom attributes</strong></p>
+              {/* When the form is not visible, show the Plus button; when visible, show the Minus */}
+                {!isAttributesVisible ? (
+                <Plus
+                  onClick={() => setIsAttributesVisible(true)}
+                  className="text-black dark:text-white hover:cursor-pointer"
+                  size={18}
+                />
+                ) : (
+                <Minus
+                  onClick={() => {
+                  form.reset(); 
+                  setIsAttributesVisible(false);
+                  }}
+                  className="text-red-500 hover:cursor-pointer"
+                  size={18}
+                />
+                )}
             </div>
+
             {isAttributesVisible && (
-              <div className="form-select w-full text-black dark:text-white px-4 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-                <p className="text-sm text-muted-foreground mb-3">Create Custom attributes</p>
+              <div className="form-select w-full text-black dark:text-white ">
                 <FormField
                   control={form.control}
                   name="name"
@@ -200,13 +205,13 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <Input
+                          <TextField
                             {...field}
-                            placeholder="Name"
-                            maxLength={25}
-                            className={cn('my-2 mr-2 flex-1', {
-                              'border-red-500': form.formState.errors.value,
-                            })}
+                            label="Name"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2 }}
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
@@ -221,13 +226,13 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <Input
+                          <TextField
                             {...field}
-                            placeholder="Value"
-                            maxLength={25}
-                            className={cn('my-2', {
-                              'border-red-500': form.formState.errors.value,
-                            })}
+                            label="Value"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2 }}
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
@@ -242,11 +247,13 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <Input
+                          <TextField
                             {...field}
-                            placeholder="Unit"
-                            maxLength={25}
-                            className="my-2"
+                            label="Unit"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2 }}
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
@@ -254,7 +261,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     </FormControl>
                   )}
                 />
-                {/* New: Quantity Datums Section */}
+                {/* Quantity Datums Section */}
                 <div className="mt-4">
                   <p className="text-sm text-muted-foreground mb-3">Quantity Datums</p>
                   <div className="grid grid-cols-1 gap-4">
@@ -265,21 +272,18 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                            <TextField
+                              select
+                              {...field}
+                              label="Provenance"
+                              variant="outlined"
+                              size="small"
+                              fullWidth
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Provenance" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectItem value="specified">Specified</SelectItem>
-                                  <SelectItem value="calculated">Calculated</SelectItem>
-                                  <SelectItem value="measured">Measured</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
+                              <MenuItem value="specified">Specified</MenuItem>
+                              <MenuItem value="calculated">Calculated</MenuItem>
+                              <MenuItem value="measured">Measured</MenuItem>
+                            </TextField>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -292,20 +296,17 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                            <TextField
+                              select
+                              {...field}
+                              label="Scope"
+                              variant="outlined"
+                              size="small"
+                              fullWidth
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Scope" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectItem value="design">Design</SelectItem>
-                                  <SelectItem value="operating">Operating</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
+                              <MenuItem value="design">Design</MenuItem>
+                              <MenuItem value="operating">Operating</MenuItem>
+                            </TextField>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -318,23 +319,20 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                            <TextField
+                              select
+                              {...field}
+                              label="Range"
+                              variant="outlined"
+                              size="small"
+                              fullWidth
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Range" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectItem value="nominal">Nominal</SelectItem>
-                                  <SelectItem value="normal">Normal</SelectItem>
-                                  <SelectItem value="average">Average</SelectItem>
-                                  <SelectItem value="minimum">Minimum</SelectItem>
-                                  <SelectItem value="maximum">Maximum</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
+                              <MenuItem value="nominal">Nominal</MenuItem>
+                              <MenuItem value="normal">Normal</MenuItem>
+                              <MenuItem value="average">Average</MenuItem>
+                              <MenuItem value="minimum">Minimum</MenuItem>
+                              <MenuItem value="maximum">Maximum</MenuItem>
+                            </TextField>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -347,20 +345,17 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                            <TextField
+                              select
+                              {...field}
+                              label="Regularity"
+                              variant="outlined"
+                              size="small"
+                              fullWidth
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Regularity" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectItem value="continuous">Continuous</SelectItem>
-                                  <SelectItem value="absolute">Absolute</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
+                              <MenuItem value="continuous">Continuous</MenuItem>
+                              <MenuItem value="absolute">Absolute</MenuItem>
+                            </TextField>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -376,41 +371,45 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             )}
           </form>
         </Form>
-      </div>
-      {customAttributes.map((attr, index) => (
-        <div key={index} className="flex items-center justify-between p-2 border mb-1">
-          <span className="text-sm">
-            {attr.name}: {attr.value} {attr.unitOfMeasure && `(${attr.unitOfMeasure})`}
-          </span>
-          <Trash
-            size={16}
-            onClick={() => handleDeleteAttribute(attr)}
-            className="cursor-pointer text-red-500"
-          />
+        {/* List existing custom attributes */}
+        <div className='pb-4'>
+          {customAttributes.map((attr, index) => (
+            <div key={index} className="flex items-center justify-between mt-1 p-2 border ">
+              <span className="text-sm">
+                {attr.name}: {attr.value} {attr.unitOfMeasure && `(${attr.unitOfMeasure})`}
+              </span>
+              <Trash
+                size={16}
+                onClick={() => handleDeleteAttribute(attr)}
+                className="cursor-pointer text-red-500"
+              />
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
+
+      
+
+      {/* Delete Node Alert */}
       <AlertDialog>
         <AlertDialogTrigger asChild>
-        <Button
-            className="mt-4 bg-red-500 text-white w-full"
-            variant="outline"
-        >
-            Delete
-        </Button>
+            <div className="mx-4 mb-4">
+              <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline">
+              Delete Node
+              </Button>
+            </div>
         </AlertDialogTrigger>
         <AlertDialogContent>
-        <AlertDialogHeader>
+          <AlertDialogHeader>
             <AlertDialogTitle>Are you sure you want to delete this node?</AlertDialogTitle>
             <AlertDialogDescription>
-            Any edges or references to this node will be deleted. You can undo this action if needed.
+              Any edges or references to this node will be deleted. You can undo this action if needed.
             </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteNode}>
-            Delete
-            </AlertDialogAction>
-        </AlertDialogFooter>
+            <AlertDialogAction onClick={handleDeleteNode}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
