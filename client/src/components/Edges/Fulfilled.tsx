@@ -17,36 +17,24 @@ const Fulfilled = (props: CustomEdgeProps) => {
     <g onClick={() => openSidebar({ ...props, type: 'fulfilled' })}>
       <defs>
         <marker
-          id="fulfilledhead"
-          markerWidth="10"
-          markerHeight="7"
-          refX="5"
-          refY="2.5"
-          orient="auto"
-          markerUnits="strokeWidth"
+        id="fulfilledhead"
+        markerWidth="8"
+        markerHeight="5.6"
+        refX="6"
+        refY="2.8"
+        orient="auto"
+        markerUnits="strokeWidth"
         >
-          <svg
-          className="fill-white stroke-black dark:fill-black"
-          width="5px"
-          height="5px"
-          viewBox="0 0 5 5"
-          role="img"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-labelledby="rectangleIconTitle"
-          strokeLinecap="square"
-          strokeLinejoin="miter"
-          >
-          {' '}
-          <title id="rectangleIconTitle">Rectangle</title>{' '}
-          <rect width="5" height="5" x="0" y="0" />{' '}
-          </svg>
+        <polygon points="0 0, 6 2.8, 0 5.6" fill="white" stroke="black"  />
         </marker>
       </defs>
       <path
-      className="stroke-black stroke-2"
-      d={pathData}
-      fill="none"
-      markerEnd="url(#fulfilledhead)"
+        stroke="black"
+        strokeWidth="2"
+        d={pathData}
+        fill="none"
+        strokeDasharray={5}
+        markerEnd="url(#fulfilledhead)"
       />
     </g>
   );

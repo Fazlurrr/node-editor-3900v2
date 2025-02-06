@@ -14,7 +14,7 @@ import 'reactflow/dist/style.css';
 import { Block, Connector, Terminal } from '@/components/Nodes';
 import { onConnect } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
-import { Connected, Fulfilled, Part, Transfer } from '@/components/Edges';
+import { Connected, Topology, Fulfilled, Part, Transfer, Equality, Proxy, Projection, Specialization } from '@/components/Edges';
 import {
   ControlsStyled,
   MiniMapStyled,
@@ -47,8 +47,13 @@ const Editor = () => {
     () => ({
       part: Part,
       connected: Connected,
+      topology: Topology,
       fulfilled: Fulfilled,
       transfer: Transfer,
+      equality: Equality,
+      proxy: Proxy,
+      projection: Projection,
+      specialization: Specialization,
     }),
     []
   );
