@@ -32,8 +32,8 @@ const Equality = (props: CustomEdgeProps) => {
 
   return (
     <g onClick={() => openSidebar({ ...props, type: 'equality' })}>
-      <path stroke="black" strokeWidth="2" d={pathData} fill="none" />
-      <path stroke="black" strokeWidth="2" d={pathData2} fill="none" />
+      <path stroke="currentColor" strokeWidth="2" d={pathData} fill="none" />
+      <path stroke="currentColor" strokeWidth="2" d={pathData2} fill="none" />
     </g>
   );
 };

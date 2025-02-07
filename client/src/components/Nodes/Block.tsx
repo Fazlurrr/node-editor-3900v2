@@ -15,7 +15,7 @@ const Block = (props: CustomNodeProps) => {
     <figure id={props.data.label} className="relative">
       <div
         onClick={() => openSidebar(props)}
-        className={`h-[66px] w-[110px] border border-black 
+        className={`h-[66px] w-[110px] border-2 border-black dark:border-white
           bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
       >
         <header className="flex min-h-16 w-full items-center justify-center">

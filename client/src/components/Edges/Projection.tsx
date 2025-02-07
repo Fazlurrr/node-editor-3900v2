@@ -24,11 +24,11 @@ const Projection = (props: CustomEdgeProps) => {
         orient="auto"
         markerUnits="strokeWidth"
         >
-        <polygon points="0 0, 6 2.8, 0 5.6" fill="black" />
+        <polygon points="0 0, 6 2.8, 0 5.6" fill="currentColor" />
         </marker>
       </defs>
       <path
-        stroke="black"
+        stroke="currentColor"
         strokeWidth="2"
         d={pathData}
         fill="none"

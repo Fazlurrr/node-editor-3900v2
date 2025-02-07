@@ -49,7 +49,7 @@ const Navbar = () => {
             <img src={`/logo-${theme}.png`} alt="Logo" className="h-16 p-4" />
           </span>
           {currentPage === AppPage.Editor && (
-            <Menubar className="border-none drop-shadow-none bg-transparent">
+            <Menubar className="border-none shadow-none bg-transparent">
               <MenubarMenu>
               <MenubarTrigger>File</MenubarTrigger>
               <MenubarContent className="dark:bg-navbar-dark">

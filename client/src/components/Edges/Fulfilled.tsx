@@ -25,11 +25,11 @@ const Fulfilled = (props: CustomEdgeProps) => {
         orient="auto"
         markerUnits="strokeWidth"
         >
-        <polygon points="0 0, 6 2.8, 0 5.6" fill="white" stroke="black"  />
+        <polygon points="0 0, 6 2.8, 0 5.6" fill="white" stroke="currentColor" className="dark:fill-black" />
         </marker>
       </defs>
       <path
-        stroke="black"
+        stroke="currentColor"
         strokeWidth="2"
         d={pathData}
         fill="none"
