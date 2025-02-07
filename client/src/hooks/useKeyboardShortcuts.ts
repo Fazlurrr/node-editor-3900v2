@@ -1,9 +1,15 @@
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useRef } from 'react';
+import toast from 'react-hot-toast';
+import { Node, Edge } from 'reactflow';
 
 export const useKeyboardShortcuts = (
-  selectedElement: any, 
-  onTriggerDelete: () => void
+  selectedElement: Node | Edge | null,
+  onTriggerDelete: () => void,
+  onPaste: (clipboardElement: Node | Edge) => void,
 ) => {
+  const clipboardRef = useRef<Node | Edge | null>(null);
+
   useHotkeys(
     'delete, backspace',
     (event) => {
@@ -11,9 +17,9 @@ export const useKeyboardShortcuts = (
       if (
         target &&
         (target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.tagName === 'SELECT' ||
-          target.isContentEditable)
+         target.tagName === 'TEXTAREA' ||
+         target.tagName === 'SELECT' ||
+         target.isContentEditable)
       ) {
         return;
       }
@@ -23,5 +29,37 @@ export const useKeyboardShortcuts = (
     },
     { enableOnFormTags: false },
     [selectedElement]
+  );
+
+  useHotkeys(
+    'ctrl+c, command+c',
+    () => {
+      if (selectedElement) {
+        clipboardRef.current = JSON.parse(JSON.stringify(selectedElement));
+        toast.success('Copied');
+      }
+    },
+    [selectedElement]
+  );
+
+  useHotkeys(
+    'ctrl+x, command+x',
+    () => {
+      if (selectedElement) {
+        clipboardRef.current = JSON.parse(JSON.stringify(selectedElement));
+        toast.success('Cut');
+        onTriggerDelete();
+      }
+    },
+    [selectedElement]
+  );
+
+  useHotkeys(
+    'ctrl+v, command+v',
+    () => {
+      if (clipboardRef.current) {
+        onPaste(clipboardRef.current);
+      }
+    },
   );
 };

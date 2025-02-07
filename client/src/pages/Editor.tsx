@@ -42,6 +42,8 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { deleteNode } from '@/api/nodes';
 import { deleteEdge } from '@/api/edges';
+import { createNode } from '@/api/nodes';
+import { v4 as uuidv4 } from 'uuid';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -121,7 +123,23 @@ const Editor = () => {
     }
   };
 
-  useKeyboardShortcuts(selectedElement, handleTriggerDelete);
+  const handlePaste = async (clipboardElement: Node | Edge) => {
+    
+    const clonedNode = { ...clipboardElement } as Node;
+    const { id, ...nodeWithoutId } = clonedNode;
+    
+    if (nodeWithoutId.position) {
+      nodeWithoutId.position = {
+        x: nodeWithoutId.position.x + 20,
+        y: nodeWithoutId.position.y + 20,
+      };
+    }
+    
+    const newNode = { ...nodeWithoutId, id: `${clonedNode.type}-${uuidv4()}` };
+      await createNode(newNode);
+  };
+  
+  useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);
 
   const handleConfirmDelete = async () => {
     if (!selectedElement) return;
