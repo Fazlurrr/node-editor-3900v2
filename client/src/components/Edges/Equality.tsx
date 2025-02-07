@@ -32,7 +32,7 @@ const Equality = (props: CustomEdgeProps) => {
 
   return (
     <g onClick={() => openSidebar({ ...props, type: 'equality' })}>
-      <path stroke="theme === 'dark' ? 'black' : '#eee'" strokeWidth="2" d={pathData} fill="none" />
+      <path stroke="black" strokeWidth="2" d={pathData} fill="none" />
       <path stroke="black" strokeWidth="2" d={pathData2} fill="none" />
     </g>
   );
