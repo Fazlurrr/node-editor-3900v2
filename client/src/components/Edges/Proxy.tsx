@@ -14,7 +14,7 @@ const Proxy = (props: CustomEdgeProps) => {
 
   return (
     <g onClick={() => openSidebar({ ...props, type: 'proxy' })}>
-      <path stroke="black" strokeWidth="2" d={pathData} fill="none" strokeDasharray={2}/>
+      <path stroke="currentColor" strokeWidth="2" d={pathData} fill="none" strokeDasharray={2}/>
     </g>
   );
 };

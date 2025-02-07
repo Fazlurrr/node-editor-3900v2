@@ -24,11 +24,11 @@ const Part = (props: CustomEdgeProps) => {
         orient="auto"
         markerUnits="strokeWidth"
         >
-        <polygon points="4.5,0 9,2.8 4.5,5.6 0,2.8" fill="black" />
+        <polygon points="4.5,0 9,2.8 4.5,5.6 0,2.8" fill="currentColor" />
         </marker>
       </defs>
       <path
-        stroke="black"
+        stroke="currentColor"
         strokeWidth="2"
         d={pathData}
         markerEnd="url(#parthead)"

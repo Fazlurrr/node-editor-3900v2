@@ -23,7 +23,7 @@ const Connector = (props: CustomNodeProps) => {
           <figure id={props.data.label} className="relative">
             <div
               onClick={() => openSidebar(props)}
-              className={`h-[44px] w-[44px] overflow-hidden whitespace-nowrap rounded-full border border-black bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+              className={`h-[44px] w-[44px] overflow-hidden whitespace-nowrap rounded-full border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
             >
               <header className="flex h-full w-full items-center justify-center">
                 <p
