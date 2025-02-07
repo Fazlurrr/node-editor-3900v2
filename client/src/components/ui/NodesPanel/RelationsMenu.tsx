@@ -114,61 +114,162 @@ const RelationsMenu: React.FC = () => {
   return (
     <div className="flex flex-wrap justify-between">
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Topology ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Topology ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Topology)}
       >
         Topology
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+        <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 4 L30 4"
+            fill="none"
+          />
+        </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Transfer ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Transfer ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Transfer)}
       >
         Media Transfer
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+        <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 4 L24 4"
+            fill="none"
+          />
+          <polygon 
+            points="0,0 6,2.8 0,5.6"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="1"
+            transform="translate(24 1.2)"
+          />
+        </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Part ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Part ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Part)}
       >
         Partonomy
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+        <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 4 L24 4"
+            fill="none"
+          />
+          <polygon 
+            points="4.5,0 9,2.8 4.5,5.6 0,2.8"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="1"
+            transform="translate(22 1.2)"
+          />
+        </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Specialization ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Specialization ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Specialization)}
       >
         Specialization
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
+        <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 4 L24 4"
+            fill="none"
+          />
+          <polygon 
+            points="0,0 6,2.8 0,5.6"
+            fill="white"
+            stroke="currentColor"
+            strokeWidth="1"
+            transform="translate(24 1.2)"
+            className="dark:fill-black"
+          />
+        </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Fulfilled ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Fulfilled ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Fulfilled)}
       >
         Fulfills
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
+        <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 4 L24 4"
+            fill="none"
+            strokeDasharray="5"
+          />
+          <polygon 
+            points="0,0 6,2.8 0,5.6"
+            fill="white"
+            stroke="currentColor"
+            strokeWidth="1"
+            transform="translate(24 1.2)"
+            className="dark:fill-black"
+          />
+        </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Proxy ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Proxy ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Proxy)}
       >
         Proxy
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
+        <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 4 L30 4"
+            fill="none"
+            strokeDasharray="2"
+          />
+        </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Projection ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Projection ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Projection)}
       >
         Projection
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-dotted border-black"></span>
+        <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 4 L24 4"
+            fill="none"
+            strokeDasharray="2"
+          />
+          <polygon 
+            points="0,0 6,2.8 0,5.6"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="1"
+            transform="translate(24 1.2)"
+          />
+        </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Equality ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Equality ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Equality)}
       >
         Equality
-        <span className="block mx-auto mt-1 w-8 h-0.5 border-t border-black"></span>
-        <span className="block mx-auto w-8 h-0.5 border-t border-black"></span>
+        <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 2 L30 2"
+            fill="none"
+          />
+          <path
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M0 5 L30 5"
+            fill="none"
+          />
+        </svg>
       </button>
     </div>
   );
