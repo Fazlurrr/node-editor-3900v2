@@ -461,7 +461,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         )}
       </div>
       <div className="mx-4 mb-4">
-        <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline">
+        <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline" onClick={() => setShowDeleteDialog(true)}>
           Delete Node
         </Button>
       </div>
