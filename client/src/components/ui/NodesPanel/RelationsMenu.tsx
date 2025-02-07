@@ -114,7 +114,7 @@ const RelationsMenu: React.FC = () => {
   return (
     <div className="flex flex-wrap justify-between">
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Topology ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Topology ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Topology)}
       >
         Topology
@@ -128,7 +128,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Transfer ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Transfer ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Transfer)}
       >
         Media Transfer
@@ -149,7 +149,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Part ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Part ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Part)}
       >
         Partonomy
@@ -170,7 +170,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Specialization ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Specialization ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Specialization)}
       >
         Specialization
@@ -192,7 +192,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Fulfilled ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Fulfilled ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Fulfilled)}
       >
         Fulfills
@@ -215,7 +215,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Proxy ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Proxy ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Proxy)}
       >
         Proxy
@@ -230,7 +230,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Projection ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Projection ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Projection)}
       >
         Projection
@@ -252,7 +252,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white mb-1 p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Equality ? 'bg-gray-200' : ''}`}
+        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Equality ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Equality)}
       >
         Equality
