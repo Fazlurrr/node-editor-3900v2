@@ -15,7 +15,7 @@ const RelationsMenu: React.FC = () => {
       } = useConnection();
     
       const { nodes } = useStore(storeSelector, shallow);
-    
+
       const createNewConnection = async () => {
         const newNodeRelations: NodeRelation[] = [];
     
@@ -117,7 +117,7 @@ const RelationsMenu: React.FC = () => {
         className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Topology ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Topology)}
       >
-        Topology
+        Connected to
         <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
           <path
             stroke="currentColor"
@@ -131,7 +131,7 @@ const RelationsMenu: React.FC = () => {
         className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Transfer ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Transfer)}
       >
-        Media Transfer
+        Transferred to
         <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
           <path
             stroke="currentColor"
@@ -152,7 +152,7 @@ const RelationsMenu: React.FC = () => {
         className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Part ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Part)}
       >
-        Partonomy
+        Part of
         <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
           <path
             stroke="currentColor"
@@ -255,7 +255,7 @@ const RelationsMenu: React.FC = () => {
         className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Equality ? 'bg-gray-200' : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Equality)}
       >
-        Equality
+        Same as
         <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">
           <path
             stroke="currentColor"
