@@ -16,6 +16,10 @@ const RelationsMenu: React.FC = () => {
     
       const { nodes } = useStore(storeSelector, shallow);
 
+      useEffect(() => {
+        setEdgeType(EdgeType.Topology);
+      }, [setEdgeType]);
+
       const createNewConnection = async () => {
         const newNodeRelations: NodeRelation[] = [];
     
