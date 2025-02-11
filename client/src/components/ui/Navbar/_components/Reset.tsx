@@ -18,7 +18,7 @@ import {
 import { LucideMonitorX } from 'lucide-react';
 import { deleteEdges } from '@/api/edges';
 import { deleteNodes } from '@/api/nodes';
-import toast from 'react-hot-toast';
+import { Bounce, toast, ToastContainer } from 'react-toastify';
 
 const ResetConfirm = () => {
   const reset = async () => {

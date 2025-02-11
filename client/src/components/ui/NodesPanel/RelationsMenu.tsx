@@ -2,7 +2,7 @@ import { storeSelector, useConnection, useStore } from '@/hooks';
 import { EdgeType, NodeRelation } from '@/lib/types';
 import { addEdge } from '@/lib/utils/edges';
 import { shallow } from 'zustand/shallow';
-import toast from 'react-hot-toast';
+import { Bounce, toast, ToastContainer } from 'react-toastify';
 import { useEffect } from 'react';
 
 const RelationsMenu: React.FC = () => {

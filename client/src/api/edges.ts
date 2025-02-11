@@ -1,7 +1,7 @@
 import { useLoading, useSession, useStore } from '@/hooks';
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
 import { updateNodeRelations } from '@/lib/utils/nodes';
-import toast from 'react-hot-toast';
+import { Bounce, toast, ToastContainer } from 'react-toastify';
 import { type Edge } from 'reactflow';
 
 export const fetchEdges = async (): Promise<Edge[] | null> => {

@@ -250,6 +250,17 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             <span title="Add new attribute">
               <Plus
                 onClick={() => {
+                    form.reset({
+                      name: '',
+                      value: '',
+                      unitOfMeasure: '',
+                      quantityDatums: {
+                      provenance: '',
+                      scope: '',
+                      range: '',
+                      regularity: '',
+                      },
+                    });
                   setEditingIndex(null);
                   setIsAttributesVisible(true);
                 }}
