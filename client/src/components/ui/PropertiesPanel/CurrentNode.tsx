@@ -258,7 +258,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
 
             {/* Modal Form */}
         {isAttributesVisible && (
-          <div className="fixed top-64 right-56 w-80 bg-white dark:bg-gray-800 shadow-xl rounded-lg z-50 border border-[#9facbc] dark:border-gray-700">
+          <div className="fixed top-64 right-56 w-80 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
             <div className='flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc]'>
                     <h2 className='font-bold'>{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h2>
                   <div className="cursor-pointer" onClick={() => setIsAttributesVisible(false)}>
@@ -266,66 +266,106 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                   </div>
             </div>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmitAttribute)} className="p-4 pt-0">
-              <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
+                <form onSubmit={form.handleSubmit(onSubmitAttribute)} className="p-4 pt-0">
+                <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
                 <FormControl>
-              <TextField
+                <TextField
                 {...field}
                 label="Name"
                 variant="outlined"
                 size="small"
                 fullWidth
-              />
+                className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                            dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                            dark:[&_.MuiInputLabel-root]:text-white
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                />
                 </FormControl>
                 <FormMessage className="text-xs text-red-600" />
-              </FormItem>
-            )}
-              />
-              <div className="flex flex-row mt-4 gap-2">
+                </FormItem>
+              )}
+                />
+                <div className="flex flex-row mt-4 gap-2">
+                <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormControl>
+                <FormItem>
+                <FormControl>
+                <TextField {...field} label="Value" variant="outlined" size="small" fullWidth
+                  className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                />
+                </FormControl>
+                <FormMessage className="text-xs text-red-600" />
+                </FormItem>
+                </FormControl>
+              )}
+                />
               <FormField
-            control={form.control}
-            name="value"
-            render={({ field }) => (
+                control={form.control}
+                name="unitOfMeasure"
+                render={({ field }) => (
               <FormControl>
                 <FormItem>
-              <FormControl>
-                <TextField {...field} label="Value" variant="outlined" size="small" fullWidth />
-              </FormControl>
-              <FormMessage className="text-xs text-red-600" />
+                <FormControl>
+                <TextField {...field} label="Unit" variant="outlined" size="small" fullWidth
+                className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                dark:[&_.MuiInputLabel-root]:text-white
+                dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                />
+                </FormControl>
+                <FormMessage className="text-xs text-red-600" />
                 </FormItem>
               </FormControl>
-            )}
+                )}
               />
-            <FormField
-              control={form.control}
-              name="unitOfMeasure"
-              render={({ field }) => (
-            <FormControl>
-              <FormItem>
-                <FormControl>
-              <TextField {...field} label="Unit" variant="outlined" size="small" fullWidth/>
-                </FormControl>
-                <FormMessage className="text-xs text-red-600" />
-              </FormItem>
-            </FormControl>
-              )}
-            />
-            </div>
-            {/* Quantity Datums Section */}
-            <div className="mt-4">
-              <p className="text-sm text-muted-foreground mb-3">Quantity Datums</p>
-              <div className="grid grid-cols-2 gap-2">
-            <FormField
-              control={form.control}
-              name="quantityDatums.provenance"
-              render={({ field }) => (
+              </div>
+              {/* Quantity Datums Section */}
+              <div className="mt-4">
+                <p className="text-sm text-muted-foreground dark:text-white mb-3">Quantity Datums</p>
+                <div className="grid grid-cols-2 gap-2">
+              <FormField
+                control={form.control}
+                name="quantityDatums.provenance"
+                render={({ field }) => (
                 <FormItem>
-              <FormControl>
-                <TextField select {...field} label="Provenance" variant="outlined" size="small" fullWidth>
+                <FormControl>
+                <TextField select {...field} label="Provenance" variant="outlined" size="small" fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+                >
                   <MenuItem value="">
                 <em>None</em>
                   </MenuItem>
@@ -333,36 +373,58 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                   <MenuItem value="calculated">Calculated</MenuItem>
                   <MenuItem value="measured">Measured</MenuItem>
                 </TextField>
-              </FormControl>
-              <FormMessage />
+                </FormControl>
+                <FormMessage />
                 </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="quantityDatums.scope"
-              render={({ field }) => (
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quantityDatums.scope"
+                render={({ field }) => (
                 <FormItem>
-              <FormControl>
-                <TextField select {...field} label="Scope" variant="outlined" size="small" fullWidth>
+                <FormControl>
+                <TextField select {...field} label="Scope" variant="outlined" size="small" fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+                >
                   <MenuItem value="">
                 <em>None</em>
                   </MenuItem>
                   <MenuItem value="design">Design</MenuItem>
                   <MenuItem value="operating">Operating</MenuItem>
                 </TextField>
-              </FormControl>
-              <FormMessage />
+                </FormControl>
+                <FormMessage />
                 </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="quantityDatums.range"
-              render={({ field }) => (
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quantityDatums.range"
+                render={({ field }) => (
                 <FormItem>
-              <FormControl>
-                <TextField select {...field} label="Range" variant="outlined" size="small" fullWidth>
+                <FormControl>
+                <TextField select {...field} label="Range" variant="outlined" size="small" fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+                >
                   <MenuItem value="">
                 <em>None</em>
                   </MenuItem>
@@ -372,41 +434,52 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                   <MenuItem value="minimum">Minimum</MenuItem>
                   <MenuItem value="maximum">Maximum</MenuItem>
                 </TextField>
-              </FormControl>
-              <FormMessage />
+                </FormControl>
+                <FormMessage />
                 </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="quantityDatums.regularity"
-              render={({ field }) => (
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quantityDatums.regularity"
+                render={({ field }) => (
                 <FormItem>
-              <FormControl>
-                <TextField select {...field} label="Regularity" variant="outlined" size="small" fullWidth>
+                <FormControl>
+                <TextField select {...field} label="Regularity" variant="outlined" size="small" fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+                >
                   <MenuItem value="">
                 <em>None</em>
                   </MenuItem>
                   <MenuItem value="continuous">Continuous</MenuItem>
                   <MenuItem value="absolute">Absolute</MenuItem>
                 </TextField>
-              </FormControl>
-              <FormMessage />
+                </FormControl>
+                <FormMessage />
                 </FormItem>
-              )}
-            />
+                )}
+              />
+                </div>
               </div>
-            </div>
-            <div className="flex justify-center mt-4">
-              <Button
-              type="submit"
-              className="w-1/2 bg-blue-600 hover:bg-blue-700 text-white"
-              size="sm"
-              >
-              {editingIndex === null ? 'Add' : 'Update'}
-              </Button>
-            </div>
-          </form>
+              <div className="flex justify-center mt-4">
+                <Button
+                type="submit"
+                className="w-1/2 bg-[#232528] dark:bg-white text-white dark:text-[#232528]"
+                size="sm"
+                >
+                {editingIndex === null ? 'Add' : 'Update'}
+                </Button>
+              </div>
+              </form>
             </Form>
           </div>
         )}
