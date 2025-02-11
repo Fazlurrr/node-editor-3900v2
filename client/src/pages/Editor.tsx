@@ -50,6 +50,7 @@ const Editor = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
 
   const nodeTypes = useMemo(
     () => ({
@@ -156,27 +157,44 @@ const Editor = () => {
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <ReactFlowProvider>
         <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
-          <ReactFlowStyled
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            nodeTypes={nodeTypes as unknown as NodeTypes}
-            edgeTypes={edgeTypes as unknown as EdgeTypes}
-            onNodeDragStop={(_, node) => updateNode(node.id)}
-            onNodeClick={handleNodeClick}
-            onEdgeClick={handleEdgeClick}
-            onPaneClick={() => setSelectedElement(null)}
-            onInit={onLoad}
-            snapToGrid={true}
-            snapGrid={[11, 11]}
-            onDrop={handleDrop}
-            onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
-              event.preventDefault();
-              event.dataTransfer.dropEffect = 'move';
-            }}
-          >
+        <ReactFlowStyled
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          nodeTypes={nodeTypes as unknown as NodeTypes}
+          edgeTypes={edgeTypes as unknown as EdgeTypes}
+          onNodeDragStart={(_, node) => {
+            initialPositions.current[node.id] = {
+              x: node.position.x,
+              y: node.position.y,
+            };
+          }}
+          onNodeDragStop={(_, node) => {
+            const initialPos = initialPositions.current[node.id];
+            if (initialPos) {
+              const hasPositionChanged =
+                node.position.x !== initialPos.x ||
+                node.position.y !== initialPos.y;
+              if (hasPositionChanged) {
+                updateNode(node.id);
+              }
+              delete initialPositions.current[node.id];
+            }
+          }}
+          onNodeClick={handleNodeClick}
+          onEdgeClick={handleEdgeClick}
+          onPaneClick={() => setSelectedElement(null)}
+          onInit={onLoad}
+          snapToGrid={true}
+          snapGrid={[11, 11]}
+          onDrop={handleDrop}
+          onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+          }}
+        >
             <NodesPanel />
             <Sidebar />
             <PropertiesPanel selectedElement={selectedElement} />
