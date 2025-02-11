@@ -1,5 +1,4 @@
 import Handles from './Handles';
-import { useSidebar } from '@/hooks';
 import type { CustomNodeProps } from '@/lib/types';
 import {
   Tooltip,
@@ -7,10 +6,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip';
-import { Asterisk } from 'lucide-react'; // Importing an icon
+import { Asterisk } from 'lucide-react';
 
 const Connector = (props: CustomNodeProps) => {
-  const { openSidebar } = useSidebar();
 
   // Check for custom attributes
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
@@ -22,7 +20,6 @@ const Connector = (props: CustomNodeProps) => {
         <TooltipTrigger>
           <figure id={props.data.label} className="relative">
             <div
-              onClick={() => openSidebar(props)}
               className={`h-[44px] w-[44px] overflow-hidden whitespace-nowrap rounded-full border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
             >
               <header className="flex h-full w-full items-center justify-center">
