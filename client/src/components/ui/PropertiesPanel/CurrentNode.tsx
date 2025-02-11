@@ -10,8 +10,7 @@ import { Edit2, Plus, Minus,  X} from 'lucide-react';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode, deleteNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
-import { TextField, MenuItem, createMuiTheme } from '@mui/material';
-import { modes } from 'react-transition-group/SwitchTransition';
+import { TextField, MenuItem} from '@mui/material';
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -250,6 +249,17 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             {!isAttributesVisible ? (
               <Plus
                 onClick={() => {
+                    form.reset({
+                      name: '',
+                      value: '',
+                      unitOfMeasure: '',
+                      quantityDatums: {
+                      provenance: '',
+                      scope: '',
+                      range: '',
+                      regularity: '',
+                      },
+                    });
                   setEditingIndex(null);
                   setIsAttributesVisible(true);
                 }}

@@ -1,6 +1,6 @@
 import { useLoading, useSession } from '@/hooks';
 import { Role, User, UserWithToken } from '@/lib/types';
-import toast from 'react-hot-toast';
+import { Bounce, toast, ToastContainer } from 'react-toastify';
 
 export const login = async (
   username: string,

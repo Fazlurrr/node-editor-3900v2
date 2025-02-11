@@ -12,7 +12,8 @@ import { createNode, updateNode } from '@/api/nodes';
 import { isBlock, isTerminal } from '.';
 import { v4 as uuidv4 } from 'uuid';
 import { Edge, Node } from 'reactflow';
-import toast from 'react-hot-toast';
+import { Bounce, toast, ToastContainer } from 'react-toastify';
+
 
 // Set properties for nodes. NodeRelation is an array of objects with nodeId, relation, and relations properties
 export const handleNewNodeRelations = (newNodeRelations: NodeRelation[]) => {

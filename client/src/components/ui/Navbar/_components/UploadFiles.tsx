@@ -18,7 +18,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { validateJsonFiles } from '@/lib/utils/validators';
 import { useSession, useStore } from '@/hooks';
-import toast from 'react-hot-toast';
+import { Bounce, toast, ToastContainer } from 'react-toastify';
 import { uploadNodes } from '@/api/nodes';
 import { uploadEdges } from '@/api/edges';
 import { generateNewNodeId } from '@/lib/utils';
