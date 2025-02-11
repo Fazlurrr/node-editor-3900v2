@@ -521,17 +521,21 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <strong className="text-sm break-words">{attr.name}</strong>
-                        <Edit2
-                          size={16}
-                          className="cursor-pointer ml-2 text-blue-500"
-                          onClick={() => handleEditAttribute(index)}
+                        <div title="Edit Attribute">
+                          <Edit2
+                            size={16}
+                            className="cursor-pointer ml-2 text-blue-500"
+                            onClick={() => handleEditAttribute(index)}
+                          />
+                        </div>
+                      </div>
+                      <div title="Delete Attribute">
+                        <Minus
+                          size={20}
+                          onClick={() => handleDeleteAttribute(attr)}
+                          className="cursor-pointer text-red-500 ml-2"
                         />
                       </div>
-                      <Minus
-                        size={20}
-                        onClick={() => handleDeleteAttribute(attr)}
-                        className="cursor-pointer text-red-500 ml-2"
-                      />
                     </div>
                     <div className="text-sm break-words">{attr.value}</div>
                     <div className="text-sm break-words">{attr.unitOfMeasure ? ` (${attr.unitOfMeasure})` : ''}</div>
