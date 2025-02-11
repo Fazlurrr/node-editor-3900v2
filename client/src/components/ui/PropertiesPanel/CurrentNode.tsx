@@ -10,7 +10,8 @@ import { Edit2, Plus, Minus } from 'lucide-react';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode, deleteNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
-import { TextField, MenuItem } from '@mui/material';
+import { TextField, MenuItem, createMuiTheme } from '@mui/material';
+import { modes } from 'react-transition-group/SwitchTransition';
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -188,6 +189,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           onChange={(e) => handleAspectChange(e.target.value as AspectType)}
           size="small"
           fullWidth
+          className="text-black dark:text-white bg-white dark:bg-border-dark"
         >
           <MenuItem value={AspectType.Function}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
@@ -222,7 +224,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           <MenuItem value={AspectType.UnspecifiedAspect}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
               <span style={{ height: '10px', width: '10px', backgroundColor: '#9E9E9E', borderRadius: '50%', marginRight: '10px' }}></span>
-              Unspecified Aspect
+              Unspecified
             </span>
           </MenuItem>
         </TextField>
@@ -267,7 +269,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <TextField {...field} label="Name" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} />
+                          <TextField {...field} label="Name" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} className="text-black dark:text-white bg-white dark:bg-border-dark" />
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
                       </FormItem>
@@ -281,7 +283,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <TextField {...field} label="Value" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} />
+                          <TextField {...field} label="Value" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} className="text-black dark:text-white bg-white dark:bg-border-dark"/>
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
                       </FormItem>
@@ -295,7 +297,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <FormControl>
                       <FormItem>
                         <FormControl>
-                          <TextField {...field} label="Unit" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} />
+                          <TextField {...field} label="Unit" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} className="text-black dark:text-white bg-white dark:bg-border-dark"/>
                         </FormControl>
                         <FormMessage className="text-xs text-red-600" />
                       </FormItem>
@@ -312,14 +314,15 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <TextField select {...field} label="Provenance" variant="outlined" size="small" fullWidth>
-                              <MenuItem value="">
+                            <TextField select {...field} label="Provenance" variant="outlined" size="small" fullWidth className="text-black dark:text-white bg-white dark:bg-border-dark">
+                              <MenuItem value=""
+                              >
                                 <em>None</em>
                               </MenuItem>
                               <MenuItem value="specified">Specified</MenuItem>
                               <MenuItem value="calculated">Calculated</MenuItem>
                               <MenuItem value="measured">Measured</MenuItem>
-                            </TextField>
+                            </TextField >
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -331,7 +334,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <TextField select {...field} label="Scope" variant="outlined" size="small" fullWidth>
+                            <TextField select {...field} label="Scope" variant="outlined" size="small" fullWidth className="text-black dark:text-white bg-white dark:bg-border-dark">
                               <MenuItem value="">
                                 <em>None</em>
                               </MenuItem>
@@ -349,7 +352,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <TextField select {...field} label="Range" variant="outlined" size="small" fullWidth>
+                            <TextField select {...field} label="Range" variant="outlined" size="small" fullWidth className="text-black dark:text-white bg-white dark:bg-border-dark">
                               <MenuItem value="">
                                 <em>None</em>
                               </MenuItem>
@@ -370,7 +373,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <TextField select {...field} label="Regularity" variant="outlined" size="small" fullWidth>
+                            <TextField select {...field} label="Regularity" variant="outlined" size="small" fullWidth className="text-black dark:text-white bg-white dark:bg-border-dark">
                               <MenuItem value="">
                                 <em>None</em>
                               </MenuItem>
