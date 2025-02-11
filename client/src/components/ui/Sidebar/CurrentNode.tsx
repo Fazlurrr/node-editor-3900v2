@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast';
+import { Bounce, toast, ToastContainer } from 'react-toastify';
 import {
   AspectType,
   type CustomNodeProps,

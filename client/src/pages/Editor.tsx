@@ -206,7 +206,7 @@ const Editor = () => {
                 transform: 'translate(-50%, -50%)',
               }}
             />
-            <MiniMapStyled />
+
             <Background
               color={theme === 'dark' ? '#2f3237' : '#eee'}
               gap={11}

@@ -3,7 +3,7 @@ import { AppPage } from '@/lib/types';
 import { Login, Editor, Dashboard } from '@/pages';
 import { useEffect } from 'react';
 import { useTheme, useSession } from '@/hooks';
-import { Toaster } from 'react-hot-toast';
+import { Bounce, ToastContainer } from 'react-toastify';
 import { Navbar, Loader } from './components/ui';
 
 const routeConfig = {
@@ -32,7 +32,18 @@ const App: React.FC = () => {
 
   return (
     <>
-      <Toaster />
+      <ToastContainer 
+        position="top-center" 
+        autoClose={4000} 
+        hideProgressBar={false} 
+        newestOnTop={true} 
+        closeOnClick rtl={false} 
+        pauseOnFocusLoss 
+        draggable 
+        pauseOnHover 
+        theme="light" 
+        transition={Bounce} 
+      />
       <Navbar />
       {Object.entries(routeConfig).map(([page, Component]) => (
         <CSSTransition
