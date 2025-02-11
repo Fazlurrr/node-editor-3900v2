@@ -171,7 +171,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             autoFocus
           />
         ) : (
-          <span onClick={() => setEditLabel(true)} className="cursor-pointer">
+          <span title="Edit Name" onClick={() => setEditLabel(true)} className="cursor-pointer">
             {label || 'N/A'} <Edit2 size={18} className="inline ml-1" />
           </span>
         )}
