@@ -10,7 +10,8 @@ import { Edit2, Plus, Minus,  X} from 'lucide-react';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode, deleteNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
-import { TextField, MenuItem } from '@mui/material';
+import { TextField, MenuItem, createMuiTheme } from '@mui/material';
+import { modes } from 'react-transition-group/SwitchTransition';
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -198,6 +199,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                   dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
                   dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
                   dark:[&_.MuiSelect-icon]:text-white"
+
         >
           <MenuItem value={AspectType.Function}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
@@ -232,7 +234,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           <MenuItem value={AspectType.UnspecifiedAspect}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
               <span style={{ height: '10px', width: '10px', backgroundColor: '#9E9E9E', borderRadius: '50%', marginRight: '10px' }}></span>
-              Unspecified Aspect
+              Unspecified
             </span>
           </MenuItem>
         </TextField>
