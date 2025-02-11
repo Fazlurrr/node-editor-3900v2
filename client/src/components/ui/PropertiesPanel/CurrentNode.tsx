@@ -247,6 +247,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           </p>
           <div className="relative">
             {!isAttributesVisible ? (
+            <span title="Add new attribute">
               <Plus
                 onClick={() => {
                   setEditingIndex(null);
@@ -255,7 +256,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                 className="text-black dark:text-white hover:cursor-pointer"
                 size={18}
               />
-            ) : (
+            </span>
+          ) : (
+            <span title="Close">
               <Minus
                 onClick={() => {
                   form.reset();
@@ -265,16 +268,17 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                 className="text-red-500 hover:cursor-pointer"
                 size={18}
               />
+            </span>
             )}
 
-            {/* Modal Form */}
+            {/* Create Attribute Menu*/}
         {isAttributesVisible && (
           <div className="fixed top-64 right-56 w-80 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
             <div className='flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc]'>
                     <h2 className='font-bold'>{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h2>
-                  <div className="cursor-pointer" onClick={() => setIsAttributesVisible(false)}>
+                  <span className="cursor-pointer" title='Close' onClick={() => setIsAttributesVisible(false)}>
                     <X size={18} />
-                  </div>
+                  </span>
             </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmitAttribute)} className="p-4 pt-0">
