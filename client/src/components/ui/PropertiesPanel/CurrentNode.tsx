@@ -188,6 +188,16 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           onChange={(e) => handleAspectChange(e.target.value as AspectType)}
           size="small"
           fullWidth
+          className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
         >
           <MenuItem value={AspectType.Function}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
