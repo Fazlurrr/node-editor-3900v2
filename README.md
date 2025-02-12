@@ -1,4 +1,4 @@
-# IMF Editor <img src="images/IMF-Editor.png" alt="Description" width="200" />
+# <img src="images/IMF-Editor.png" alt="Description" width="25"/> IMF Editor 
 
 
 Welcome to IMF Editor 🛠️, a robust and versatile tool for creating, updating, and managing nodes and their relationships. This application provides a dynamic environment 🌐 where users can not only create and modify nodes but also establish and adjust edges that define the connections between them. 
