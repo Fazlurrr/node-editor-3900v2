@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import {
   type Edge,
   type Node,
@@ -36,7 +36,7 @@ import { ThemeProvider } from 'styled-components';
 import { Sidebar, NodesPanel } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
-import { addNode } from '@/lib/utils/nodes';
+import { addNode, addTerminalToBlock } from '@/lib/utils/nodes';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
@@ -90,23 +90,157 @@ const Editor = () => {
   }, [setNodes, setEdges]);
 
   const onLoad = (instance: ReactFlowInstance) => setReactFlowInstance(instance);
+  
+  const isPointInsideNode = (point: { x: number; y: number }, node: Node) => {
+    if (!node.positionAbsolute && !node.position) return false;
 
+    const { x, y } = node.positionAbsolute ?? node.position;
+    const width = node.width ?? 150;
+    const height = node.height ?? 150;
+
+    const inside = 
+      point.x >= x && 
+      point.x <= x + width && 
+      point.y >= y && 
+      point.y <= y + height;
+
+      return inside;
+  };
+
+  const getSnappedPosition = (node: Node, blockNode: Node) => {
+    if (!blockNode) return { x: node.position.x, y: node.position.y };
+  
+    // Get dimensions
+    const childWidth = node.width ?? 22;
+    const childHeight = node.height ?? 22;
+    const parentWidth = blockNode.width ?? 110;
+    const parentHeight = blockNode.height ?? 66;
+  
+    // Calculate relative position
+    const relativeX = node.position.x;
+    const relativeY = node.position.y;
+  
+    // Calculate distances to edges
+    const distances = [
+      { edge: "left", distance: Math.abs(relativeX + childWidth) },
+      { edge: "right", distance: Math.abs(relativeX - parentWidth) },
+      { edge: "top", distance: Math.abs(relativeY + childHeight) },
+      { edge: "bottom", distance: Math.abs(relativeY - parentHeight) },
+    ];
+  
+    const closestEdge = distances.reduce((prev, curr) =>
+      curr.distance < prev.distance ? curr : prev
+    );
+  
+    let newX = relativeX;
+    let newY = relativeY;
+  
+    // Snap to closest edge
+    switch (closestEdge.edge) {
+      case "left":
+        newX = -childWidth;
+        newY = Math.max(-childHeight, Math.min(relativeY, parentHeight));
+        break;
+      case "right":
+        newX = parentWidth;
+        newY = Math.max(-childHeight, Math.min(relativeY, parentHeight));
+        break;
+      case "top":
+        newY = -childHeight;
+        newX = Math.max(-childWidth, Math.min(relativeX, parentWidth));
+        break;
+      case "bottom":
+        newY = parentHeight;
+        newX = Math.max(-childWidth, Math.min(relativeX, parentWidth));
+        break;
+    }
+  
+    return { x: newX, y: newY };
+  };
+  
+
+  const onNodeDrag = useCallback(
+    (_: unknown, node: Node) => {
+      if (node.type !== "terminal" || !node.parentId) return;
+  
+      const { nodes, setNodes } = useStore.getState();
+      const blockNode = nodes.find((n) => n.id === node.parentId);
+  
+      if (!blockNode) return;
+  
+      // Get the corrected position
+      const { x: newX, y: newY } = getSnappedPosition(node, blockNode);
+  
+      // Update node position
+      const updatedNodes = nodes.map((n) => {
+        if (n.id === node.id) {
+          return {
+            ...n,
+            position: { x: newX, y: newY },
+          };
+        }
+        return n;
+      });
+  
+      setNodes(updatedNodes);
+    },
+    [] // No dependencies needed since we fetch `nodes` from `useStore.getState()`
+  );
+   
+  
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-
+  
     if (!reactFlowWrapper.current || !reactFlowInstance) return;
-
+  
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
     const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-
+  
     if (!data) return;
-
-    const position = reactFlowInstance.project({
-      x: event.clientX - reactFlowBounds.left - 25,
-      y: event.clientY - reactFlowBounds.top - 25,
+  
+    const position = reactFlowInstance.screenToFlowPosition({
+      x: event.clientX - reactFlowBounds.left,
+      y: event.clientY - reactFlowBounds.top,
     });
-
-    addNode(data.aspect, data.nodeType, position);
+  
+    if (data.nodeType === "terminal") {
+      const blockNode = nodes.find(
+        (node) => isPointInsideNode(position, node) && node.type === "block"
+      );
+      
+      if (blockNode) {
+        // Calculate position relative to the block
+        const relativePosition = {
+          x: position.x - blockNode.position.x,
+          y: position.y - blockNode.position.y
+        };
+  
+        // Create temporary node for position calculation
+        const tempNode = {
+          id: 'temp',
+          type: 'terminal',
+          position: relativePosition,
+          width: 22,
+          height: 22,
+          data
+        };
+  
+        // Get snapped position relative to block
+        const snappedPosition = getSnappedPosition(tempNode, {
+          ...blockNode,
+          position: { x: 0, y: 0 }
+        });
+        
+        // Pass the relative snapped position directly
+        addTerminalToBlock(blockNode.id, snappedPosition, data.aspect);
+        return;
+      }
+    }
+    
+    addNode(data.aspect, data.nodeType, {
+      x: position.x - 25,
+      y: position.y - 25
+    });
   };
 
   const handleNodeClick = (_: React.MouseEvent, node: Node) => {
@@ -165,6 +299,7 @@ const Editor = () => {
             nodeTypes={nodeTypes as unknown as NodeTypes}
             edgeTypes={edgeTypes as unknown as EdgeTypes}
             onNodeDragStop={(_, node) => updateNode(node.id)}
+            onNodeDrag={onNodeDrag}
             onNodeClick={handleNodeClick}
             onEdgeClick={handleEdgeClick}
             onPaneClick={() => setSelectedElement(null)}
