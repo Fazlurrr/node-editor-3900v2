@@ -7,8 +7,10 @@ import {
   TooltipTrigger,
 } from '../ui/tooltip';
 import { Asterisk } from 'lucide-react';
+import { useStore } from 'reactflow';
 
 const Connector = (props: CustomNodeProps) => {
+  const connectionStartHandle = useStore((store) => store.connectionStartHandle);
 
   // Check for custom attributes
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
@@ -41,7 +43,9 @@ const Connector = (props: CustomNodeProps) => {
               </div>
             )}
 
-            <Handles nodeId={props.data.label} />
+            <div style={{ visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden' }}>
+              <Handles nodeId={props.data.label} />
+            </div>
           </figure>
         </TooltipTrigger>
         {props.data.customName !== '' && (
