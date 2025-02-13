@@ -14,6 +14,14 @@ const Part = (props: CustomEdgeProps) => {
 
   return (
     <g onClick={() => openSidebar({ ...props, type: 'part' })}>
+      {/* Invisible path for larger clickable area */}
+      <path
+        stroke="transparent"
+        strokeWidth="20"
+        d={pathData}
+        fill="none"
+        style={{ cursor: 'pointer' }}
+      />
       <defs>
         <marker
         id="parthead"
