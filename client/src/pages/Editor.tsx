@@ -126,18 +126,19 @@ const Editor = () => {
 
   const handlePaste = async (clipboardElement: Node | Edge) => {
     
-    const clonedNode = { ...clipboardElement } as Node;
-    const { id, ...nodeWithoutId } = clonedNode;
-    
-    if (nodeWithoutId.position) {
-      nodeWithoutId.position = {
-        x: nodeWithoutId.position.x + 20,
-        y: nodeWithoutId.position.y + 20,
-      };
-    }
+  const clonedNode = JSON.parse(JSON.stringify(clipboardElement)) as Node;
+  const { id, ...nodeWithoutId } = clonedNode;
+  
+  if (nodeWithoutId.position) {
+    nodeWithoutId.position = {
+      x: nodeWithoutId.position.x + 20,
+      y: nodeWithoutId.position.y + 20,
+    };
+  }
     
     const newNode = { ...nodeWithoutId, id: `${clonedNode.type}-${uuidv4()}` };
-      await createNode(newNode);
+    await createNode(newNode);
+    setNodes([...nodes, newNode]);
   };
   
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);

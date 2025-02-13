@@ -8,13 +8,13 @@ import { updateNode } from '@/api/nodes';
 
 const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [tempName, setTempName] = useState(props.data.customName ?? '');
+  const [tempName, setTempName] = useState(props.data.customName || props.data.label || '');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
 
   useEffect(() => {
-    setTempName(props.data.customName ?? '');
-  }, [props.data.customName]);
+    setTempName(props.data.customName || props.data.label || '');
+  }, [props.data.customName, props.data.label]);
 
   const handleSubmit = () => {
     if (tempName.trim() !== props.data.customName) {
@@ -28,7 +28,7 @@ const Block = (props: CustomNodeProps) => {
       e.preventDefault();
       handleSubmit();
     } else if (e.key === 'Escape') {
-      setTempName(props.data.customName ?? '');
+      setTempName(props.data.customName || props.data.label || '');
       setIsEditing(false);
     }
   };
@@ -42,8 +42,6 @@ const Block = (props: CustomNodeProps) => {
   // Check if the node has custom attributes
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
-
-  
 
   return (
     <figure

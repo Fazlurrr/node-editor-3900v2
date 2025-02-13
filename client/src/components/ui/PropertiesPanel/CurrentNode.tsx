@@ -29,8 +29,8 @@ const customAttributeSchema = z.object({
 });
 
 const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
-  const [label, setLabel] = useState(currentNode.data.label || '');
   const [editLabel, setEditLabel] = useState(false);
+  const [tempName, setTempName] = useState(currentNode.data.customName || currentNode.data.label || '');
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -52,17 +52,27 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   });
 
   useEffect(() => {
-    setLabel(currentNode.data.label || '');
+    setTempName(currentNode.data.customName || currentNode.data.label || '');
     setCustomAttributes(currentNode.data.customAttributes || []);
   }, [currentNode]);
 
-  const handleUpdateLabel = async () => {
-    const updated = await updateNode(currentNode.id, { label });
+  const handleUpdateCustomName = async () => {
+    const trimmedName = tempName.trim();
+    const updated = await updateNode(currentNode.id, { customName: trimmedName });
     if (updated) {
-      currentNode.data.label = label;
+      currentNode.data.customName = trimmedName;
     }
     setEditLabel(false);
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleUpdateCustomName();
+    } else if (e.key === 'Escape') {
+      setTempName(currentNode.data.customName || currentNode.data.label || '');
+      setEditLabel(false);
+    }
+  }
 
   const onSubmitAttribute = async (values: z.infer<typeof customAttributeSchema>) => {
     if (editingIndex === null) {
@@ -162,17 +172,26 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   return (
     <div className="">
       <div className="mb-2 p-4">
-        <strong>Name:</strong>{' '}
+      <strong>Name:</strong>{' '}
         {editLabel ? (
           <Input
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            onBlur={handleUpdateLabel}
+            value={tempName}
+            onChange={(e) => setTempName(e.target.value)}
+            onBlur={handleUpdateCustomName}
             autoFocus
+            onKeyDown={handleKeyDown}
           />
         ) : (
-          <span title="Edit Name" onClick={() => setEditLabel(true)} className="cursor-pointer">
-            {label || 'N/A'} <Edit2 size={18} className="inline ml-1" />
+          <span
+            title="Edit Name"
+            onClick={() => {
+              setTempName(currentNode.data.customName || currentNode.data.label || '');
+              setEditLabel(true);
+            }}
+            className="cursor-pointer"
+          >
+            {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
+            <Edit2 size={18} className="inline ml-1" />
           </span>
         )}
       </div>
