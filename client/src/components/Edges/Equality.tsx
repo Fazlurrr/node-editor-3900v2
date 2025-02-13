@@ -32,6 +32,14 @@ const Equality = (props: CustomEdgeProps) => {
 
   return (
     <g onClick={() => openSidebar({ ...props, type: 'equality' })}>
+      {/* Invisible path for larger clickable area */}
+      <path
+        stroke="transparent"
+        strokeWidth="20"
+        d={pathData}
+        fill="none"
+        style={{ cursor: 'pointer' }}
+      />
       <path stroke="currentColor" strokeWidth="2" d={pathData} fill="none" />
       <path stroke="currentColor" strokeWidth="2" d={pathData2} fill="none" />
     </g>
