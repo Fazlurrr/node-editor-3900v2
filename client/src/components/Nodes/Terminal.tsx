@@ -1,12 +1,6 @@
 import Handles from './Handles';
 import { useSidebar } from '@/hooks';
 import type { CustomNodeProps } from '@/lib/types';
-import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from '../ui/tooltip';
 import { Asterisk } from 'lucide-react'; // Importing an icon
 
 const Terminal = (props: CustomNodeProps) => {
@@ -17,9 +11,7 @@ const Terminal = (props: CustomNodeProps) => {
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
+
           <figure id={props.data.label} className="relative">
             <div
               onClick={() => openSidebar(props)}
@@ -46,16 +38,6 @@ const Terminal = (props: CustomNodeProps) => {
 
             <Handles nodeId={props.data.label} />
           </figure>
-        </TooltipTrigger>
-        {props.data.customName !== '' && (
-          <TooltipContent>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {props.data.customName}
-            </p>
-          </TooltipContent>
-        )}
-      </Tooltip>
-    </TooltipProvider>
   );
 };
 
