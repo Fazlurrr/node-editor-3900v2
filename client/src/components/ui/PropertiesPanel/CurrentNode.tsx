@@ -11,6 +11,10 @@ import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode, deleteNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
 import { TextField, MenuItem } from '@mui/material';
+import { capitalizeFirstLetter } from '@/lib/utils';
+import { useStore, storeSelector } from '@/hooks';
+import { shallow } from 'zustand/shallow';
+
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -29,12 +33,13 @@ const customAttributeSchema = z.object({
 });
 
 const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
-  const [label, setLabel] = useState(currentNode.data.label || '');
+  const [customName, setCustomName] = useState(currentNode.data.customName || '');
   const [editLabel, setEditLabel] = useState(false);
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const { nodes, setNodes } = useStore(storeSelector, shallow);
 
   const form = useForm<z.infer<typeof customAttributeSchema>>({
     resolver: zodResolver(customAttributeSchema),
@@ -52,17 +57,24 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   });
 
   useEffect(() => {
-    setLabel(currentNode.data.label || '');
+    setCustomName(currentNode.data.customName || '');
     setCustomAttributes(currentNode.data.customAttributes || []);
   }, [currentNode]);
 
-  const handleUpdateLabel = async () => {
-    const updated = await updateNode(currentNode.id, { label });
+  const handleUpdateCustomName = async () => {
+    const trimmedName = customName.trim();
+    const updated = await updateNode(currentNode.id, { customName: trimmedName });
     if (updated) {
-      currentNode.data.label = label;
+      const updatedNodes = nodes.map((node) =>
+        node.id === currentNode.id
+          ? { ...node, data: { ...node.data, customName: trimmedName } }
+          : node
+      );
+      setNodes(updatedNodes);
     }
     setEditLabel(false);
   };
+
 
   const onSubmitAttribute = async (values: z.infer<typeof customAttributeSchema>) => {
     if (editingIndex === null) {
@@ -165,14 +177,14 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         <strong>Name:</strong>{' '}
         {editLabel ? (
           <Input
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            onBlur={handleUpdateLabel}
+            value={customName}
+            onChange={(e) => setCustomName(e.target.value)}
+            onBlur={handleUpdateCustomName}
             autoFocus
           />
         ) : (
           <span title="Edit Name" onClick={() => setEditLabel(true)} className="cursor-pointer">
-            {label || 'N/A'} <Edit2 size={18} className="inline ml-1" />
+            {customName !== '' ? customName : capitalizeFirstLetter(currentNode.data.label)} <Edit2 size={18} className="inline ml-1" />
           </span>
         )}
       </div>
@@ -188,17 +200,17 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           onChange={(e) => handleAspectChange(e.target.value as AspectType)}
           size="small"
           fullWidth
-          className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
-                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
-                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
-                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
-                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
-                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
-                  dark:[&_.MuiInputLabel-root]:text-white
-                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
-                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
-                  dark:[&_.MuiSelect-icon]:text-white"
-
+          className="
+          dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+          dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+          dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+          dark:[&_.MuiInputBase-input]:text-[#9facbc]
+          dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+          dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+          dark:[&_.MuiInputLabel-root]:text-white
+          dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+          dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+          dark:[&_.MuiSelect-icon]:text-white"
         >
           <MenuItem value={AspectType.Function}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
