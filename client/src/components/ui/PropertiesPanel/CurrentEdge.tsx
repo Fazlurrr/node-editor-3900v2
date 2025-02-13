@@ -48,19 +48,47 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
         <div>{targetNode ? targetNode.data.label : currentEdge.target}</div>
       </div>
       <div className="mb-4">
-        <strong>Connection Type:</strong>
+        <strong>Relation Type:</strong>
         <Select 
           value={currentEdge.type} 
           onValueChange={(value) => handleConnectionTypeChange(value as EdgeType)}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue>{currentEdge.type}</SelectValue>
+            <SelectValue>
+              {(() => {
+              switch (currentEdge.type) {
+                case EdgeType.Connected:
+                return 'Connected to';
+                case EdgeType.Transfer:
+                return 'Transferred to';
+                case EdgeType.Part:
+                return 'Part of';
+                case EdgeType.Specialization:
+                return 'Specialization';
+                case EdgeType.Fulfilled:
+                return 'Fulfills';
+                case EdgeType.Proxy:
+                return 'Proxy';
+                case EdgeType.Projection:
+                return 'Projection';
+                case EdgeType.Equality:
+                return 'Same as';
+                default:
+                return currentEdge.type;
+              }
+              })()}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value={EdgeType.Part}>Part of</SelectItem>
               <SelectItem value={EdgeType.Connected}>Connected to</SelectItem>
-              <SelectItem value={EdgeType.Fulfilled}>Fulfilled by</SelectItem>
+              <SelectItem value={EdgeType.Transfer}>Transferred to</SelectItem>
+              <SelectItem value={EdgeType.Part}>Part of</SelectItem>
+              <SelectItem value={EdgeType.Specialization}>Specialization</SelectItem>
+              <SelectItem value={EdgeType.Fulfilled}>Fulfills</SelectItem>
+              <SelectItem value={EdgeType.Proxy}>Proxy</SelectItem>
+              <SelectItem value={EdgeType.Projection}>Projection</SelectItem>
+              <SelectItem value={EdgeType.Equality}>Same as</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
