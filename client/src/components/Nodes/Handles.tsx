@@ -10,7 +10,6 @@ const Handles: FC<{
     width: '7px',
     height: '7px', 
     borderRadius: '50%',
-    bottom: '0.5px', 
   };
 
   return (

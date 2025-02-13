@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
+import { useStore } from 'reactflow';
 import Handles from './Handles';
 import type { CustomNodeProps } from '@/lib/types';
 import { capitalizeFirstLetter } from '@/lib/utils';
@@ -9,6 +10,7 @@ const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(props.data.customName ?? '');
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const connectionStartHandle = useStore((store) => store.connectionStartHandle);
 
   useEffect(() => {
     setTempName(props.data.customName ?? '');
@@ -40,6 +42,8 @@ const Block = (props: CustomNodeProps) => {
   // Check if the node has custom attributes
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
+
+  
 
   return (
     <figure
@@ -88,7 +92,9 @@ const Block = (props: CustomNodeProps) => {
         </div>
       )}
 
-      <Handles nodeId={props.data.label} />
+      <div style={{ visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden' }}>
+        <Handles nodeId={props.data.label} />
+      </div>
     </figure>
   );
 };
