@@ -3,6 +3,9 @@ import CurrentNode from './CurrentNode';
 import CurrentEdge from './CurrentEdge';
 import { MiniMapStyled } from '@/components/ui/styled';
 import { AspectType } from '@/lib/types';
+import { set } from 'zod';
+import React from 'react';
+import {  MiniMapProvider ,useMiniMapContext } from '../toggleMiniMap';
 
 interface PropertiesPanelProps {
   selectedElement: Node | Edge | null;
@@ -34,41 +37,49 @@ const getAspectColor = (node: any): string => {
 
 const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) => {
 
+  const { isMiniMapVisible } = useMiniMapContext();
+
+
   return (
-    <div
-      className="h-full w-56 border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 right-0 z-10 
-      flex flex-col"
-    >
-      <div className="pb-2 pl-4 mt-14 mb-2 border-b border-[#9facbc]">
-      <h2 className="text-lg font-semibold text-black dark:text-white">Properties</h2>
-      </div>
-      <div className="flex-1 overflow-auto">
-      {selectedElement ? (
-        isEdgeElement(selectedElement) ? (
-        <CurrentEdge currentEdge={selectedElement} />
+    <MiniMapProvider>
+      <div
+        className="h-full w-56 border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 right-0 z-10 
+        flex flex-col"
+      >
+        <div className="pb-2 pl-4 mt-14 mb-2 border-b border-[#9facbc]">
+        <h2 className="text-lg font-semibold text-black dark:text-white">Properties</h2>
+        </div>
+        <div className="flex-1 overflow-auto">
+        {selectedElement ? (
+          isEdgeElement(selectedElement) ? (
+          <CurrentEdge currentEdge={selectedElement} />
+          ) : (
+          <CurrentNode currentNode={selectedElement} />
+          )
         ) : (
-        <CurrentNode currentNode={selectedElement} />
-        )
-      ) : (
-        <p className="p-4">No element selected</p>
-      )}
+          <p className="p-4">No element selected</p>
+        )}
+        </div>
+        {isMiniMapVisible && (
+          
+          <MiniMapStyled
+            nodeColor={getAspectColor}
+            pannable={true}
+            zoomable={true}
+            zoomStep={0.5}
+            style={{
+              position: 'relative',
+              width: 224,
+              height: 120,
+              bottom: 'auto',
+              right: 'auto',
+              margin: 0,
+              borderTop: '1px solid #9facbc',
+            }}
+          />
+        )}
       </div>
-      <MiniMapStyled
-      nodeColor={getAspectColor}
-      pannable={true}
-      zoomable={true}
-      zoomStep={0.5}
-      style={{
-        position: 'relative',
-        width: 224,
-        height: 120,
-        bottom: 'auto',
-        right: 'auto',
-        margin: 0,
-        borderTop: '1px solid #9facbc',
-      }}
-      />
-    </div>
+    </MiniMapProvider>
   );
 };
 

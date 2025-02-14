@@ -1,6 +1,6 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useRef } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { Node, Edge } from 'reactflow';
 
 export const useKeyboardShortcuts = (
@@ -58,6 +58,7 @@ export const useKeyboardShortcuts = (
     'ctrl+v, command+v',
     () => {
       if (clipboardRef.current) {
+        toast.success('Pasted');
         onPaste(clipboardRef.current);
       }
     },
