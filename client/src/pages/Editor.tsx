@@ -50,6 +50,7 @@ const Editor = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
 
   const nodeTypes = useMemo(
     () => ({
@@ -189,70 +190,78 @@ const Editor = () => {
 
   const onNodeDragStop = async (_: unknown, node: Node) => {
     const { nodes } = useStore.getState();
-    
-    if (node.type === "block") {
-      // Update the block's position
-      await updateNode(node.id);
-  
-      // Update all child terminals with their absolute positions
-      const childTerminals = nodes.filter(
-        n => n.type === "terminal" && n.parentId === node.id
-      );
-  
-      for (const terminal of childTerminals) {
-        // Calculate absolute position based on parent block's position
-        const absolutePosition = {
-          x: node.position.x + terminal.position.x,
-          y: node.position.y + terminal.position.y
-        };
-  
-        // Update terminal in state with absolute position
-        const updatedNodes = nodes.map((n) => {
-          if (n.id === terminal.id) {
-            return {
-              ...n,
-              position: terminal.position,
-              positionAbsolute: absolutePosition
+    const initialPos = initialPositions.current[node.id];
+    if (initialPos) {
+      const hasPositionChanged =
+        node.position.x !== initialPos.x ||
+        node.position.y !== initialPos.y;
+      if (hasPositionChanged) {
+        if (node.type === "block") {
+          // Update the block's position
+          await updateNode(node.id);
+      
+          // Update all child terminals with their absolute positions
+          const childTerminals = nodes.filter(
+            n => n.type === "terminal" && n.parentId === node.id
+          );
+      
+          for (const terminal of childTerminals) {
+            // Calculate absolute position based on parent block's position
+            const absolutePosition = {
+              x: node.position.x + terminal.position.x,
+              y: node.position.y + terminal.position.y
             };
+      
+            // Update terminal in state with absolute position
+            const updatedNodes = nodes.map((n) => {
+              if (n.id === terminal.id) {
+                return {
+                  ...n,
+                  position: terminal.position,
+                  positionAbsolute: absolutePosition
+                };
+              }
+              return n;
+            });
+            setNodes(updatedNodes);
+      
+            // Update in backend
+            await updateNode(terminal.id);
           }
-          return n;
-        });
-        setNodes(updatedNodes);
-  
-        // Update in backend
-        await updateNode(terminal.id);
-      }
-    } else if (node.type === "terminal" && node.parentId) {
-      const blockNode = nodes.find((n) => n.id === node.parentId);
-      if (blockNode) {
-        // Get the final snapped position relative to parent
-        const snappedPosition = getSnappedPosition(node, blockNode);
-        
-        // Calculate the absolute position based on the snapped position
-        const absolutePosition = {
-          x: blockNode.position.x + snappedPosition.x,
-          y: blockNode.position.y + snappedPosition.y
-        };
-  
-        // Update terminal in state with both positions
-        const updatedNodes = nodes.map((n) => {
-          if (n.id === node.id) {
-            return {
-              ...n,
-              position: snappedPosition,        // Relative position for React Flow
-              positionAbsolute: absolutePosition // Absolute position for storage
+        } else if (node.type === "terminal" && node.parentId) {
+          const blockNode = nodes.find((n) => n.id === node.parentId);
+          if (blockNode) {
+            // Get the final snapped position relative to parent
+            const snappedPosition = getSnappedPosition(node, blockNode);
+            
+            // Calculate the absolute position based on the snapped position
+            const absolutePosition = {
+              x: blockNode.position.x + snappedPosition.x,
+              y: blockNode.position.y + snappedPosition.y
             };
+      
+            // Update terminal in state with both positions
+            const updatedNodes = nodes.map((n) => {
+              if (n.id === node.id) {
+                return {
+                  ...n,
+                  position: snappedPosition,        // Relative position for React Flow
+                  positionAbsolute: absolutePosition // Absolute position for storage
+                };
+              }
+              return n;
+            });
+            setNodes(updatedNodes);
+      
+            // Update in backend
+            await updateNode(node.id);
           }
-          return n;
-        });
-        setNodes(updatedNodes);
-  
-        // Update in backend
-        await updateNode(node.id);
+        } else {
+          // For all other nodes
+          await updateNode(node.id);
+        }
       }
-    } else {
-      // For all other nodes
-      await updateNode(node.id);
+      delete initialPositions.current[node.id];
     }
   };
 
@@ -374,6 +383,12 @@ const Editor = () => {
             onConnect={onConnect}
             nodeTypes={nodeTypes as unknown as NodeTypes}
             edgeTypes={edgeTypes as unknown as EdgeTypes}
+            onNodeDragStart={(_, node) => {
+              initialPositions.current[node.id] = {
+                x: node.position.x,
+                y: node.position.y,
+              };
+            }}
             onNodeDragStop={onNodeDragStop}
             onNodeDrag={onNodeDrag}
             onNodeClick={handleNodeClick}
