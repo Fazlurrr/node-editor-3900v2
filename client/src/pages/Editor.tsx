@@ -403,6 +403,7 @@ const Editor = () => {
               event.preventDefault();
               event.dataTransfer.dropEffect = 'move';
             }}
+          >
             <NodesPanel />
             <Sidebar />
             <PropertiesPanel selectedElement={selectedElement} />
