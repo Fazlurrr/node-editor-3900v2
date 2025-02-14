@@ -518,11 +518,11 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
               </div>
               <div className="flex justify-center mt-4">
                 <Button
-                type="submit"
-                className="w-1/2 bg-[#232528] dark:bg-white text-white dark:text-[#232528]"
-                size="sm"
+                  type="submit"
+                  className={`w-1/2 ${buttonVariants.confirm}`}
+                  size="sm"
                 >
-                {editingIndex === null ? 'Add' : 'Update'}
+                  {editingIndex === null ? 'Add' : 'Update'}
                 </Button>
               </div>
               </form>

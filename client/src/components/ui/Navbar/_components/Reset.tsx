@@ -48,10 +48,12 @@ const ResetConfirm = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => reset()} className={buttonVariants.danger}>
+          <AlertDialogCancel className={buttonVariants.cancel}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={() => reset()} className={buttonVariants.danger}>
             Reset
-            </AlertDialogAction>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
