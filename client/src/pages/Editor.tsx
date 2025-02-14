@@ -27,7 +27,6 @@ import {
 } from '@/components/Edges';
 import {
   ControlsStyled,
-  MiniMapStyled,
   ReactFlowStyled,
   darkTheme,
   lightTheme,
@@ -44,6 +43,7 @@ import { deleteNode } from '@/api/nodes';
 import { deleteEdge } from '@/api/edges';
 import { createNode } from '@/api/nodes';
 import { v4 as uuidv4 } from 'uuid';
+
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -403,6 +403,7 @@ const Editor = () => {
               event.preventDefault();
               event.dataTransfer.dropEffect = 'move';
             }}
+          >
             <NodesPanel />
             <Sidebar />
             <PropertiesPanel selectedElement={selectedElement} />
