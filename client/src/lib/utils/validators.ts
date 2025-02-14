@@ -123,10 +123,10 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
         throw new Error(`Terminal ${node.id} must transfer by`);
       }
       if (!node.height) {
-        node.height = 26;
+        node.height = 22;
       }
       if (!node.width) {
-        node.width = 24;
+        node.width = 22;
       }
       if (!node.position.x) {
         throw new Error(`Terminal ${node.id} must have an x position`);
