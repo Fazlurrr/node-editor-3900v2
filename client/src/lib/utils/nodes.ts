@@ -93,7 +93,8 @@ export const addNode = async (aspect: AspectType, type: NodeType, position: { x:
 
 export const addTerminalToBlock = async (
   blockNodeId: string, 
-  position: { x: number; y: number }, 
+  relativePosition: { x: number; y: number },
+  absolutePosition: { x: number; y: number },
   aspect: string
 ) => {
   const { nodes, setNodes } = useStore.getState();
@@ -108,13 +109,14 @@ export const addTerminalToBlock = async (
 
   const type = NodeType.Terminal;
   const labelNum = getMaxNumber(type) + 1;
-  const label = type === 'terminal' ? `T${labelNum}` : `C${labelNum}`;
+  const label = `T${labelNum}`;
 
-  // Create the terminal node with relative position and parent reference
+  // Create the terminal node
   const terminal: Node = {
     type: type,
     id: `${type}-${uuidv4()}`,
-    position: position,  // Using the snapped relative position
+    position: relativePosition,
+    positionAbsolute: absolutePosition,
     data: {
       aspect,
       label,
@@ -122,22 +124,29 @@ export const addTerminalToBlock = async (
       createdBy: user?.id,
       terminalOf: blockNodeId,
     },
-    parentId: blockNodeId,  // Important for maintaining the parent-child relationship
+    parentId: blockNodeId,
     draggable: true,
     selectable: true,
   };
 
-  const response = await createNode(terminal);
+  // First create the node
+  const response = await createNode({
+    ...terminal,
+    position: absolutePosition
+  });
 
   if (!response) {
     toast.error("Failed to create Terminal");
     return;
   }
 
-  // When adding to the nodes array, use the same position
-  // ReactFlow will handle the rendering position automatically
-  // since we've specified the parentId
+  // Add to React Flow state
   setNodes([...nodes, terminal]);
+
+  // Immediately update the position to ensure it's stored correctly
+  await updateNode(terminal.id);
+
+  return terminal;
 };
 
 

@@ -7,7 +7,7 @@ import {
   EdgeTypes,
   NodeTypes,
   ReactFlowProvider,
-  ReactFlowInstance,
+  ReactFlowInstance
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 import 'reactflow/dist/style.css';
@@ -168,10 +168,10 @@ const Editor = () => {
   
       if (!blockNode) return;
   
-      // Get the corrected position
+      // Get the snapped position relative to parent
       const { x: newX, y: newY } = getSnappedPosition(node, blockNode);
   
-      // Update node position
+      // Update node position for visual feedback
       const updatedNodes = nodes.map((n) => {
         if (n.id === node.id) {
           return {
@@ -184,10 +184,79 @@ const Editor = () => {
   
       setNodes(updatedNodes);
     },
-    [] // No dependencies needed since we fetch `nodes` from `useStore.getState()`
+    []
   );
-   
+
+  const onNodeDragStop = async (_: unknown, node: Node) => {
+    const { nodes } = useStore.getState();
+    
+    if (node.type === "block") {
+      // Update the block's position
+      await updateNode(node.id);
   
+      // Update all child terminals with their absolute positions
+      const childTerminals = nodes.filter(
+        n => n.type === "terminal" && n.parentId === node.id
+      );
+  
+      for (const terminal of childTerminals) {
+        // Calculate absolute position based on parent block's position
+        const absolutePosition = {
+          x: node.position.x + terminal.position.x,
+          y: node.position.y + terminal.position.y
+        };
+  
+        // Update terminal in state with absolute position
+        const updatedNodes = nodes.map((n) => {
+          if (n.id === terminal.id) {
+            return {
+              ...n,
+              position: terminal.position,
+              positionAbsolute: absolutePosition
+            };
+          }
+          return n;
+        });
+        setNodes(updatedNodes);
+  
+        // Update in backend
+        await updateNode(terminal.id);
+      }
+    } else if (node.type === "terminal" && node.parentId) {
+      const blockNode = nodes.find((n) => n.id === node.parentId);
+      if (blockNode) {
+        // Get the final snapped position relative to parent
+        const snappedPosition = getSnappedPosition(node, blockNode);
+        
+        // Calculate the absolute position based on the snapped position
+        const absolutePosition = {
+          x: blockNode.position.x + snappedPosition.x,
+          y: blockNode.position.y + snappedPosition.y
+        };
+  
+        // Update terminal in state with both positions
+        const updatedNodes = nodes.map((n) => {
+          if (n.id === node.id) {
+            return {
+              ...n,
+              position: snappedPosition,        // Relative position for React Flow
+              positionAbsolute: absolutePosition // Absolute position for storage
+            };
+          }
+          return n;
+        });
+        setNodes(updatedNodes);
+  
+        // Update in backend
+        await updateNode(node.id);
+      }
+    } else {
+      // For all other nodes
+      await updateNode(node.id);
+    }
+  };
+
+   
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   
@@ -226,13 +295,20 @@ const Editor = () => {
         };
   
         // Get snapped position relative to block
-        const snappedPosition = getSnappedPosition(tempNode, {
-          ...blockNode,
-          position: { x: 0, y: 0 }
-        });
+        const snappedPosition = getSnappedPosition(tempNode, blockNode);
         
-        // Pass the relative snapped position directly
-        addTerminalToBlock(blockNode.id, snappedPosition, data.aspect);
+        // Calculate absolute position for storage
+        const absolutePosition = {
+          x: blockNode.position.x + snappedPosition.x,
+          y: blockNode.position.y + snappedPosition.y
+        };
+        
+        addTerminalToBlock(
+          blockNode.id, 
+          snappedPosition,  // For React Flow rendering
+          absolutePosition, // For storage
+          data.aspect
+        );
         return;
       }
     }
@@ -298,7 +374,7 @@ const Editor = () => {
             onConnect={onConnect}
             nodeTypes={nodeTypes as unknown as NodeTypes}
             edgeTypes={edgeTypes as unknown as EdgeTypes}
-            onNodeDragStop={(_, node) => updateNode(node.id)}
+            onNodeDragStop={onNodeDragStop}
             onNodeDrag={onNodeDrag}
             onNodeClick={handleNodeClick}
             onEdgeClick={handleEdgeClick}
