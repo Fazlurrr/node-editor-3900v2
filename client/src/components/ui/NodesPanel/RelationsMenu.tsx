@@ -115,10 +115,13 @@ const RelationsMenu: React.FC = () => {
     setEdgeType(edgeType);
   };
 
+  const relationButton = "w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700";
+  const activeRelationButton = "bg-gray-200 dark:bg-gray-700";
+
   return (
     <div className="flex flex-wrap justify-between">
       <button
-        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Topology ? 'bg-gray-200' : ''}`}
+        className={`${relationButton} ${edgeType === EdgeType.Topology ? activeRelationButton : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Topology)}
       >
         Connected to
@@ -132,7 +135,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Transfer ? 'bg-gray-200' : ''}`}
+        className={`${relationButton} ${edgeType === EdgeType.Transfer ? activeRelationButton : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Transfer)}
       >
         Transferred to
@@ -153,7 +156,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Part ? 'bg-gray-200' : ''}`}
+        className={`${relationButton} ${edgeType === EdgeType.Part ? activeRelationButton : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Part)}
       >
         Part of
@@ -174,7 +177,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Specialization ? 'bg-gray-200' : ''}`}
+        className={`${relationButton} ${edgeType === EdgeType.Specialization ? activeRelationButton : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Specialization)}
       >
         Specialization
@@ -196,7 +199,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Fulfilled ? 'bg-gray-200' : ''}`}
+        className={`${relationButton} ${edgeType === EdgeType.Fulfilled ? activeRelationButton : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Fulfilled)}
       >
         Fulfills
@@ -219,7 +222,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Proxy ? 'bg-gray-200' : ''}`}
+        className={`${relationButton} ${edgeType === EdgeType.Proxy ? activeRelationButton : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Proxy)}
       >
         Proxy
@@ -234,7 +237,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Projection ? 'bg-gray-200' : ''}`}
+        className={`${relationButton} ${edgeType === EdgeType.Projection ? activeRelationButton : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Projection)}
       >
         Projection
@@ -256,7 +259,7 @@ const RelationsMenu: React.FC = () => {
         </svg>
       </button>
       <button
-        className={`w-1/2 text-center text-black dark:text-white p-1 text-sm hover:bg-gray-200 ${edgeType === EdgeType.Equality ? 'bg-gray-200' : ''}`}
+        className={`${relationButton} ${edgeType === EdgeType.Equality ? activeRelationButton : ''}`}
         onClick={() => handleEdgeTypeSelection(EdgeType.Equality)}
       >
         Same as
