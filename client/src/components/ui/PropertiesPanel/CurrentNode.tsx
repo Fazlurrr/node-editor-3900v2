@@ -5,13 +5,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { Input } from '../input';
 import { Button } from '../button';
+import { buttonVariants } from '@/lib/config.ts';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
-import { Edit2, Plus, Minus } from 'lucide-react';
+import { Edit2, Plus, Minus,  X} from 'lucide-react';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode, deleteNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
-import { TextField, MenuItem, createMuiTheme } from '@mui/material';
-import { modes } from 'react-transition-group/SwitchTransition';
+import { TextField, MenuItem } from '@mui/material';
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -22,16 +22,16 @@ const customAttributeSchema = z.object({
   value: z.string().min(1).max(25),
   unitOfMeasure: z.string().optional(),
   quantityDatums: z.object({
-    provenance: z.enum(['','specified', 'calculated', 'measured']).optional(),
-    scope: z.enum(['','design', 'operating']).optional(),
-    range: z.enum(['','nominal', 'normal', 'average', 'minimum', 'maximum']).optional(),
-    regularity: z.enum(['','continuous', 'absolute']).optional(),
+    provenance: z.enum(['', 'specified', 'calculated', 'measured']).optional(),
+    scope: z.enum(['', 'design', 'operating']).optional(),
+    range: z.enum(['', 'nominal', 'normal', 'average', 'minimum', 'maximum']).optional(),
+    regularity: z.enum(['', 'continuous', 'absolute']).optional(),
   }).optional(),
 });
 
 const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
-  const [label, setLabel] = useState(currentNode.data.label || '');
   const [editLabel, setEditLabel] = useState(false);
+  const [tempName, setTempName] = useState(currentNode.data.customName || currentNode.data.label || '');
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -53,17 +53,27 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   });
 
   useEffect(() => {
-    setLabel(currentNode.data.label || '');
+    setTempName(currentNode.data.customName || currentNode.data.label || '');
     setCustomAttributes(currentNode.data.customAttributes || []);
   }, [currentNode]);
 
-  const handleUpdateLabel = async () => {
-    const updated = await updateNode(currentNode.id, { label });
+  const handleUpdateCustomName = async () => {
+    const trimmedName = tempName.trim();
+    const updated = await updateNode(currentNode.id, { customName: trimmedName });
     if (updated) {
-      currentNode.data.label = label;
+      currentNode.data.customName = trimmedName;
     }
     setEditLabel(false);
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleUpdateCustomName();
+    } else if (e.key === 'Escape') {
+      setTempName(currentNode.data.customName || currentNode.data.label || '');
+      setEditLabel(false);
+    }
+  }
 
   const onSubmitAttribute = async (values: z.infer<typeof customAttributeSchema>) => {
     if (editingIndex === null) {
@@ -163,17 +173,26 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   return (
     <div className="">
       <div className="mb-2 p-4">
-        <strong>Name:</strong>{' '}
+      <strong>Name:</strong>{' '}
         {editLabel ? (
           <Input
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            onBlur={handleUpdateLabel}
+            value={tempName}
+            onChange={(e) => setTempName(e.target.value)}
+            onBlur={handleUpdateCustomName}
             autoFocus
+            onKeyDown={handleKeyDown}
           />
         ) : (
-          <span onClick={() => setEditLabel(true)} className="cursor-pointer">
-            {label || 'N/A'} <Edit2 size={18} className="inline ml-1" />
+          <span
+            title="Edit Name"
+            onClick={() => {
+              setTempName(currentNode.data.customName || currentNode.data.label || '');
+              setEditLabel(true);
+            }}
+            className="cursor-pointer"
+          >
+            {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
+            <Edit2 size={18} className="inline ml-1" />
           </span>
         )}
       </div>
@@ -189,7 +208,17 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           onChange={(e) => handleAspectChange(e.target.value as AspectType)}
           size="small"
           fullWidth
-          className="text-black dark:text-white bg-white dark:bg-border-dark"
+          className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+
         >
           <MenuItem value={AspectType.Function}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
@@ -232,168 +261,276 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
 
       {/* Custom Attributes Section */}
       <div className="mb-4 px-4 border-b border-[#9facbc]">
-        <Form {...form}>
-          <form className="my-4" onSubmit={form.handleSubmit(onSubmitAttribute)}>
-            <div className="flex justify-between items-center mb-2">
-              <p className="text-black dark:text-white">
-                <strong>Custom attributes</strong>
-              </p>
-              {!isAttributesVisible ? (
-                <Plus
-                  onClick={() => {
-                    setEditingIndex(null);
-                    setIsAttributesVisible(true);
-                  }}
-                  className="text-black dark:text-white hover:cursor-pointer"
-                  size={18}
-                />
-              ) : (
-                <Minus
-                  onClick={() => {
-                    form.reset();
-                    setIsAttributesVisible(false);
-                    setEditingIndex(null);
-                  }}
-                  className="text-red-500 hover:cursor-pointer"
-                  size={18}
-                />
-              )}
-            </div>
+        <div className="flex justify-between items-center mb-2 relative">
+          <p className="text-black dark:text-white">
+            <strong>Custom attributes</strong>
+          </p>
+          <div className="relative">
+            {!isAttributesVisible ? (
+            <span title="Add new attribute">
+              <Plus
+                onClick={() => {
+                    form.reset({
+                      name: '',
+                      value: '',
+                      unitOfMeasure: '',
+                      quantityDatums: {
+                      provenance: '',
+                      scope: '',
+                      range: '',
+                      regularity: '',
+                      },
+                    });
+                  setEditingIndex(null);
+                  setIsAttributesVisible(true);
+                }}
+                className="text-black dark:text-white hover:cursor-pointer"
+                size={18}
+              />
+            </span>
+          ) : (
+            <span title="Close">
+              <Minus
+                onClick={() => {
+                  form.reset();
+                  setIsAttributesVisible(false);
+                  setEditingIndex(null);
+                }}
+                className="text-red-500 hover:cursor-pointer"
+                size={18}
+              />
+            </span>
+            )}
 
-            {isAttributesVisible && (
-              <div className="form-select w-full text-black dark:text-white ">
+            {/* Create Attribute Menu*/}
+        {isAttributesVisible && (
+          <div className="fixed top-64 right-56 w-80 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
+            <div className='flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc]'>
+                    <h2 className='font-bold'>{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h2>
+                  <span className="cursor-pointer" title='Close' onClick={() => setIsAttributesVisible(false)}>
+                    <X size={18} />
+                  </span>
+            </div>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmitAttribute)} className="p-4 pt-0">
                 <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormControl>
-                      <FormItem>
-                        <FormControl>
-                          <TextField {...field} label="Name" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} className="text-black dark:text-white bg-white dark:bg-border-dark" />
-                        </FormControl>
-                        <FormMessage className="text-xs text-red-600" />
-                      </FormItem>
-                    </FormControl>
-                  )}
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                <FormControl>
+                <TextField
+                {...field}
+                label="Name"
+                variant="outlined"
+                size="small"
+                fullWidth
+                className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                            dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                            dark:[&_.MuiInputLabel-root]:text-white
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
                 />
+                </FormControl>
+                <FormMessage className="text-xs text-red-600" />
+                </FormItem>
+              )}
+                />
+                <div className="flex flex-row mt-4 gap-2">
                 <FormField
-                  control={form.control}
-                  name="value"
-                  render={({ field }) => (
-                    <FormControl>
-                      <FormItem>
-                        <FormControl>
-                          <TextField {...field} label="Value" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} className="text-black dark:text-white bg-white dark:bg-border-dark"/>
-                        </FormControl>
-                        <FormMessage className="text-xs text-red-600" />
-                      </FormItem>
-                    </FormControl>
-                  )}
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormControl>
+                <FormItem>
+                <FormControl>
+                <TextField {...field} label="Value" variant="outlined" size="small" fullWidth
+                  className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
                 />
-                <FormField
-                  control={form.control}
-                  name="unitOfMeasure"
-                  render={({ field }) => (
-                    <FormControl>
-                      <FormItem>
-                        <FormControl>
-                          <TextField {...field} label="Unit" variant="outlined" size="small" fullWidth sx={{ mt: 2 }} className="text-black dark:text-white bg-white dark:bg-border-dark"/>
-                        </FormControl>
-                        <FormMessage className="text-xs text-red-600" />
-                      </FormItem>
-                    </FormControl>
-                  )}
+                </FormControl>
+                <FormMessage className="text-xs text-red-600" />
+                </FormItem>
+                </FormControl>
+              )}
                 />
-                {/* Quantity Datums Section */}
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground mb-3">Quantity Datums</p>
-                  <div className="grid grid-cols-1 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="quantityDatums.provenance"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <TextField select {...field} label="Provenance" variant="outlined" size="small" fullWidth className="text-black dark:text-white bg-white dark:bg-border-dark">
-                              <MenuItem value=""
-                              >
-                                <em>None</em>
-                              </MenuItem>
-                              <MenuItem value="specified">Specified</MenuItem>
-                              <MenuItem value="calculated">Calculated</MenuItem>
-                              <MenuItem value="measured">Measured</MenuItem>
-                            </TextField >
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="quantityDatums.scope"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <TextField select {...field} label="Scope" variant="outlined" size="small" fullWidth className="text-black dark:text-white bg-white dark:bg-border-dark">
-                              <MenuItem value="">
-                                <em>None</em>
-                              </MenuItem>
-                              <MenuItem value="design">Design</MenuItem>
-                              <MenuItem value="operating">Operating</MenuItem>
-                            </TextField>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="quantityDatums.range"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <TextField select {...field} label="Range" variant="outlined" size="small" fullWidth className="text-black dark:text-white bg-white dark:bg-border-dark">
-                              <MenuItem value="">
-                                <em>None</em>
-                              </MenuItem>
-                              <MenuItem value="nominal">Nominal</MenuItem>
-                              <MenuItem value="normal">Normal</MenuItem>
-                              <MenuItem value="average">Average</MenuItem>
-                              <MenuItem value="minimum">Minimum</MenuItem>
-                              <MenuItem value="maximum">Maximum</MenuItem>
-                            </TextField>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="quantityDatums.regularity"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <TextField select {...field} label="Regularity" variant="outlined" size="small" fullWidth className="text-black dark:text-white bg-white dark:bg-border-dark">
-                              <MenuItem value="">
-                                <em>None</em>
-                              </MenuItem>
-                              <MenuItem value="continuous">Continuous</MenuItem>
-                              <MenuItem value="absolute">Absolute</MenuItem>
-                            </TextField>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+              <FormField
+                control={form.control}
+                name="unitOfMeasure"
+                render={({ field }) => (
+              <FormControl>
+                <FormItem>
+                <FormControl>
+                <TextField {...field} label="Unit" variant="outlined" size="small" fullWidth
+                className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                dark:[&_.MuiInputLabel-root]:text-white
+                dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                />
+                </FormControl>
+                <FormMessage className="text-xs text-red-600" />
+                </FormItem>
+              </FormControl>
+                )}
+              />
+              </div>
+              {/* Quantity Datums Section */}
+              <div className="mt-4">
+                <p className="text-sm text-muted-foreground dark:text-white mb-3">Quantity Datums</p>
+                <div className="grid grid-cols-2 gap-2">
+              <FormField
+                control={form.control}
+                name="quantityDatums.provenance"
+                render={({ field }) => (
+                <FormItem>
+                <FormControl>
+                <TextField select {...field} label="Provenance" variant="outlined" size="small" fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+                >
+                  <MenuItem value="">
+                <em>None</em>
+                  </MenuItem>
+                  <MenuItem value="specified">Specified</MenuItem>
+                  <MenuItem value="calculated">Calculated</MenuItem>
+                  <MenuItem value="measured">Measured</MenuItem>
+                </TextField>
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quantityDatums.scope"
+                render={({ field }) => (
+                <FormItem>
+                <FormControl>
+                <TextField select {...field} label="Scope" variant="outlined" size="small" fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+                >
+                  <MenuItem value="">
+                <em>None</em>
+                  </MenuItem>
+                  <MenuItem value="design">Design</MenuItem>
+                  <MenuItem value="operating">Operating</MenuItem>
+                </TextField>
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quantityDatums.range"
+                render={({ field }) => (
+                <FormItem>
+                <FormControl>
+                <TextField select {...field} label="Range" variant="outlined" size="small" fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+                >
+                  <MenuItem value="">
+                <em>None</em>
+                  </MenuItem>
+                  <MenuItem value="nominal">Nominal</MenuItem>
+                  <MenuItem value="normal">Normal</MenuItem>
+                  <MenuItem value="average">Average</MenuItem>
+                  <MenuItem value="minimum">Minimum</MenuItem>
+                  <MenuItem value="maximum">Maximum</MenuItem>
+                </TextField>
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quantityDatums.regularity"
+                render={({ field }) => (
+                <FormItem>
+                <FormControl>
+                <TextField select {...field} label="Regularity" variant="outlined" size="small" fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+                >
+                  <MenuItem value="">
+                <em>None</em>
+                  </MenuItem>
+                  <MenuItem value="continuous">Continuous</MenuItem>
+                  <MenuItem value="absolute">Absolute</MenuItem>
+                </TextField>
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+                )}
+              />
                 </div>
-                <Button type="submit" className="w-full my-2 bg-blue-500 hover:bg-blue-700 text-white" size="sm">
+              </div>
+              <div className="flex justify-center mt-4">
+                <Button
+                  type="submit"
+                  className={`w-1/2 ${buttonVariants.confirm}`}
+                  size="sm"
+                >
                   {editingIndex === null ? 'Add' : 'Update'}
                 </Button>
               </div>
-            )}
-          </form>
-        </Form>
+              </form>
+            </Form>
+          </div>
+        )}
+          </div>
+        </div>
 
         {/* List existing custom attributes */}
         {customAttributes.length > 0 && (
@@ -415,17 +552,21 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <strong className="text-sm break-words">{attr.name}</strong>
-                        <Edit2
-                          size={16}
-                          className="cursor-pointer ml-2 text-blue-500"
-                          onClick={() => handleEditAttribute(index)}
+                        <div title="Edit Attribute">
+                          <Edit2
+                            size={16}
+                            className="cursor-pointer ml-2 text-blue-500"
+                            onClick={() => handleEditAttribute(index)}
+                          />
+                        </div>
+                      </div>
+                      <div title="Delete Attribute">
+                        <Minus
+                          size={20}
+                          onClick={() => handleDeleteAttribute(attr)}
+                          className="cursor-pointer text-red-500 ml-2"
                         />
                       </div>
-                      <Minus
-                        size={20}
-                        onClick={() => handleDeleteAttribute(attr)}
-                        className="cursor-pointer text-red-500 ml-2"
-                      />
                     </div>
                     <div className="text-sm break-words">{attr.value}</div>
                     <div className="text-sm break-words">{attr.unitOfMeasure ? ` (${attr.unitOfMeasure})` : ''}</div>
@@ -464,7 +605,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         )}
       </div>
       <div className="mx-4 mb-4">
-        <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline" onClick={() => setShowDeleteDialog(true)}>
+        <Button className={buttonVariants.danger} variant="outline" onClick={() => setShowDeleteDialog(true)}>
           Delete Node
         </Button>
       </div>

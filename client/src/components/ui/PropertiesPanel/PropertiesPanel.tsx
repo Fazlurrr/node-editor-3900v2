@@ -21,7 +21,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
         dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
         [scrollbar-width:thin] 
         [scrollbar-color:lightGray_transparent]">
-      <div className="p-4 mt-14 mb-2 border-b border-[#9facbc]">
+      <div className="pb-2 pl-4 mt-14 mb-2 border-b border-[#9facbc]">
         <h2 className="text-lg font-semibold text-black dark:text-white">Properties</h2>
       </div>
       <div className="overflow-auto">

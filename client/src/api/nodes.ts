@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast';
+import { Bounce, toast, ToastContainer } from 'react-toastify';
 import { getConnectedEdges, type Node } from 'reactflow';
 import { type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
@@ -137,6 +137,7 @@ export const createNode = async (node: Node): Promise<Node | null> => {
     const createdNode = await response.json();
 
     toast.success('Node created successfully!');
+    
 
     if (createdNode) {
       setNodes([...nodes, createdNode]);

@@ -1,12 +1,13 @@
-# Node Editor 3900v2 🌟
+# <img src="images/IMF-Editor.png" alt="Description" width="25"/> IMF Editor 
 
-Welcome to Node Editor 3900v2 🛠️, a robust and versatile tool for creating, updating, and managing nodes and their relationships. This application provides a dynamic environment 🌐 where users can not only create and modify nodes but also establish and adjust edges that define the connections between them. 
+
+Welcome to IMF Editor 🛠️, a robust and versatile tool for creating, updating, and managing nodes and their relationships. This application provides a dynamic environment 🌐 where users can not only create and modify nodes but also establish and adjust edges that define the connections between them. 
 
 Whether you're looking to visualize complex networks, design workflows, or map out systems, our Node Editor offers the flexibility and power 🔌 needed to translate your ideas into actionable diagrams.
 
 ## Introduction 🎬
 
-Node Editor 3900v2 is a web-based platform designed for creating, updating, and managing nodes and their interconnections. Built with React and Vite on the frontend and powered by a .NET backend with SQLite, this tool offers a user-friendly interface for complex data manipulation and visualization. 
+IMF Editor is a web-based platform designed for creating, updating, and managing nodes and their interconnections. Built with React and Vite on the frontend and powered by a .NET backend with SQLite, this tool offers a user-friendly interface for complex data manipulation and visualization. 
 
 Ideal for software developers, project managers, and system architects, it allows for detailed mapping of database schemas, designing workflows, and planning network configurations. It provides a secure, scalable solution for handling various project demands while ensuring data integrity with role-based authentication using JWT. Whether you're sketching out organizational structures or documenting system designs, this tool equips you with the tools to bring precision and clarity to your projects. 🛠️🔐
 
