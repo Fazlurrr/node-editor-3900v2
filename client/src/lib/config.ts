@@ -8,7 +8,7 @@ export const buttonVariants = {
   connector: `${commonStyles} px-5 py-2.5 border-connector  text-connector hover:bg-connector`,
   terminal: `${commonStyles} px-5 py-2.5 border-terminal  text-terminal hover:bg-terminal`,
   danger:
-    'border-red-500 dark:border-red-500 text-red-500 dark:text-red-500 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white',
+    'bg-red-500 border-2 text-white border-red-500 hover:bg-white hover:text-red-500 dark:hover:bg-[#232528] dark:hover:text-red-500',
   verbose:
     'border-yellow-500 dark:border-yellow-500 text-yellow-500 dark:text-yellow-500 hover:bg-yellow-500 hover:text-white dark:hover:bg-yellow-500 dark:hover:text-white',
 };

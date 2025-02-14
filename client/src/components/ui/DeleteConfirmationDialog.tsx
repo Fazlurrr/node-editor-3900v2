@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { buttonVariants } from '@/lib/config';
 
 interface DeleteConfirmationDialogProps {
   open: boolean;
@@ -60,7 +61,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           <AlertDialogCancel onClick={onCancel} ref={cancelButtonRef}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} ref={deleteButtonRef}>
+          <AlertDialogAction onClick={onConfirm} ref={deleteButtonRef} className={buttonVariants.danger}>
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
