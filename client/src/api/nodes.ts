@@ -30,7 +30,34 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
 
   const nodes = await response.json();
 
-  return nodes;
+  // Process nodes to restore parent-child relationships
+  const processedNodes = nodes.map((node: Node) => {
+    if (node.type === 'terminal' && node.data.terminalOf) {
+      // Find the parent block
+      const parentNode = nodes.find((n: { id: unknown; }) => n.id === node.data.terminalOf);
+      
+      if (parentNode) {
+        // Store the absolute position
+        const absolutePosition = { ...node.position };
+        
+        // Calculate relative position
+        const relativePosition = {
+          x: node.position.x - parentNode.position.x,
+          y: node.position.y - parentNode.position.y
+        };
+
+        return {
+          ...node,
+          parentId: node.data.terminalOf,  // Restore the parent relationship
+          position: relativePosition,       // Set relative position for rendering
+          positionAbsolute: absolutePosition // Keep absolute position for storage
+        };
+      }
+    }
+    return node;
+  });
+
+  return processedNodes;
 };
 
 export const uploadNodes = async (nodesToAdd: Node[]): Promise<boolean> => {
@@ -124,7 +151,6 @@ export const createNode = async (node: Node): Promise<Node | null> => {
     stopLoading();
   }
 };
-
 export const updateNode = async (
   nodeToUpdateId: string,
   newNodeData?: UpdateNode
@@ -140,15 +166,28 @@ export const updateNode = async (
   const { token, logout } = useSession.getState();
   const { startLoading, stopLoading } = useLoading.getState();
 
+  // Create a copy of the node to update
+  const updatedNodeData = { ...nodeToUpdate };
+
   if (newNodeData) {
     startLoading();
-    Object.keys(newNodeData).forEach(key => {
-      // @ts-ignore
-      nodeToUpdate.data[key] = newNodeData[key];
-    });
+    // Update only the specified data properties
+    updatedNodeData.data = {
+      ...updatedNodeData.data,
+      ...newNodeData,
+      updatedAt: Date.now()
+    };
+  } else {
+    // If no newNodeData is provided, this is a position update
+    // For terminals with parents, use positionAbsolute if available
+    if (nodeToUpdate.type === 'terminal' && nodeToUpdate.parentId) {
+      updatedNodeData.position = nodeToUpdate.positionAbsolute || nodeToUpdate.position;
+    }
+    updatedNodeData.data = {
+      ...updatedNodeData.data,
+      updatedAt: Date.now()
+    };
   }
-
-  nodeToUpdate.data.updatedAt = Date.now();
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
@@ -157,7 +196,7 @@ export const updateNode = async (
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(nodeToUpdate),
+      body: JSON.stringify(updatedNodeData),
     });
 
     if (response.status === 401) {
@@ -181,6 +220,15 @@ export const updateNode = async (
     if (updatedNode) {
       const newNodes = nodes.map(node => {
         if (node.id === updatedNode.id) {
+          // For terminal nodes with parents, maintain the relative position for rendering
+          if (node.type === 'terminal' && node.parentId) {
+            return {
+              ...updatedNode,
+              position: node.position, // Keep the relative position for rendering
+              positionAbsolute: updatedNode.position, // Store the absolute position
+              parentId: node.parentId // Maintain the parent relationship
+            };
+          }
           return updatedNode;
         }
         return node;
