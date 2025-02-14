@@ -15,15 +15,15 @@ const Terminal = (props: CustomNodeProps) => {
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
 
-  // Create base terminal content
   const terminalContent = (
-    <figure id={props.data.label} className="relative m-0 p-0 inline-flex flex-col">
+    <figure id={props.data.label} className="relative m-0 p-0 block" style={{ lineHeight: 0 }}>
       <div
         className={`h-[22px] w-[22px] overflow-hidden whitespace-nowrap border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+        style={{ display: 'inline-block', verticalAlign: 'top' }}
       >
         <header className="flex h-full w-full items-center justify-center">
           <p
-            className={`truncate text-center text-xs text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark m-0 p-0`}
+            className={`truncate text-center text-xs leading-none text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark m-0 p-0`}
           >
             {props.data.customName === ''
               ? props.data.label.replace('terminal', 'T')
@@ -39,32 +39,36 @@ const Terminal = (props: CustomNodeProps) => {
         </div>
       )}
 
-      <div style={{ visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden' }}>
+      <div 
+        className="absolute" 
+        style={{ 
+          visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden',
+          top: 0 
+        }}
+      >
         <Handles nodeId={props.data.label} />
       </div>
     </figure>
   );
 
-  // Only wrap in tooltip if we have a custom name
-  if (props.data.customName !== '') {
-    return (
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
-          <TooltipTrigger asChild className="block leading-none">
-            {terminalContent}
-          </TooltipTrigger>
-          <TooltipContent side="top" sideOffset={5}>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {props.data.customName}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
+  if (!props.data.customName) {
+    return terminalContent;
   }
 
-  // Return without tooltip wrapping if no custom name
-  return terminalContent;
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger className="block p-0 m-0" style={{ lineHeight: 0 }}>
+          {terminalContent}
+        </TooltipTrigger>
+        <TooltipContent side="top" sideOffset={5}>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {props.data.customName}
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 };
 
 export default Terminal;
