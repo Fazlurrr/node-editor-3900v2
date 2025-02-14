@@ -50,45 +50,106 @@ export const handleNewNodeRelations = (newNodeRelations: NodeRelation[]) => {
   }
 };
 
-// This function triggers when a node is created
-export const addNode = async (aspect: AspectType, type: NodeType, position: { x: number; y: number }) => {
+export const getMaxNumber = (nodeType: string | undefined) => {
   const { nodes } = useStore.getState();
-  const { user } = useSession.getState();
-
- // Filter nodes by type and find the maximum number for each type
- const getMaxNumber = (nodeType: string | undefined) => {
   return nodes.filter(node => node.type === nodeType).reduce((max, node) => {
     const match = node.data.label.match(/\d+$/);
     const currentNumber = match ? parseInt(match[0], 10) : 0;
     return Math.max(max, currentNumber);
   }, 0);
 };
+// This function triggers when a node is created
+export const addNode = async (aspect: AspectType, type: NodeType, position: { x: number; y: number }) => {
+
+    const { user } = useSession.getState();
+
+  // Filter nodes by type and find the maximum number for each type
+
 
 // Determine label number based on type
-const labelNum = getMaxNumber(type) + 1; // Increment the max number found by 1 for the new node
+  const labelNum = getMaxNumber(type) + 1; // Increment the max number found by 1 for the new node
 
-  const label =
-    type === 'block'
-      ? `Block${labelNum}`
-      : type === 'terminal'
-      ? `T${labelNum}`
-      : `C${labelNum}`;
+    const label =
+      type === 'block'
+        ? `Block${labelNum}`
+        : type === 'terminal'
+        ? `T${labelNum}`
+        : `C${labelNum}`;
 
-  const newNode: Node = {
-    type,
-    id: `${type}-${uuidv4()}`,
-    position,
-    data: {
-      aspect,
-      label,
+    const newNode: Node = {
       type,
-      createdBy: user?.id,
-    },
+      id: `${type}-${uuidv4()}`,
+      position,
+      data: {
+        aspect,
+        label,
+        type,
+        createdBy: user?.id,
+      },
   };
 
   // /api/nodes POST request
   await createNode(newNode);
 };
+
+export const addTerminalToBlock = async (
+  blockNodeId: string, 
+  relativePosition: { x: number; y: number },
+  absolutePosition: { x: number; y: number },
+  aspect: string
+) => {
+  const { nodes, setNodes } = useStore.getState();
+  const { user } = useSession.getState();
+
+  const blockNode = nodes.find(node => node.id === blockNodeId);
+
+  if (!blockNode) {
+    toast.error('Could not find block node to add terminal to. Please try again.');
+    return;
+  }
+
+  const type = NodeType.Terminal;
+  const labelNum = getMaxNumber(type) + 1;
+  const label = `T${labelNum}`;
+
+  // Create the terminal node
+  const terminal: Node = {
+    type: type,
+    id: `${type}-${uuidv4()}`,
+    position: relativePosition,
+    positionAbsolute: absolutePosition,
+    data: {
+      aspect,
+      label,
+      type,
+      createdBy: user?.id,
+      terminalOf: blockNodeId,
+    },
+    parentId: blockNodeId,
+    draggable: true,
+    selectable: true,
+  };
+
+  // First create the node
+  const response = await createNode({
+    ...terminal,
+    position: absolutePosition
+  });
+
+  if (!response) {
+    toast.error("Failed to create Terminal");
+    return;
+  }
+
+  // Add to React Flow state
+  setNodes([...nodes, terminal]);
+
+  // Immediately update the position to ensure it's stored correctly
+  await updateNode(terminal.id);
+
+  return terminal;
+};
+
 
 // This function is called to update props of a node when a connection is deleted or a node connected to it is deleted
 export const updateNodeRelations = async (

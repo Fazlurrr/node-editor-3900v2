@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { Input } from '../input';
 import { Button } from '../button';
+import { buttonVariants } from '@/lib/config.ts';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
 import { Edit2, Plus, Minus,  X} from 'lucide-react';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
@@ -517,11 +518,11 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
               </div>
               <div className="flex justify-center mt-4">
                 <Button
-                type="submit"
-                className="w-1/2 bg-[#232528] dark:bg-white text-white dark:text-[#232528]"
-                size="sm"
+                  type="submit"
+                  className={`w-1/2 ${buttonVariants.confirm}`}
+                  size="sm"
                 >
-                {editingIndex === null ? 'Add' : 'Update'}
+                  {editingIndex === null ? 'Add' : 'Update'}
                 </Button>
               </div>
               </form>
@@ -604,7 +605,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         )}
       </div>
       <div className="mx-4 mb-4">
-        <Button className="mt-4 bg-red-500 text-white w-full block" variant="outline" onClick={() => setShowDeleteDialog(true)}>
+        <Button className={buttonVariants.danger} variant="outline" onClick={() => setShowDeleteDialog(true)}>
           Delete Node
         </Button>
       </div>

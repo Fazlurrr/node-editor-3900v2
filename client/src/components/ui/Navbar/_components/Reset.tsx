@@ -19,6 +19,7 @@ import { LucideMonitorX } from 'lucide-react';
 import { deleteEdges } from '@/api/edges';
 import { deleteNodes } from '@/api/nodes';
 import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { buttonVariants } from '@/lib/config.ts';
 
 const ResetConfirm = () => {
   const reset = async () => {
@@ -47,9 +48,11 @@ const ResetConfirm = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => reset()}>
-            Continue
+          <AlertDialogCancel className={buttonVariants.cancel}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={() => reset()} className={buttonVariants.danger}>
+            Reset
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
