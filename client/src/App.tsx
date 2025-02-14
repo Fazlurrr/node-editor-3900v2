@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { useTheme, useSession } from '@/hooks';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { Navbar, Loader } from './components/ui';
+import { GridProvider } from './components/ui/toogleGrid';
+import { MiniMapProvider } from './components/ui/toggleMiniMap';
 
 const routeConfig = {
   [AppPage.Login]: Login,
@@ -31,35 +33,39 @@ const App: React.FC = () => {
   }, [dashboard, setCurrentPage, token]);
 
   return (
-    <>
-      <ToastContainer 
-        position="top-center" 
-        autoClose={4000} 
-        hideProgressBar={false} 
-        newestOnTop={true} 
-        closeOnClick rtl={false} 
-        pauseOnFocusLoss 
-        draggable 
-        pauseOnHover 
-        theme="light" 
-        transition={Bounce} 
-      />
-      <Navbar />
-      {Object.entries(routeConfig).map(([page, Component]) => (
-        <CSSTransition
-          key={page}
-          in={page === currentPage}
-          timeout={300}
-          classNames="page"
-          unmountOnExit
-        >
-          <main className="page h-screen w-screen">
-            <Loader />
-            <Component />
-          </main>
-        </CSSTransition>
-      ))}
-    </>
+    <MiniMapProvider>
+      <GridProvider>
+        <>
+          <ToastContainer 
+            position="top-center" 
+            autoClose={4000} 
+            hideProgressBar={false} 
+            newestOnTop={true} 
+            closeOnClick rtl={false} 
+            pauseOnFocusLoss 
+            draggable 
+            pauseOnHover 
+            theme="light" 
+            transition={Bounce} 
+          />
+          <Navbar />
+          {Object.entries(routeConfig).map(([page, Component]) => (
+            <CSSTransition
+              key={page}
+              in={page === currentPage}
+              timeout={300}
+              classNames="page"
+              unmountOnExit
+            >
+              <main className="page h-screen w-screen">
+                <Loader />
+                <Component />
+              </main>
+            </CSSTransition>
+          ))}
+        </>
+      </GridProvider>
+    </MiniMapProvider>
   );
 };
 

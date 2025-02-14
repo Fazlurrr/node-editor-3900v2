@@ -43,7 +43,8 @@ import { deleteNode } from '@/api/nodes';
 import { deleteEdge } from '@/api/edges';
 import { createNode } from '@/api/nodes';
 import { v4 as uuidv4 } from 'uuid';
-
+import { GridProvider, useGridContext } from '@/components/ui/toogleGrid';
+import { Grid } from 'lucide-react';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -51,6 +52,7 @@ const Editor = () => {
   const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
+  const { isGridVisible } = useGridContext();
 
   const nodeTypes = useMemo(
     () => ({
@@ -373,65 +375,68 @@ const Editor = () => {
   };
 
   return (
-    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <ReactFlowProvider>
-        <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
-          <ReactFlowStyled
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            nodeTypes={nodeTypes as unknown as NodeTypes}
-            edgeTypes={edgeTypes as unknown as EdgeTypes}
-            onNodeDragStart={(_, node) => {
-              initialPositions.current[node.id] = {
-                x: node.position.x,
-                y: node.position.y,
-              };
-            }}
-            onNodeDragStop={onNodeDragStop}
-            onNodeDrag={onNodeDrag}
-            onNodeClick={handleNodeClick}
-            onEdgeClick={handleEdgeClick}
-            onPaneClick={() => setSelectedElement(null)}
-            onInit={onLoad}
-            snapToGrid={true}
-            snapGrid={[11, 11]}
-            onDrop={handleDrop}
-            onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
-              event.preventDefault();
-              event.dataTransfer.dropEffect = 'move';
-            }}
-          >
-            <NodesPanel />
-            <Sidebar />
-            <PropertiesPanel selectedElement={selectedElement} />
-            <ControlsStyled
-              style={{
-                position: 'absolute',
-                top: '95%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
+    <GridProvider>
+      <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+        <ReactFlowProvider>
+          <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
+            <ReactFlowStyled
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              nodeTypes={nodeTypes as unknown as NodeTypes}
+              edgeTypes={edgeTypes as unknown as EdgeTypes}
+              onNodeDragStart={(_, node) => {
+                initialPositions.current[node.id] = {
+                  x: node.position.x,
+                  y: node.position.y,
+                };
               }}
-            />
-
-            <Background
-              color={theme === 'dark' ? '#2f3237' : '#eee'}
-              gap={11}
-              lineWidth={1}
-              variant={BackgroundVariant.Lines}
-            />
-          </ReactFlowStyled>
-        </div>
-        <DeleteConfirmationDialog
-          open={showDeleteDialog}
-          elementType={selectedElement && 'source' in selectedElement ? 'edge' : 'node'}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setShowDeleteDialog(false)}
-        />
-      </ReactFlowProvider>
-    </ThemeProvider>
+              onNodeDragStop={onNodeDragStop}
+              onNodeDrag={onNodeDrag}
+              onNodeClick={handleNodeClick}
+              onEdgeClick={handleEdgeClick}
+              onPaneClick={() => setSelectedElement(null)}
+              onInit={onLoad}
+              snapToGrid={true}
+              snapGrid={[11, 11]}
+              onDrop={handleDrop}
+              onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+              }}
+            >
+              <NodesPanel />
+              <Sidebar />
+              <PropertiesPanel selectedElement={selectedElement} />
+              <ControlsStyled
+                style={{
+                  position: 'absolute',
+                  top: '95%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+              {isGridVisible && (
+                <Background
+                  color={theme === 'dark' ? '#2f3237' : '#eee'}
+                  gap={11}
+                  lineWidth={1}
+                  variant={BackgroundVariant.Lines}
+                />
+              )}
+            </ReactFlowStyled>
+          </div>
+          <DeleteConfirmationDialog
+            open={showDeleteDialog}
+            elementType={selectedElement && 'source' in selectedElement ? 'edge' : 'node'}
+            onConfirm={handleConfirmDelete}
+            onCancel={() => setShowDeleteDialog(false)}
+          />
+        </ReactFlowProvider>
+      </ThemeProvider>
+    </GridProvider>
   );
 };
 

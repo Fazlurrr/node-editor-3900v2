@@ -1,11 +1,6 @@
-import { Moon, Sun } from 'lucide-react';
+import React from 'react';
+import { Moon, Sun, Monitor, Check } from 'lucide-react';
 import { useTheme } from '@/hooks';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../../tooltip';
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
@@ -17,30 +12,28 @@ const ThemeToggle = () => {
   };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
-          <div 
-            className="flex items-center justify-center rounded-sm p-3 hover:bg-muted"
-            onClick={handleToggleTheme}
-          >
-            <Moon
-              className={`size-4 rotate-0 scale-100 transition-all ${theme === 'dark' ? 'dark:-rotate-90 dark:scale-0' : ''}`}
-            />
-            <Sun
-              className={`absolute size-4 rotate-90 scale-0 transition-all ${theme === 'dark' ? 'dark:rotate-0 dark:scale-100' : ''}`}
-            />
-            <span className="sr-only">Toggle theme</span>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Toggle theme
-          </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div className="flex flex-col w-full">
+      {(['light', 'dark'] as const).map((item) => (
+        <button
+          key={item}
+          className={`flex items-center justify-between p-2 w-full hover:bg-gray-100 dark:hover:bg-gray-700 
+                      ${theme === item ? 'bg-blue-100 dark:bg-blue-900' : ''}`
+                    }
+          onClick={() => toggleTheme(item)}
+        >
+          <span className="flex items-center">
+            {item === 'light' && <Sun className="w-5 h-5 text-yellow-400 mr-2" />}
+            {item === 'dark' && <Moon className="w-5 h-5 text-gray-400 mr-2" />}
+            {item.charAt(0).toUpperCase() + item.slice(1)}
+          </span>
+          {theme === item && <Check className="w-5 h-5 text-green-400" />}
+        </button>
+      ))}
+    </div>
   );
 };
 
 export default ThemeToggle;
+
+
+

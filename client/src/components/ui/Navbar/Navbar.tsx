@@ -1,45 +1,34 @@
 import * as React from 'react';
-
 import { cn } from '@/lib/utils';
-
-import {
-  NavigationMenu,
-  NavigationMenuLink,
-} from '@/components/ui/navigation-menu';
-
-import {
-  Menubar,
-  MenubarCheckboxItem,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
-  MenubarTrigger,
-} from "@/components/ui/menubar"
-
-
-
+import { NavigationMenu, NavigationMenuLink } from '@/components/ui/navigation-menu';
+import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from "@/components/ui/menubar"
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import {
-  ThemeToggle,
-  DownloadNodes,
-  Logout,
-  Reset,
-  ViewDashboard,
-  UploadFiles,
-} from './_components';
-
+import { ThemeToggle, DownloadNodes, Logout, Reset, ViewDashboard, UploadFiles } from './_components';
+import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
+import { useGridContext } from '../toogleGrid';
+import { useMiniMapContext } from '../toggleMiniMap';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
   const { theme } = useTheme();
   const { currentPage, setDashboard } = useSession();
+  const { isGridVisible, setGridVisible } = useGridContext();
+  const [isFullScreen, setIsFullScreen] = React.useState(false);
+  const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
+
+  // used for debugging
+  const toggleGrid = () => {
+    console.log("Current grid visibility: ", isGridVisible);
+    setGridVisible(!isGridVisible);
+  }
+
+  // used for debugging
+  const toggleMiniMap = () => {
+    console.log("Current mini map visibility: ", isMiniMapVisible);
+    setMiniMapVisible(!isMiniMapVisible);
+  }
 
   return (
     <NavigationMenu className="fixed h-12 border-b border-[#9facbc] bg-white dark:bg-navbar-dark">
@@ -94,17 +83,19 @@ const Navbar = () => {
                 <MenubarSub>
                 <MenubarSubTrigger inset>Theme</MenubarSubTrigger>
                 <MenubarSubContent className="dark:bg-navbar-dark">
-                  <MenubarItem>Light</MenubarItem>
-                  <MenubarItem>Dark</MenubarItem>
-                  <MenubarItem>System</MenubarItem>
+                  <ThemeToggle />
                 </MenubarSubContent>
                 </MenubarSub>
-                <MenubarCheckboxItem checked>Toggle Grid</MenubarCheckboxItem>
-                <MenubarCheckboxItem checked>Toggle Map</MenubarCheckboxItem>
+                <MenubarCheckboxItem checked={isGridVisible} onCheckedChange={toggleGrid}>
+                  {isGridVisible ? 'Grid' : 'Grid'} <MenubarShortcut>Ctrl+G</MenubarShortcut>
+                </MenubarCheckboxItem>
+                <MenubarCheckboxItem checked={isMiniMapVisible} onCheckedChange={toggleMiniMap}>
+                  {isMiniMapVisible ? 'MiniMap' : 'MiniMap'} <MenubarShortcut>Ctrl+M</MenubarShortcut>
+                </MenubarCheckboxItem>
                 <MenubarSeparator />
-                <MenubarItem inset>
-                Fullscreen <MenubarShortcut>F11</MenubarShortcut>
-                </MenubarItem>
+                <MenubarCheckboxItem checked={isFullScreen} onCheckedChange={toggleFullScreen}>
+                    {isFullScreen ? 'Fullscreen' : 'Fullscreen'} <MenubarShortcut>F11</MenubarShortcut>
+                </MenubarCheckboxItem>
                 <MenubarItem inset>Advanced Settings</MenubarItem>
               </MenubarContent>
               </MenubarMenu>
@@ -128,7 +119,6 @@ const Navbar = () => {
             </>
           )}
           {currentPage === AppPage.Editor && <UploadFiles />}
-          <ThemeToggle />
           {currentPage !== AppPage.Login && <Logout />}
         </div>
       </div>
