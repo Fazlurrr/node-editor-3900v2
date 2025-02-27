@@ -9,6 +9,7 @@ import { ThemeToggle, DownloadNodes, Logout, Reset, ViewDashboard, UploadFiles }
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
 import { useGridContext } from '../toogleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
+import HelpMenu from './HelpMenu/HelpMenu';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
@@ -17,6 +18,8 @@ const Navbar = () => {
   const { isGridVisible, setGridVisible } = useGridContext();
   const [isFullScreen, setIsFullScreen] = React.useState(false);
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
+  const [isHelpMenuVisible, setIsHelpMenuVisible] = React.useState(false);
+  const [helpMenuPage, setHelpMenuPage] = React.useState('');
 
   // used for debugging
   const toggleGrid = () => {
@@ -30,18 +33,23 @@ const Navbar = () => {
     setMiniMapVisible(!isMiniMapVisible);
   }
 
+  const toggleHelpMenu = () => {
+    console.log("Current Help Menu visibility: ", isHelpMenuVisible);
+    setIsHelpMenuVisible(!isHelpMenuVisible);
+  }
+
   return (
     <NavigationMenu className="fixed h-12 border-b border-[#9facbc] bg-white dark:bg-navbar-dark">
       <div className="flex w-full items-center justify-between ">
-        <div className="flex items-center ">
-          <span className="cursor-pointer" onClick={() => setDashboard(false)}>
-            <img src={`/logo-${theme}.png`} alt="Logo" className="h-16 p-4" />
-          </span>
-          {currentPage === AppPage.Editor && (
-            <Menubar className="border-none shadow-none bg-transparent">
-              <MenubarMenu>
-              <MenubarTrigger>File</MenubarTrigger>
-              <MenubarContent className="dark:bg-navbar-dark">
+      <div className="flex items-center ">
+        <span className="cursor-pointer" onClick={() => setDashboard(false)}>
+        <img src={`/logo-${theme}.png`} alt="Logo" className="h-16 p-4" />
+        </span>
+        {currentPage === AppPage.Editor && (
+        <Menubar className="border-none shadow-none bg-transparent">
+          <MenubarMenu>
+          <MenubarTrigger>File</MenubarTrigger>
+          <MenubarContent className="dark:bg-navbar-dark">
                 <MenubarItem>
                 New Project <MenubarShortcut>Ctrl+T</MenubarShortcut>
                 </MenubarItem>
@@ -102,9 +110,9 @@ const Navbar = () => {
               <MenubarMenu>
               <MenubarTrigger>Help</MenubarTrigger>
               <MenubarContent className="dark:bg-navbar-dark">
-                <MenubarItem>Tutorial</MenubarItem>
-                <MenubarItem>IMF Documentation</MenubarItem>
-                <MenubarItem>Credits</MenubarItem>
+                <MenubarItem onClick={() => { toggleHelpMenu(); setHelpMenuPage('Tutorial'); }}>Tutorial</MenubarItem>
+                <MenubarItem onClick={() => window.open('https://sirius-labs.no/imf/')}>IMF Documentation</MenubarItem>
+                <MenubarItem onClick={() => { toggleHelpMenu(); setHelpMenuPage('Credits'); }}>Credits</MenubarItem>
               </MenubarContent>
               </MenubarMenu>
             </Menubar>
@@ -122,6 +130,7 @@ const Navbar = () => {
           {currentPage !== AppPage.Login && <Logout />}
         </div>
       </div>
+      {isHelpMenuVisible && <HelpMenu close={() => setIsHelpMenuVisible(false)} page={helpMenuPage}/>}
     </NavigationMenu>
   );
 };
