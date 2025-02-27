@@ -9,7 +9,7 @@ import { ThemeToggle, DownloadNodes, Logout, Reset, ViewDashboard, UploadFiles }
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
 import { useGridContext } from '../toogleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
-import HelpMenu from './HelpMenu';
+import HelpMenu from './HelpMenu/HelpMenu';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
