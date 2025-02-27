@@ -69,6 +69,11 @@ const HelpMenu: React.FC<HelpMenuProps> = ({close, page}) => {
                   </div>
                 </div>
             )}
+            {currentPage === 'Tutorial' && (
+                <div className='p-4'>
+                    <h2 className="text-lg font-semibold mb-2">Welcome to IMF Editor</h2>
+                </div>
+            )}
         </div>
     )
 }
