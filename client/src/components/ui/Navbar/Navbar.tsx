@@ -110,9 +110,9 @@ const Navbar = () => {
               <MenubarMenu>
               <MenubarTrigger>Help</MenubarTrigger>
               <MenubarContent className="dark:bg-navbar-dark">
-                <MenubarItem onClick={() => { toggleHelpMenu(); setHelpMenuPage('Tutorial'); }}>Tutorial</MenubarItem>
+                <MenubarItem onClick={() => { if (!isHelpMenuVisible) toggleHelpMenu(); setHelpMenuPage('Tutorial'); }}>Tutorial</MenubarItem>
                 <MenubarItem onClick={() => window.open('https://sirius-labs.no/imf/')}>IMF Documentation</MenubarItem>
-                <MenubarItem onClick={() => { toggleHelpMenu(); setHelpMenuPage('Credits'); }}>Credits</MenubarItem>
+                <MenubarItem onClick={() => { if (!isHelpMenuVisible) toggleHelpMenu(); setHelpMenuPage('Credits'); }}>Credits</MenubarItem>
               </MenubarContent>
               </MenubarMenu>
             </Menubar>

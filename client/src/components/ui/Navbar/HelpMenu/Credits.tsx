@@ -1,6 +1,6 @@
 const Credits = () => {
     return (
-        <div>
+        <div className="pb-12">
             <div className='p-4 flex flex-row gap-24 justify-center'>
                 <div>
                     <h2 className="text-lg font-semibold mb-2 flex items-center">

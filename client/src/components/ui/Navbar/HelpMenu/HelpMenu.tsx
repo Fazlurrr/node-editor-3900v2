@@ -1,6 +1,4 @@
 import { X } from 'lucide-react';
-import { buttonVariants } from '@/lib/config.ts';
-import { Button } from '@/components/ui/button';
 import Credits from './Credits';
 import Tutorial from './Tutorial';
 
@@ -13,7 +11,7 @@ const HelpMenu: React.FC<HelpMenuProps> = ({close, page}) => {
   const currentPage = page;
 
     return(
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 h-3/4 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
             <div className='flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc] font-bold'>
                 {currentPage === 'Tutorial' ? 'Tutorial' : currentPage === 'Credits' ? 'Credits' : ''}
               <span className="cursor-pointer" title='Close' onClick={close}>
@@ -24,7 +22,7 @@ const HelpMenu: React.FC<HelpMenuProps> = ({close, page}) => {
                 <Credits />
             )}
             {currentPage === 'Tutorial' && (
-                <Tutorial />
+                <Tutorial close={close} />
             )}
         </div>
     )
