@@ -2,7 +2,7 @@ import { Node, Edge } from 'reactflow';
 import CurrentNode from './CurrentNode';
 import CurrentEdge from './CurrentEdge';
 import { MiniMapStyled } from '@/components/ui/styled';
-import { AspectType } from '@/lib/types';
+import { AspectType, EdgeType } from '@/lib/types';
 import { set } from 'zod';
 import React from 'react';
 import {  MiniMapProvider ,useMiniMapContext } from '../toggleMiniMap';
@@ -34,6 +34,30 @@ const getAspectColor = (node: any): string => {
       return '#f2f2f5';
   }
 };
+
+// const getEdgeColor = (edge: any): string => {
+//   const aspect = edge.data.aspect;
+//   switch (aspect) {
+//     case EdgeType.Connected:
+//       return '#ff6347';  
+//     case EdgeType.Transfer:
+//       return '#4682b4';  
+//     case EdgeType.Part:
+//       return '#32cd32'; 
+//     case EdgeType.Specialization:
+//       return '#ff69b4';
+//     case EdgeType.Fulfilled:
+//       return '#ff4500';
+//     case EdgeType.Proxy:
+//       return '#d3d3d3';
+//     case EdgeType.Projection:
+//       return '#d3d3d3';
+//     case EdgeType.Equality:
+//       return '#d3d3d3';
+//     default:
+//       return '#87gr34'; 
+//   }
+// };
 
 const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) => {
 

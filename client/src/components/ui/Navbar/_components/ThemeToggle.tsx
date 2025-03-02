@@ -22,11 +22,11 @@ const ThemeToggle = () => {
           onClick={() => toggleTheme(item)}
         >
           <span className="flex items-center">
-            {item === 'light' && <Sun className="w-5 h-5 text-yellow-400 mr-2" />}
-            {item === 'dark' && <Moon className="w-5 h-5 text-gray-400 mr-2" />}
+            {item === 'light' && <Sun className="w-4 h-4 text-yellow-400 mr-2" />}
+            {item === 'dark' && <Moon className="w-4 h-4 text-gray-400 mr-2" />}
             {item.charAt(0).toUpperCase() + item.slice(1)}
           </span>
-          {theme === item && <Check className="w-5 h-5 text-green-400" />}
+          {theme === item && <Check className="w-4 h-4 text-green-400" />}
         </button>
       ))}
     </div>

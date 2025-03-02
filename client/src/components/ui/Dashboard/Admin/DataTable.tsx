@@ -28,6 +28,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchIcon from '@mui/icons-material/Search';
+import { TextField, ThemeProvider } from '@mui/material';
+
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -61,24 +65,41 @@ export default function DataTable<TData, TValue>({
   return (
     <>
       <div className="flex items-center py-4">
-        <Input
+        <TextField
           placeholder="Filter username"
-          value={
-            (table.getColumn('username')?.getFilterValue() as string) ?? ''
-          }
+          className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                  dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                  dark:[&_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
+                  dark:[&_.MuiSelect-icon]:text-white"
+          InputProps={{  
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          value={(table.getColumn('username')?.getFilterValue() as string) ?? ''}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             table.getColumn('username')?.setFilterValue(e.target.value)
           }
-          className="max-w-sm"
+          style={{ width: '200px' }}
+          variant="outlined"
         />
+
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="ml-auto border-2 border-black dark:border-[#9facbc]">
               Columns
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="start">
             {table
               .getAllColumns()
               .filter(column => column.getCanHide())
@@ -97,7 +118,17 @@ export default function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div
+            className="mb-4 border border-[#9facbc] max-h-[485px]
+            overflow-y-auto
+            [&::-webkit-scrollbar]:w-1
+            [&::-webkit-scrollbar-track]:bg-white
+            [&::-webkit-scrollbar-thumb]:bg-gray-200
+            dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+            [scrollbar-width:thin] 
+            [scrollbar-color:lightGray_transparent]"
+          >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (

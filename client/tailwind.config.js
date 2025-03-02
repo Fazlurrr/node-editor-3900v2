@@ -1,3 +1,5 @@
+const { Component } = require('lucide-react');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
@@ -54,7 +56,6 @@ module.exports = {
       colors: {
         'navbar-dark': '#232528',
         block: '#ff5f5f',
-        connector: '#5f5fff',
         terminal: '#5fff5f',
         transfer: '#60a5fa',
         'function-light': '#ffff00',
