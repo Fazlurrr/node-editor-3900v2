@@ -33,7 +33,7 @@ const LogoutConfirm = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
           <AlertDialogDescription>
-            All unsaved changes will be lost.
+          All unsaved changes will be lost.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

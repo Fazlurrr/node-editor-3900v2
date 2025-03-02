@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '../../dropdown-menu';
 import { Button } from '../../button';
+import { buttonVariants } from '@/lib/config.ts';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import {
   Select,
@@ -42,6 +43,7 @@ import {
 import { Input } from '../../input';
 import { useState } from 'react';
 import { updatePasswordAdmin } from '@/lib/schemas';
+import { TextField } from '@mui/material';
 
 const UserActions = ({ username, id }: { username: string; id: string }) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -124,11 +126,26 @@ const UpdatePasswordAdmin = ({
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>New password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="password" {...field} />
+                <TextField
+                {...field}
+                type="password"
+                label="New password"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                            dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                            dark:[&_.MuiInputLabel-root]:text-white
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                />
                 </FormControl>
-                <FormMessage className="text-red-500" />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
@@ -137,16 +154,32 @@ const UpdatePasswordAdmin = ({
             name="repeatPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Repeat password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="password" {...field} />
+                <TextField
+                {...field}
+                type="password"
+                label="Repeat password"
+                variant="outlined"
+                fullWidth
+                className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                            dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                            dark:[&_.MuiInputLabel-root]:text-white
+                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                />
                 </FormControl>
-                <FormMessage className="text-red-500" />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
           <div className="mt-6 flex justify-center">
-            <Button type="submit">Update password</Button>
+            <Button className={buttonVariants.confirm} onClick={ form.handleSubmit(handleSubmit)}>
+                      Update password
+            </Button>
           </div>
         </form>
       </Form>

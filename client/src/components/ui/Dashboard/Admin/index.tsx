@@ -5,8 +5,22 @@ import { Separator } from '@/components/ui/separator';
 import Register from './Register';
 import { columns } from './Columns';
 import DataTable from './DataTable';
+import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { buttonVariants } from '@/lib/config.ts';
+import { SetStateAction, useState } from 'react';
+import { storeSelector, useStore, useTheme } from '@/hooks';
+import {
+  ControlsStyled,
+  ReactFlowStyled,
+  darkTheme,
+  lightTheme,
+} from '@/components/ui/styled';
+import { ThemeProvider } from 'styled-components';
 
 const AdminDashboard = () => {
+  const { theme } = useTheme();
+  const [selectedTab, setSelectedTab] = useState('manage');
   const { data, error, isRefetching, refetch } = useQuery({
     queryKey: ['users'],
     queryFn: fetchAllUsers,
@@ -24,25 +38,44 @@ const AdminDashboard = () => {
     );
   }
 
+  const handleTabChange = (newTab: SetStateAction<string>) => {
+    setSelectedTab(newTab);
+    refetch();
+  };
+
+  function goBack() {
+    const navigate = useNavigate();
+    navigate(-1);
+  }
+
   return (
-    <Tabs
-      defaultValue="manage"
-      className="mt-14 flex w-screen flex-col items-center justify-start"
-    >
-      <TabsList className="bg-tansparent grid w-[300px] grid-cols-3">
-        <TabsTrigger value="manage">Manage users</TabsTrigger>
-        <Separator orientation="vertical" className="mx-auto" />
-        <TabsTrigger value="register">Register user</TabsTrigger>
+    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+      <Tabs defaultValue={selectedTab} 
+            onValueChange={handleTabChange} 
+            className="mt-14 flex w-screen flex-col items-center justify-start"
+      >
+        <TabsList className="bg-transparent grid w-[300px] grid-cols-3">
+          <TabsTrigger value="manage" style={{ fontSize: '1.25rem' }}>Manage users</TabsTrigger>
+          <Separator orientation="vertical" className="mx-auto" />
+          <TabsTrigger value="register" style={{ fontSize: '1.25rem' }}>Register user</TabsTrigger>
       </TabsList>
-      <TabsContent value="manage">
-        <div className="mt-4">
-          <DataTable columns={columns} data={data ?? []} />
-        </div>
-      </TabsContent>
-      <TabsContent value="register" className="h-full">
-        <Register />
-      </TabsContent>
-    </Tabs>
+
+        <TabsContent value="manage">
+          <div className="mt-4">
+            <DataTable columns={columns} data={data ?? []} />
+          </div>
+        </TabsContent>
+        <TabsContent value="register" className="h-full">
+          <Register />
+        </TabsContent>
+
+        <div className="mt-6 flex justify-center ">
+          <Button className={buttonVariants.cancel} variant="outlined" onClick={goBack} >
+            Go back to node editor
+          </Button>
+          </div>
+      </Tabs>
+    </ThemeProvider>
   );
 };
 
