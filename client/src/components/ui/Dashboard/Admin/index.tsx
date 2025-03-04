@@ -6,7 +6,6 @@ import Register from './Register';
 import { columns } from './Columns';
 import DataTable from './DataTable';
 import { Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { buttonVariants } from '@/lib/config.ts';
 import { SetStateAction, useState } from 'react';
 import { storeSelector, useStore, useTheme } from '@/hooks';
@@ -43,11 +42,6 @@ const AdminDashboard = () => {
     refetch();
   };
 
-  function goBack() {
-    const navigate = useNavigate();
-    navigate(-1);
-  }
-
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <Tabs defaultValue={selectedTab} 
@@ -70,7 +64,7 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <div className="mt-6 flex justify-center ">
-          <Button className={buttonVariants.cancel} variant="outlined" onClick={goBack} >
+          <Button className={buttonVariants.cancel} variant="outlined" >
             Go back to node editor
           </Button>
           </div>

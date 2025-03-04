@@ -1,40 +1,36 @@
 import { ValidUploadEdge, ValidUploadNode } from '@/lib/types';
 
-export const validateJsonFiles = async (
-  files: File[]
-): Promise<string | null> => {
-  for (const file of files) {
-    if (file.name !== 'nodes.json' && file.name !== 'edges.json') {
-      return 'Files must be named nodes.json and edges.json';
-    }
-    if (file.type !== 'application/json') {
-      try {
-        const text = await file.text();
-        JSON.parse(text);
-      } catch (error) {
-        return 'One or more files are not valid JSON';
-      }
-    }
-    if (file.name === 'nodes.json') {
-      const text = await file.text();
-      try {
-        const nodes = JSON.parse(text);
-        validateNodesJson(nodes);
-      } catch (error) {
-        return `Invalid nodes.json file ${(error as Error).message}`;
-      }
-    }
-    if (file.name === 'edges.json') {
-      const text = await file.text();
-      try {
-        const edges = JSON.parse(text);
-        validateEdgesJson(edges);
-      } catch (error) {
-        return `Invalid edges.json file ${(error as Error).message}`;
-      }
-    }
+export const validateJsonFiles = async (files: File[]): Promise<string | null> => {
+  if (files.length !== 1) {
+    return 'Only one .imf file is allowed';
   }
-  return null;
+
+  const file = files[0];
+
+  if (!file.name.endsWith('.imf')) {
+    return 'File must have a .imf extension';
+  }
+
+  try {
+    const text = await file.text();
+    const parsedData = JSON.parse(text);
+
+    if (!parsedData.nodes || !Array.isArray(parsedData.nodes)) {
+      return 'Invalid file: Missing or incorrect "nodes" array';
+    }
+    if (!parsedData.edges || !Array.isArray(parsedData.edges)) {
+      return 'Invalid file: Missing or incorrect "edges" array';
+    }
+
+    // Validate nodes and edges separately
+    validateNodesJson(parsedData.nodes);
+    validateEdgesJson(parsedData.edges);
+
+  } catch (error) {
+    return `Invalid .imf file: ${(error as Error).message}`;
+  }
+
+  return null; // No errors
 };
 
 export const validateNodesJson = (nodes: ValidUploadNode[]) => {
@@ -73,10 +69,10 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
       if (!node.width) {
         node.width = 96;
       }
-      if (!node.position.x) {
+      if (node.position.x == null) {
         throw new Error(`Block ${node.id} must have an x position`);
       }
-      if (!node.position.y) {
+      if (node.position.y == null) {
         throw new Error(`Block ${node.id} must have a y position`);
       }
       if (!node.id) {
@@ -96,10 +92,10 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
       if (!node.width) {
         node.width = 32;
       }
-      if (!node.position.x) {
+      if (node.position.x == null) {
         throw new Error(`Connector ${node.id} must have an x position`);
       }
-      if (!node.position.y) {
+      if (node.position.y == null) {
         throw new Error(`Connector ${node.id} must have a y position`);
       }
       if (!node.id) {
@@ -128,10 +124,10 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
       if (!node.width) {
         node.width = 22;
       }
-      if (!node.position.x) {
+      if (node.position.x == null) {
         throw new Error(`Terminal ${node.id} must have an x position`);
       }
-      if (!node.position.y) {
+      if (node.position.y == null) {
         throw new Error(`Terminal ${node.id} must have a y position`);
       }
       if (!node.id) {
