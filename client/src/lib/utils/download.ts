@@ -3,18 +3,28 @@ import { type Node } from 'reactflow';
 import { RelationKeys } from '@/lib/types';
 import { capitalizeFirstLetter } from '@/lib/utils';
 
-export const downloadFile = async () => {
+export const downloadFile = async (fileType: string, fileName: string) => {
   // Get nodes and edges from app state
   const { nodes, edges } = useStore.getState();
 
-  // Combine nodes and edges into a single .imf file
-  const graphData = JSON.stringify({ nodes, edges }, null, 2);
-  const blob = new Blob([graphData], { type: 'application/json' });
+  let data: string | Blob;
 
-  const url = window.URL.createObjectURL(blob);
+  if (fileType === 'imf') {
+    // Combine nodes and edges into a single .imf file
+    const imfData = JSON.stringify({ nodes, edges }, null, 2);
+    data = new Blob([imfData], { type: 'application/json' });
+  } else if (fileType === 'rdf') {
+    // Create a string with RDF triples for each node and its relations
+    const rdfData = mapNodeRelationsToString(nodes);
+    data = new Blob([rdfData], { type: 'text/plain' });
+  } else {
+    throw new Error('Unsupported file type');
+  }
+
+  const url = window.URL.createObjectURL(data);
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', 'Untitled.imf');
+  link.setAttribute('download', `${fileName || 'Untitled'}.${fileType}`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

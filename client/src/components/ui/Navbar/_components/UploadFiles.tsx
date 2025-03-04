@@ -18,7 +18,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { validateJsonFiles } from '@/lib/utils/validators';
 import { useSession, useStore } from '@/hooks';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { uploadNodes } from '@/api/nodes';
 import { uploadEdges } from '@/api/edges';
 import { generateNewNodeId } from '@/lib/utils';
@@ -66,10 +66,10 @@ const UploadFileDialog = () => {
     try {
       const file = data.files[0]; // Only one file is expected
       const fileContent = await file.text();
-      const graphData = JSON.parse(fileContent);
+      const imfData = JSON.parse(fileContent);
 
       // Validate the structure of the .imf file
-      if (!graphData.nodes || !graphData.edges) {
+      if (!imfData.nodes || !imfData.edges) {
         setError('files', {
           type: 'manual',
           message: 'Invalid .imf file structure - missing nodes or edges arrays',
@@ -77,8 +77,8 @@ const UploadFileDialog = () => {
         return;
       }
 
-      dataToUpload.nodes = graphData.nodes;
-      dataToUpload.edges = graphData.edges;
+      dataToUpload.nodes = imfData.nodes;
+      dataToUpload.edges = imfData.edges;
 
       const idsToReplace: Record<string, string> = {};
 
