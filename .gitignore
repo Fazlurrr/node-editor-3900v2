@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 
+.git
+.vscode
+temp
+
 
 # Editor directories and files
 !.vscode/extensions.json
