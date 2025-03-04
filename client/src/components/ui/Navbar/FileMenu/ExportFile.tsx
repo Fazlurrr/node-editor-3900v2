@@ -28,7 +28,7 @@ const ExportFile: React.FC = () => {
                     onChange={(e) => setFileType(e.target.value)}
                     variant="outlined"
                     size="small"
-                    className="w-1/4"
+                    className="w-1/3"
                 >
                     <MenuItem value="imf">.imf</MenuItem>
                     <MenuItem value="rdf">.rdf</MenuItem>
