@@ -1,31 +1,26 @@
 import { useStore } from '@/hooks';
-import JSZip from 'jszip';
 import { type Node } from 'reactflow';
 import { RelationKeys } from '@/lib/types';
 import { capitalizeFirstLetter } from '@/lib/utils';
 
-export const downloadZipFile = async () => {
-  const zip = new JSZip();
-
+export const downloadFile = async () => {
   // Get nodes and edges from app state
   const { nodes, edges } = useStore.getState();
-  // Create relation string for relations.txt file
-  const relationsStr = mapNodeRelationsToString(nodes);
 
-  zip.file('relations.txt', relationsStr);
-  zip.file('nodes.json', JSON.stringify(nodes, null, 2));
-  zip.file('edges.json', JSON.stringify(edges, null, 2));
+  // Combine nodes and edges into a single .imf file
+  const graphData = JSON.stringify({ nodes, edges }, null, 2);
+  const blob = new Blob([graphData], { type: 'application/json' });
 
-  const blob = await zip.generateAsync({ type: 'blob' });
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', 'nodeFiles.zip');
+  link.setAttribute('download', 'Untitled.imf');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
 };
+
 
 // Create a string with RDF triples for each node and its relations
 export const mapNodeRelationsToString = (nodes: Node[]): string => {
@@ -149,5 +144,7 @@ export const getReadableKey = (key: RelationKeys): string => {
       return 'transferedBy';
     case 'fulfills':
       return 'fulfills';
+    default:
+      return '';
   }
 };

@@ -24,11 +24,12 @@ import { uploadEdges } from '@/api/edges';
 import { generateNewNodeId } from '@/lib/utils';
 import { Edge, Node } from 'reactflow';
 
+// Updated schema to expect only one .imf file
 const filesSchema = z.object({
   files: z
     .array(z.instanceof(File))
-    .min(2, { message: 'Two JSON files are required' })
-    .max(2, { message: 'Only two JSON files are allowed' }),
+    .min(1, { message: 'One .imf file is required' })
+    .max(1, { message: 'Only one .imf file is allowed' }),
 });
 
 const UploadFileDialog = () => {
@@ -62,31 +63,22 @@ const UploadFileDialog = () => {
       edges: [],
     };
 
-    const fileReadPromises = data.files.map(file => {
-      return new Promise<void>((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          try {
-            if (file.name === 'nodes.json') {
-              dataToUpload.nodes = JSON.parse(e.target!.result as string);
-            } else {
-              dataToUpload.edges = JSON.parse(e.target!.result as string);
-            }
-            resolve();
-          } catch (error) {
-            reject(error);
-          }
-        };
-
-        reader.onerror = () => reject(reader.error);
-
-        reader.readAsText(file);
-      });
-    });
-
     try {
-      await Promise.all(fileReadPromises);
+      const file = data.files[0]; // Only one file is expected
+      const fileContent = await file.text();
+      const graphData = JSON.parse(fileContent);
+
+      // Validate the structure of the .imf file
+      if (!graphData.nodes || !graphData.edges) {
+        setError('files', {
+          type: 'manual',
+          message: 'Invalid .imf file structure - missing nodes or edges arrays',
+        });
+        return;
+      }
+
+      dataToUpload.nodes = graphData.nodes;
+      dataToUpload.edges = graphData.edges;
 
       const idsToReplace: Record<string, string> = {};
 
@@ -143,9 +135,10 @@ const UploadFileDialog = () => {
       const uploadedEdges = await uploadEdges(dataToUpload.edges);
       if (uploadedNodes && uploadedEdges) {
         setDialogOpen(false);
+        toast.success('File uploaded successfully!');
       }
     } catch (error) {
-      toast.error('There was an error processing the files');
+      toast.error('There was an error processing the file');
     }
   };
 
@@ -170,11 +163,11 @@ const UploadFileDialog = () => {
       >
         <div className="flex items-center justify-center rounded-sm p-3 hover:bg-muted">
           <UploadCloud className="size-4 hover:cursor-pointer" />
-          <span className="sr-only">Upload nodes.json & edges.json</span>
+          <span className="sr-only">Upload File</span>
         </div>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>Upload nodes.json & edges.json</DialogHeader>
+        <DialogHeader>Upload File</DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
             name="files"
@@ -185,7 +178,7 @@ const UploadFileDialog = () => {
                 type="file"
                 onBlur={onBlur}
                 onChange={e => onChange([...e.target.files!])}
-                multiple
+                accept=".imf"
                 required
               />
             )}
@@ -209,7 +202,7 @@ const UploadFiles = () => {
         </TooltipTrigger>
         <TooltipContent>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Upload files
+            Upload IMF file
           </p>
         </TooltipContent>
       </Tooltip>

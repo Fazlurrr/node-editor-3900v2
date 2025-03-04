@@ -1,4 +1,4 @@
-import { downloadZipFile } from '@/lib/utils/download';
+import { downloadFile } from '@/lib/utils/download';
 import { DownloadCloud } from 'lucide-react';
 
 import {
@@ -15,7 +15,7 @@ const DownloadNodes = () => {
         <TooltipTrigger>
           <div 
             className="flex items-center justify-center rounded-sm p-3 hover:bg-muted"
-            onClick={downloadZipFile}
+            onClick={downloadFile}
           >
             <DownloadCloud
               className="size-4 hover:cursor-pointer"
