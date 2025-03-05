@@ -5,7 +5,7 @@ import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu,
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import { ThemeToggle, DownloadNodes, Logout, Reset, ViewDashboard, UploadFiles } from './_components';
+import { ThemeToggle, Logout, Reset, ViewDashboard } from './_components';
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
 import { useGridContext } from '../toogleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
@@ -131,10 +131,8 @@ const Navbar = () => {
           {currentPage === AppPage.Editor && nodes.length > 0 && (
             <>
               <Reset />
-              <DownloadNodes />
             </>
           )}
-          {currentPage === AppPage.Editor && <UploadFiles />}
           {currentPage !== AppPage.Login && <Logout />}
         </div>
       </div>
