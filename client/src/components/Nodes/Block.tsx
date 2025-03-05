@@ -84,7 +84,7 @@ const Block = (props: CustomNodeProps) => {
 
       {/* Icon + Amount Indicator */}
       {hasCustomAttributes && (
-        <div className="absolute -top-6 -right-10 flex items-center space-x-1 bg-white px-1 border-2 border-black rounded shadow">
+        <div className="absolute -top-6 -right-10 flex items-center space-x-1 bg-white dark:bg-[#232528] px-1 border-2 border-black dark:border-white rounded shadow">
           <Asterisk className="" size={14} />
           <span className="text-xs font-bold ">{amountOfCustomAttributes}</span>
         </div>

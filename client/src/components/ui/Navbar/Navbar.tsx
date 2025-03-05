@@ -5,11 +5,12 @@ import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu,
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import { ThemeToggle, DownloadNodes, Logout, Reset, ViewDashboard, UploadFiles } from './_components';
+import { ThemeToggle, Logout, Reset, ViewDashboard } from './_components';
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
 import { useGridContext } from '../toogleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
+import Modal from './FileMenu/Modal';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
@@ -20,6 +21,8 @@ const Navbar = () => {
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
   const [isHelpMenuVisible, setIsHelpMenuVisible] = React.useState(false);
   const [helpMenuPage, setHelpMenuPage] = React.useState('');
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [modalPage, setModalPage] = React.useState('');
 
   // used for debugging
   const toggleGrid = () => {
@@ -38,6 +41,11 @@ const Navbar = () => {
     setIsHelpMenuVisible(!isHelpMenuVisible);
   }
 
+  const toggleModal = () => {
+    console.log("Current Modal visibility: ", isModalVisible);
+    setIsModalVisible(!isModalVisible);
+  }
+
   return (
     <NavigationMenu className="fixed h-12 border-b border-[#9facbc] bg-white dark:bg-navbar-dark">
       <div className="flex w-full items-center justify-between ">
@@ -53,8 +61,8 @@ const Navbar = () => {
                 <MenubarItem>
                 New Project <MenubarShortcut>Ctrl+T</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem>Import File</MenubarItem>
-                <MenubarItem>Export File</MenubarItem>
+                <MenubarItem onClick={() => { if (!isModalVisible) toggleModal(); setModalPage('ImportFile'); }}>Import File</MenubarItem>
+                <MenubarItem onClick={() => { if (!isModalVisible) toggleModal(); setModalPage('ExportFile'); }}>Export File</MenubarItem>
                 <MenubarItem>
                 Rename project <MenubarShortcut>Ctrl+N</MenubarShortcut>
                 </MenubarItem>
@@ -123,14 +131,13 @@ const Navbar = () => {
           {currentPage === AppPage.Editor && nodes.length > 0 && (
             <>
               <Reset />
-              <DownloadNodes />
             </>
           )}
-          {currentPage === AppPage.Editor && <UploadFiles />}
           {currentPage !== AppPage.Login && <Logout />}
         </div>
       </div>
       {isHelpMenuVisible && <HelpMenu close={() => setIsHelpMenuVisible(false)} page={helpMenuPage}/>}
+      {isModalVisible && <Modal close={() => setIsModalVisible(false)} page={modalPage}/>}
     </NavigationMenu>
   );
 };
