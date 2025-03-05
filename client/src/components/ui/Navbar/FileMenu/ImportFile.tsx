@@ -136,7 +136,7 @@ import { Edge, Node } from 'reactflow';
     return (
       <div className='p-4'>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className='flex justify-center'>
+            <div className='flex justify-center px-4'>
               <Controller
               name="files"
               control={control}
