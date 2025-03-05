@@ -25,7 +25,7 @@ const Modal: React.FC<ModalProps> = ({close, page}) => {
               </span>
           </div>
           {currentPage === 'ExportFile' && (
-              <ExportFile />
+              <ExportFile close={close} />
           )}
           {currentPage === 'ImportFile' && (
               <ImportFile close={close}/>

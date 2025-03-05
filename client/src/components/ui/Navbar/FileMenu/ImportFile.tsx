@@ -136,26 +136,38 @@ import { Edge, Node } from 'reactflow';
     return (
       <div className='p-4'>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Controller
+            <div className='flex justify-center'>
+              <Controller
               name="files"
               control={control}
               defaultValue={[]}
-              render={({ field: { onChange, onBlur } }) => (
-                <input
-                  type="file"
-                  onBlur={onBlur}
-                  onChange={e => onChange([...e.target.files!])}
-                  accept=".imf"
-                  required
-                />
-              )}
-            />
+                render={({ field: { onChange, onBlur } }) => (
+                  <input
+                    className='w-full border border-[#9facbc] p-2 rounded-lg'
+                    type="file"
+                    onBlur={onBlur}
+                    onChange={e => onChange([...e.target.files!])}
+                    accept=".imf"
+                    required
+                  />
+                )}
+              />
+            </div>
             {errors.files && (
               <p className="my-2 text-red-500">{errors.files.message}</p>
             )}
-            <Button type="submit" className={`w-1/4 ${buttonVariants.confirm}`}>Submit</Button>
+              <div className="flex justify-center mt-4 gap-4">
+                <Button
+                  className={`w-1/4 ${buttonVariants.cancel}`}
+                  onClick={close}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className={`w-1/4 ${buttonVariants.confirm}`}>
+                  Import
+                </Button>
+              </div>
           </form>
-
       </div>
     );
   };

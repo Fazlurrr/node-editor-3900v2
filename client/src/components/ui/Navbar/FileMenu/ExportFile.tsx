@@ -4,8 +4,11 @@ import { buttonVariants } from '@/lib/config.ts';
 import { downloadFile } from '@/lib/utils/download';
 import { TextField, MenuItem } from '@mui/material';
 
+interface ExportFileProps {
+    close: () => void;
+}
 
-const ExportFile: React.FC = () => {
+const ExportFile: React.FC<ExportFileProps> = ({close}) => {
     const [fileName, setFileName] = useState<string>('Untitled');
     const [fileType, setFileType] = useState<string>('imf');
 
@@ -38,7 +41,7 @@ const ExportFile: React.FC = () => {
           <div className="flex justify-center mt-4 gap-4">
             <Button
               className={`w-1/4 ${buttonVariants.cancel}`}
-              onClick={() => setFileName('')}
+              onClick={close}
             >
                 Cancel
             </Button>
@@ -47,7 +50,7 @@ const ExportFile: React.FC = () => {
               onClick={() => downloadFile(fileType, fileName)}
               disabled={!fileName.trim()}
             >
-              Download
+              Export
             </Button>
           </div>
         </div>
