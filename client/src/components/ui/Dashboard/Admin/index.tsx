@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import Register from './Register';
 import { columns } from './Columns';
 import DataTable from './DataTable';
-import { Button } from '@mui/material';
+import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { SetStateAction, useState } from 'react';
 import { storeSelector, useStore, useTheme } from '@/hooks';
@@ -64,8 +64,8 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <div className="mt-6 flex justify-center ">
-          <Button className={buttonVariants.cancel} variant="outlined" >
-            Go back to node editor
+          <Button className={buttonVariants.cancel} >
+            Go back to editor
           </Button>
           </div>
       </Tabs>
