@@ -8,10 +8,8 @@ import DataTable from './DataTable';
 import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { SetStateAction, useState } from 'react';
-import { storeSelector, useStore, useTheme } from '@/hooks';
+import { useTheme } from '@/hooks';
 import {
-  ControlsStyled,
-  ReactFlowStyled,
   darkTheme,
   lightTheme,
 } from '@/components/ui/styled';
