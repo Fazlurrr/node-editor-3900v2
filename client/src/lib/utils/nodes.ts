@@ -1,18 +1,16 @@
 import { useSession, useStore } from '@/hooks';
 import {
   AspectType,
-  CustomNodeProps,
   EdgeType,
   NodeRelation,
-  NodeType,
-  RelationKeys,
-  RelationKeysWithChildren,
+  NodeType
 } from '../types';
+// import CustomNodeProps, RelationKeys, RelationKeysWithChildren from '../types';
 import { createNode, updateNode } from '@/api/nodes';
 import { isBlock, isTerminal } from '.';
 import { v4 as uuidv4 } from 'uuid';
 import { Edge, Node } from 'reactflow';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 
 // Set properties for nodes. NodeRelation is an array of objects with nodeId, relation, and relations properties
@@ -336,45 +334,55 @@ export const updateNodeRelations = async (
     return;
   }
 };
-
+// REMEMBER: This is commented out before we potentially reworked relation structure in back end + NodeData in types.ts
 // Display node relations if they are not empty in sidebar when node is clicked on canvas & sidebar is displayed
-export const getNodeRelations = (
-  currentNode: CustomNodeProps
-): RelationKeysWithChildren[] => {
-  const transformableKeys: RelationKeys[] = [
-    'connectedTo',
-    'connectedBy',
-    'directParts',
-    'fulfilledBy',
-    'terminals',
-    'terminalOf',
-    'directPartOf',
-    'transfersTo',
-    'transferedBy',
-    'fulfills',
-  ];
+// export const getNodeRelations = (
+//   currentNode: CustomNodeProps
+// ): RelationKeysWithChildren[] => {
+//   const transformableKeys: RelationKeys[] = [
+//     'connectedTo',
+//     'connectedBy',
+//     'directParts',
+//     'fulfilledBy',
+//     'terminals',
+//     'terminalOf',
+//     'directPartOf',
+//     'transfersTo',
+//     'transferedBy',
+//     'fulfills',
+//     'topology',
+//     'topologyOf',
+//     'specialization',
+//     'specializationOf',
+//     'proxy',
+//     'proxyOf',
+//     'projection',
+//     'projectionOf',
+//     'equality',
+//     'equalityOf',
+//   ];
 
-  return transformableKeys.reduce(
-    (acc: RelationKeysWithChildren[], key: RelationKeys) => {
-      if (currentNode.data[key]) {
-        let children: { id: string }[];
+//   return transformableKeys.reduce(
+//     (acc: RelationKeysWithChildren[], key: RelationKeys) => {
+//       if (currentNode.data[key]) {
+//         let children: { id: string }[];
 
-        if (typeof currentNode.data[key] === 'string') {
-          children = [{ id: currentNode.data[key] as string }];
-        } else {
-          children = currentNode.data[key] as { id: string }[];
-        }
+//         if (typeof currentNode.data[key] === 'string') {
+//           children = [{ id: currentNode.data[key] as string }];
+//         } else {
+//           children = currentNode.data[key] as { id: string }[];
+//         }
 
-        acc.push({
-          key,
-          children,
-        });
-      }
-      return acc;
-    },
-    []
-  );
-};
+//         acc.push({
+//           key,
+//           children,
+//         });
+//       }
+//       return acc;
+//     },
+//     []
+//   );
+// };
 
 // Triggered when edge connection is updated
 export const updateNodeConnectionData = async (

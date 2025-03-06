@@ -17,32 +17,28 @@ const Navbar = () => {
   const { theme } = useTheme();
   const { currentPage, setDashboard } = useSession();
   const { isGridVisible, setGridVisible } = useGridContext();
-  const [isFullScreen, setIsFullScreen] = React.useState(false);
+  const [ isFullScreen ] = React.useState(false);
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
-  const [isHelpMenuVisible, setIsHelpMenuVisible] = React.useState(false);
-  const [helpMenuPage, setHelpMenuPage] = React.useState('');
-  const [isModalVisible, setIsModalVisible] = React.useState(false);
-  const [modalPage, setModalPage] = React.useState('');
+  const [ isHelpMenuVisible, setIsHelpMenuVisible ] = React.useState(false);
+  const [ helpMenuPage, setHelpMenuPage ] = React.useState('');
+  const [ isModalVisible, setIsModalVisible ] = React.useState(false);
+  const [ modalPage, setModalPage ] = React.useState('');
 
   // used for debugging
   const toggleGrid = () => {
-    console.log("Current grid visibility: ", isGridVisible);
     setGridVisible(!isGridVisible);
   }
 
   // used for debugging
   const toggleMiniMap = () => {
-    console.log("Current mini map visibility: ", isMiniMapVisible);
     setMiniMapVisible(!isMiniMapVisible);
   }
 
   const toggleHelpMenu = () => {
-    console.log("Current Help Menu visibility: ", isHelpMenuVisible);
     setIsHelpMenuVisible(!isHelpMenuVisible);
   }
 
   const toggleModal = () => {
-    console.log("Current Modal visibility: ", isModalVisible);
     setIsModalVisible(!isModalVisible);
   }
 
