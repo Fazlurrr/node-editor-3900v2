@@ -4,11 +4,11 @@ import { deleteEdges } from '@/api/edges';
 import { deleteNodes } from '@/api/nodes';
 import { toast } from 'react-toastify';
 
-interface EmptyCanvasProps {
+interface ResetEditorProps {
     close: () => void;
 }
 
-const EmptyCanvas: React.FC<EmptyCanvasProps> = ({close}) => {
+const ResetEditor: React.FC<ResetEditorProps> = ({close}) => {
     const reset = async () => {
         const deletedNodes = await deleteNodes();
         const deletedEdges = await deleteEdges();
@@ -19,10 +19,13 @@ const EmptyCanvas: React.FC<EmptyCanvasProps> = ({close}) => {
       };
     return (
         <div className='p-4'>
-            <div className='flex justify-center'>
-                <h1>Are you sure you want to reset the editor?</h1>
+            <div className='flex justify-center text-center'>
+                <div>
+                    <h1 className='font-semibold'>Are you sure you want to reset the editor?</h1>
+                    <p>Go to "Export File" to save your progress</p>
+                </div>
             </div>
-            <div className="flex justify-center mt-4 gap-4">
+            <div className="flex justify-center mt-6 gap-4">
                 <Button
                     className={`w-1/4 ${buttonVariants.cancel}`}
                     onClick={close}
@@ -40,4 +43,4 @@ const EmptyCanvas: React.FC<EmptyCanvasProps> = ({close}) => {
     );
 };
 
-export default EmptyCanvas;
+export default ResetEditor;

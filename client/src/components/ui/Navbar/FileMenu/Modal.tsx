@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { useTheme } from '@/hooks';
 import ExportFile from './ExportFile';
 import ImportFile from './ImportFile';
-import EmptyCanvas from './EmptyCanvas';
+import ResetEditor from './ResetEditor';
 
 interface ModalProps {
   close: () => void;
@@ -34,7 +34,7 @@ const Modal: React.FC<ModalProps> = ({close, page}) => {
               <ImportFile close={close} />
           )}
           {currentPage === 'EmptyCanvas' && (
-              <EmptyCanvas close={close} />
+              <ResetEditor close={close} />
           )}
             </div>
         </>
