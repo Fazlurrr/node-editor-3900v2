@@ -11,6 +11,7 @@ import { useGridContext } from '../toogleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
 import Modal from './FileMenu/Modal';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
@@ -61,8 +62,9 @@ const Navbar = () => {
                 <MenubarItem>
                 New Project <MenubarShortcut>Ctrl+T</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem onClick={() => { if (!isModalVisible) toggleModal(); setModalPage('ImportFile'); }}>Import File</MenubarItem>
-                <MenubarItem onClick={() => { if (!isModalVisible) toggleModal(); setModalPage('ExportFile'); }}>Export File</MenubarItem>
+                <MenubarItem onClick={() => { if (nodes.length === 0) { if (!isModalVisible) toggleModal(); setModalPage('ImportFile'); } else { toast.error(
+                              'Please clear the current editor before uploading new files'); } }}>Import File</MenubarItem>
+                <MenubarItem onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('ExportFile'); } else { toast.error('Cannot export an empty file'); } }}>Export File</MenubarItem>
                 <MenubarItem>
                 Rename project <MenubarShortcut>Ctrl+N</MenubarShortcut>
                 </MenubarItem>
