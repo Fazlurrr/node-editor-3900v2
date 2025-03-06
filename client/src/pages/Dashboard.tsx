@@ -1,9 +1,7 @@
 import { useSession } from '@/hooks';
 import { AdminDashboard, UserDashboard } from '@/components/ui/Dashboard';
-import { storeSelector, useStore, useTheme } from '@/hooks';
+import { useTheme } from '@/hooks';
 import {
-  ControlsStyled,
-  ReactFlowStyled,
   darkTheme,
   lightTheme,
 } from '@/components/ui/styled';

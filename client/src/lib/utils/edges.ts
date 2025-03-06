@@ -1,7 +1,7 @@
 import { useConnection, useSession, useStore } from '@/hooks';
 import { Connection, Edge } from 'reactflow';
 import { EdgeType, NodeRelation } from '../types';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { isBlock, isConnector, isTerminal } from '.';
 import { createEdge } from '@/api/edges';
 import { handleNewNodeRelations } from './nodes';

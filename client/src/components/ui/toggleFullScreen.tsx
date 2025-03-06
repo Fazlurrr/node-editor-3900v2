@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 export const toggleFullScreen = (): void => {
@@ -14,7 +14,7 @@ export const toggleFullScreen = (): void => {
 };
 
 const FullScreenToggle = () => {
-  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [, setIsFullScreen] = useState(false);
 
   useEffect(() => {
       const handleFullScreenChange = () => {

@@ -1,13 +1,11 @@
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { TextField, MenuItem, FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
 import { register } from '@/api/auth';
 import { buttonVariants } from '@/lib/config.ts';
 import { Button } from '@/components/ui/button';
-import { truncate } from 'fs';
 
 // Schema for form validation using Zod
 const registerUserSchema = z.object({

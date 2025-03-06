@@ -31,7 +31,7 @@ import {
   lightTheme,
 } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
-import { Sidebar, NodesPanel } from '@/components/ui';
+import { NodesPanel } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import { addNode, addTerminalToBlock } from '@/lib/utils/nodes';
@@ -43,7 +43,6 @@ import { deleteEdge } from '@/api/edges';
 import { createNode } from '@/api/nodes';
 import { v4 as uuidv4 } from 'uuid';
 import { GridProvider, useGridContext } from '@/components/ui/toogleGrid';
-import { Grid } from 'lucide-react';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -346,6 +345,7 @@ const Editor = () => {
     
   const clonedNode = JSON.parse(JSON.stringify(clipboardElement)) as Node;
   const { id, ...nodeWithoutId } = clonedNode;
+  void id;
   
   if (nodeWithoutId.position) {
     nodeWithoutId.position = {
@@ -406,7 +406,6 @@ const Editor = () => {
               }}
             >
               <NodesPanel />
-              <Sidebar />
               <PropertiesPanel selectedElement={selectedElement} />
               <ControlsStyled
                 style={{

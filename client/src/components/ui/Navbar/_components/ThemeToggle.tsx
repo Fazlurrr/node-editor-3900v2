@@ -1,15 +1,8 @@
-import React from 'react';
-import { Moon, Sun, Monitor, Check } from 'lucide-react';
+import { Moon, Sun, Check } from 'lucide-react';
 import { useTheme } from '@/hooks';
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
-
-  const handleToggleTheme = () => {
-    // Toggle between 'light' og 'dark'
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    toggleTheme(newTheme);
-  };
 
   return (
     <div className="flex flex-col w-full">
