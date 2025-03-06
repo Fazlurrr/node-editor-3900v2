@@ -30,7 +30,6 @@ public class EdgeData
 public enum EdgeType
 {
     Connected,
-    Topology,
     Fulfilled,
     Part,
     Transfer,
