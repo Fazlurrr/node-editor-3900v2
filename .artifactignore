@@ -1,0 +1,9 @@
+node_modules/
+tests/
+src/
+.vscode/
+.github/
+.git/
+logs/
+temp/
+dist/**/*.map
