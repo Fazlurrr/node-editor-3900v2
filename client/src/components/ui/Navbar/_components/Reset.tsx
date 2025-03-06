@@ -21,6 +21,8 @@ import { deleteNodes } from '@/api/nodes';
 import { toast } from 'react-toastify';
 import { buttonVariants } from '@/lib/config.ts';
 
+// REMEMBER: Delete later
+
 const ResetConfirm = () => {
   const reset = async () => {
     const deletedNodes = await deleteNodes();

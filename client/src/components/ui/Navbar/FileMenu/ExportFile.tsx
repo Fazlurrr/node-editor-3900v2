@@ -23,6 +23,15 @@ const ExportFile: React.FC<ExportFileProps> = ({close}) => {
                     placeholder="Enter file name"
                     value={fileName}
                     onChange={(e) => setFileName(e.target.value)}
+                    className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                    dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                    dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                    dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                    dark:[&_.MuiInputLabel-root]:text-white
+                    dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
                 />
                 <TextField
                     select
@@ -31,7 +40,15 @@ const ExportFile: React.FC<ExportFileProps> = ({close}) => {
                     onChange={(e) => setFileType(e.target.value)}
                     variant="outlined"
                     size="small"
-                    className="w-1/3"
+                    className="w-1/3 dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                    dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                    dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                    dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                    dark:[&_.MuiInputLabel-root]:text-white
+                    dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
                 >
                     <MenuItem value="imf">.imf</MenuItem>
                     <MenuItem value="rdf">.rdf</MenuItem>

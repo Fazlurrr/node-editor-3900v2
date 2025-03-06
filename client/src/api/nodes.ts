@@ -91,7 +91,6 @@ export const uploadNodes = async (nodesToAdd: Node[]): Promise<boolean> => {
       return false;
     }
 
-    toast.success('Nodes uploaded successfully!');
 
     return true;
   } catch (error) {
