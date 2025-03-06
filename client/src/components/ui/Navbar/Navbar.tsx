@@ -59,9 +59,8 @@ const Navbar = () => {
           <MenubarMenu>
           <MenubarTrigger>File</MenubarTrigger>
           <MenubarContent className="dark:bg-navbar-dark">
-                <MenubarItem>
-                New Project <MenubarShortcut>Ctrl+T</MenubarShortcut>
-                </MenubarItem>
+                <MenubarItem onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('EmptyCanvas'); } else { toast.error(
+                              'Cannot clear an empty editor'); } }}>Reset Editor</MenubarItem>
                 <MenubarItem onClick={() => { if (nodes.length === 0) { if (!isModalVisible) toggleModal(); setModalPage('ImportFile'); } else { toast.error(
                               'Please clear the current editor before uploading new files'); } }}>Import File</MenubarItem>
                 <MenubarItem onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('ExportFile'); } else { toast.error('Cannot export an empty file'); } }}>Export File</MenubarItem>

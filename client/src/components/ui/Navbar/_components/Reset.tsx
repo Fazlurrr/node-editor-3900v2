@@ -18,7 +18,7 @@ import {
 import { LucideMonitorX } from 'lucide-react';
 import { deleteEdges } from '@/api/edges';
 import { deleteNodes } from '@/api/nodes';
-import { Bounce, toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { buttonVariants } from '@/lib/config.ts';
 
 const ResetConfirm = () => {

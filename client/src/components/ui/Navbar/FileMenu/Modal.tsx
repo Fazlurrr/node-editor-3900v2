@@ -2,11 +2,14 @@ import { X } from 'lucide-react';
 import { useTheme } from '@/hooks';
 import ExportFile from './ExportFile';
 import ImportFile from './ImportFile';
+import EmptyCanvas from './EmptyCanvas';
 
 interface ModalProps {
   close: () => void;
   page: string;
 }
+
+
 
 const Modal: React.FC<ModalProps> = ({close, page}) => {
   const currentPage = page;
@@ -19,7 +22,7 @@ const Modal: React.FC<ModalProps> = ({close, page}) => {
             />
             <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/4 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
           <div className='flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc] font-bold'>
-              {currentPage === 'ExportFile' ? 'Export File' : currentPage === 'ImportFile' ? 'Import File' : ''}
+                {currentPage === 'ExportFile' ? 'Export File' : currentPage === 'ImportFile' ? 'Import File' : currentPage === 'EmptyCanvas' ? 'Reset Editor' : ''}
               <span className="cursor-pointer" title='Close' onClick={close}>
             <X size={18} />
               </span>
@@ -28,7 +31,10 @@ const Modal: React.FC<ModalProps> = ({close, page}) => {
               <ExportFile close={close} />
           )}
           {currentPage === 'ImportFile' && (
-              <ImportFile close={close}/>
+              <ImportFile close={close} />
+          )}
+          {currentPage === 'EmptyCanvas' && (
+              <EmptyCanvas close={close} />
           )}
             </div>
         </>
