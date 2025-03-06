@@ -17,7 +17,7 @@ const RelationsMenu: React.FC = () => {
       const { nodes } = useStore(storeSelector, shallow);
 
       useEffect(() => {
-        setEdgeType(EdgeType.Topology);
+        setEdgeType(EdgeType.Connected);
       }, [setEdgeType]);
 
       const createNewConnection = async () => {
@@ -121,8 +121,8 @@ const RelationsMenu: React.FC = () => {
   return (
     <div className="flex flex-wrap justify-between">
       <button
-        className={`${relationButton} ${edgeType === EdgeType.Topology ? activeRelationButton : ''}`}
-        onClick={() => handleEdgeTypeSelection(EdgeType.Topology)}
+        className={`${relationButton} ${edgeType === EdgeType.Connected ? activeRelationButton : ''}`}
+        onClick={() => handleEdgeTypeSelection(EdgeType.Connected)}
       >
         Connected to
         <svg viewBox="0 0 32 8" className="w-8 h-4 mx-auto mt-1">

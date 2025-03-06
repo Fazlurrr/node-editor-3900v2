@@ -16,7 +16,6 @@ import { onConnect } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
 import {
   Connected,
-  Topology,
   Fulfilled,
   Part,
   Transfer,
@@ -67,7 +66,6 @@ const Editor = () => {
     () => ({
       part: Part,
       connected: Connected,
-      topology: Topology,
       fulfilled: Fulfilled,
       transfer: Transfer,
       equality: Equality,

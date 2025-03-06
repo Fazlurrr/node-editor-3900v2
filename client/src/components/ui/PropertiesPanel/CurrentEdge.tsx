@@ -7,6 +7,7 @@ import { EdgeType } from '@/lib/types';
 import toast from 'react-hot-toast';
 import { useStore } from '@/hooks';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
+import { buttonVariants } from '@/lib/config';
 
 interface CurrentEdgeProps {
   currentEdge: any;
@@ -40,20 +41,27 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
   };
 
   return (
-    <div className="px-4">
-      <div className="mb-2">
-        <strong>Edge from</strong>
-        <div>{sourceNode ? sourceNode.data.label : currentEdge.source}</div>
-        <strong>To</strong>
-        <div>{targetNode ? targetNode.data.label : currentEdge.target}</div>
+    <div className="">
+      <div className="mb-1 px-4 p-4 flex items-center">
+        <strong>Edge from:</strong>
+        <div className="ml-2 text-black-600">
+          {sourceNode ? sourceNode.data.label : currentEdge.source}
+        </div>
       </div>
-      <div className="mb-4">
+      <div className="mb-0 px-4 pb-4 flex items-center">
+        <strong>To:</strong>
+        <div className="ml-2 text-black-600">
+          {targetNode ? targetNode.data.label : currentEdge.target}
+        </div>
+      </div>
+      <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
         <strong>Relation Type:</strong>
+        <div className="mb-2"></div>
         <Select 
           value={currentEdge.type} 
           onValueChange={(value) => handleConnectionTypeChange(value as EdgeType)}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] p-3">
             <SelectValue>
               {(() => {
               switch (currentEdge.type) {
@@ -93,13 +101,11 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           </SelectContent>
         </Select>
       </div>
-      <Button
-        className="mt-4 bg-red-500 text-white w-full"
-        variant="outline"
-        onClick={() => setShowDeleteDialog(true)}
-      >
-        Delete
-      </Button>
+      <div className="mx-4 mb-4">
+              <Button className={buttonVariants.danger} variant="outline" onClick={() => setShowDeleteDialog(true)}>
+                Delete Edge
+              </Button>
+            </div>
       <DeleteConfirmationDialog
         open={showDeleteDialog}
         elementType="edge"
