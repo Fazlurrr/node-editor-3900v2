@@ -114,7 +114,6 @@ export const uploadEdges = async (edgesToAdd: Edge[]): Promise<boolean> => {
       return false;
     }
 
-    toast.success('Edges uploaded successfully!');
 
     return true;
   } catch (error) {

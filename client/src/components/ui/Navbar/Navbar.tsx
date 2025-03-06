@@ -5,7 +5,7 @@ import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu,
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import { ThemeToggle, Logout, Reset, ViewDashboard } from './_components';
+import { ThemeToggle, Logout, ViewDashboard } from './_components';
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
 import { useGridContext } from '../toogleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
@@ -60,10 +60,11 @@ const Navbar = () => {
           <MenubarTrigger>File</MenubarTrigger>
           <MenubarContent className="dark:bg-navbar-dark">
                 <MenubarItem onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('EmptyCanvas'); } else { toast.error(
-                              'Cannot clear an empty editor'); } }}>Reset Editor</MenubarItem>
+                  'Editor is already empty'); } }}>Reset Editor</MenubarItem>
                 <MenubarItem onClick={() => { if (nodes.length === 0) { if (!isModalVisible) toggleModal(); setModalPage('ImportFile'); } else { toast.error(
-                              'Please clear the current editor before uploading new files'); } }}>Import File</MenubarItem>
-                <MenubarItem onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('ExportFile'); } else { toast.error('Cannot export an empty file'); } }}>Export File</MenubarItem>
+                  'Please clear the current editor before uploading new files'); } }}>Import File</MenubarItem>
+                <MenubarItem onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('ExportFile'); } else { toast.error(
+                  'Cannot export an empty file'); } }}>Export File</MenubarItem>
                 <MenubarItem>
                 Rename project <MenubarShortcut>Ctrl+N</MenubarShortcut>
                 </MenubarItem>
@@ -129,11 +130,6 @@ const Navbar = () => {
         </div>
         <div className="flex items-center justify-center">
           {currentPage !== AppPage.Login && <ViewDashboard />}
-          {currentPage === AppPage.Editor && nodes.length > 0 && (
-            <>
-              <Reset />
-            </>
-          )}
           {currentPage !== AppPage.Login && <Logout />}
         </div>
       </div>

@@ -24,6 +24,8 @@ import { uploadEdges } from '@/api/edges';
 import { generateNewNodeId } from '@/lib/utils';
 import { Edge, Node } from 'reactflow';
 
+// REMEMBER: Delete later
+
 // Updated schema to expect only one .imf file
 const filesSchema = z.object({
   files: z
