@@ -4,7 +4,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectI
 import { deleteEdge, updateEdge } from '@/api/edges';
 import { updateNodeConnectionData } from '@/lib/utils/nodes';
 import { EdgeType } from '@/lib/types';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { useStore } from '@/hooks';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { buttonVariants } from '@/lib/config';
@@ -34,9 +34,6 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
 
   const handleDeleteEdge = async () => {
     const deleted = await deleteEdge(currentEdge.id);
-    if (deleted) {
-      toast.success('Edge deleted');
-    }
     setShowDeleteDialog(false);
   };
 

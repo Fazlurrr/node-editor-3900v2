@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { Input } from '../input';
 import { Button } from '../button';
 import { buttonVariants } from '@/lib/config.ts';
@@ -95,7 +95,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       if (updated) {
         currentNode.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
-        toast.success('Attribute added');
+        toast.success('Attribute added successfully');
         form.reset();
         setIsAttributesVisible(false);
       }
@@ -157,16 +157,13 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
 
   const handleDeleteNode = async () => {
     const deleted = await deleteNode(currentNode.id);
-    if (deleted) {
-      toast.success('Node deleted');
-    }
   };
 
   const handleAspectChange = async (newAspect: AspectType) => {
     const updated = await updateNode(currentNode.id, { aspect: newAspect });
     if (updated) {
       currentNode.data.aspect = newAspect;
-      toast.success('Aspect updated');
+      toast.success('Aspect updated successfully');
     }
   };
 
