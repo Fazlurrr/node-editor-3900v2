@@ -17,4 +17,4 @@ export const buttonVariants = {
     'border-yellow-500 dark:border-yellow-500 text-yellow-500 dark:text-yellow-500 hover:bg-yellow-500 hover:text-white dark:hover:bg-yellow-500 dark:hover:text-white',
 };
 
-export const selectionColor = 'lightGreen';
+export const selectionColor = '#66f2ff';
