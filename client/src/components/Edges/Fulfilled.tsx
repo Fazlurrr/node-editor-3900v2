@@ -2,7 +2,6 @@ import { useSidebar } from '@/hooks';
 import type { CustomEdgeProps } from '@/lib/types';
 import { getStraightPath } from 'reactflow';
 
-
 const Fulfilled = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
 
