@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy ASP.Net Core app to Azure Web App - node-editor-3900-backend
 
 on:
@@ -8,12 +11,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Or keep windows-latest if needed
+    runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x'
           include-prerelease: true
@@ -22,16 +26,16 @@ jobs:
         run: dotnet build ./server --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish ./server -c Release -o ./publish
+        run: dotnet publish ./server -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ./publish
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
-    runs-on: windows-latest  # Keep if your app requires Windows
+    runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
@@ -50,3 +54,4 @@ jobs:
           app-name: 'node-editor-3900-backend'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4A0564BF1A8642E5A35889BA23F1E010 }}
+          package: .
