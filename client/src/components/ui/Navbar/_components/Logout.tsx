@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '../../alert-dialog';
+import { buttonVariants } from '@/lib/config';
 
 import { useSession } from '@/hooks';
 
@@ -37,10 +38,12 @@ const LogoutConfirm = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => logout()}>
-            Continue
-          </AlertDialogAction>
+                  <AlertDialogCancel className={buttonVariants.cancel}>    
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={() => logout()} className={buttonVariants.confirm}>
+                    Continue
+                  </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

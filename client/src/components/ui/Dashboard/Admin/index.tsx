@@ -62,7 +62,7 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <div className="mt-6 flex justify-center ">
-          <Button className={buttonVariants.cancel} >
+          <Button className={buttonVariants.cancel}>
             Go back to editor
           </Button>
           </div>

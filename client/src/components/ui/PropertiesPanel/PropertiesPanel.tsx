@@ -5,6 +5,9 @@ import { MiniMapStyled } from '@/components/ui/styled';
 import { AspectType} from '@/lib/types';
 import React from 'react';
 import {  MiniMapProvider ,useMiniMapContext } from '../toggleMiniMap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+
 
 interface PropertiesPanelProps {
   selectedElement: Node | Edge | null;
@@ -54,7 +57,10 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
           <CurrentNode currentNode={selectedElement} />
           )
         ) : (
-          <p className="p-4">No element selected</p>
+          <div className="flex items-center justify-center p-4">
+            <FontAwesomeIcon icon={faInfoCircle} className="mr-2 text-blue-600" />
+            <p className="text-normal text-black dark:text-white">No element or relation selected</p>
+          </div>
         )}
         </div>
         {isMiniMapVisible && (
