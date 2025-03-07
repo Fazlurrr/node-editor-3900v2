@@ -226,7 +226,7 @@ export const updateEdge = async (
       return null;
     }
 
-    toast.success('Edge updated successfully!');
+    toast.success('Relation type updated successfully!');
     
     const updatedEdge = await response.json();
 

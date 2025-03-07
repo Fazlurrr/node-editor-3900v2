@@ -608,7 +608,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       </div>
       <DeleteConfirmationDialog
         open={showDeleteDialog}
-        elementType="edge"
+        elementType="node"
         onConfirm={handleDeleteNode}
         onCancel={() => setShowDeleteDialog(false)}
       />

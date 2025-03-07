@@ -5,17 +5,19 @@ import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu,
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import { ThemeToggle, Logout, ViewDashboard } from './_components';
+import { Logout, ViewDashboard } from './_components';
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
 import { useGridContext } from '../toogleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
 import Modal from './FileMenu/Modal';
 import { toast } from 'react-toastify';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { currentPage, setDashboard } = useSession();
   const { isGridVisible, setGridVisible } = useGridContext();
   const [ isFullScreen ] = React.useState(false);
@@ -46,87 +48,94 @@ const Navbar = () => {
   return (
     <NavigationMenu className="fixed h-12 border-b border-[#9facbc] bg-white dark:bg-navbar-dark">
       <div className="flex w-full items-center justify-between ">
-      <div className="flex items-center ">
+      <div className="flex items-center">
         <span className="cursor-pointer" onClick={() => setDashboard(false)}>
         <img src={`/logo-${theme}.png`} alt="Logo" className="h-16 p-4" />
         </span>
         {currentPage === AppPage.Editor && (
         <Menubar className="border-none shadow-none bg-transparent">
           <MenubarMenu>
-          <MenubarTrigger>File</MenubarTrigger>
+          <MenubarTrigger className="cursor-pointer">File</MenubarTrigger>
           <MenubarContent className="dark:bg-navbar-dark">
-                <MenubarItem onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('EmptyCanvas'); } else { toast.error(
+                <MenubarItem className="cursor-pointer" onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('EmptyCanvas'); } else { toast.error(
                   'Editor is already empty'); } }}>Reset Editor</MenubarItem>
-                <MenubarItem onClick={() => { if (nodes.length === 0) { if (!isModalVisible) toggleModal(); setModalPage('ImportFile'); } else { toast.error(
+                <MenubarItem className="cursor-pointer" onClick={() => { if (nodes.length === 0) { if (!isModalVisible) toggleModal(); setModalPage('ImportFile'); } else { toast.error(
                   'Please clear the current editor before uploading new files'); } }}>Import File</MenubarItem>
-                <MenubarItem onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('ExportFile'); } else { toast.error(
+                <MenubarItem className="cursor-pointer" onClick={() => { if (nodes.length > 0) { if (!isModalVisible) toggleModal(); setModalPage('ExportFile'); } else { toast.error(
                   'Cannot export an empty file'); } }}>Export File</MenubarItem>
-                <MenubarItem>
+                <MenubarItem className="cursor-pointer">
                 Rename project <MenubarShortcut>Ctrl+N</MenubarShortcut>
                 </MenubarItem>
                 <MenubarSeparator />
-                <MenubarItem>
+                <MenubarItem className="cursor-pointer">
                 Print... <MenubarShortcut>Ctrl+P</MenubarShortcut>
                 </MenubarItem>
               </MenubarContent>
               </MenubarMenu>
               <MenubarMenu>
-              <MenubarTrigger>Edit</MenubarTrigger>
+              <MenubarTrigger className="cursor-pointer">Edit</MenubarTrigger>
               <MenubarContent className="dark:bg-navbar-dark">
-                <MenubarItem>
+                <MenubarItem className="cursor-pointer">
                 Undo <MenubarShortcut>Ctrl+Z</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem>
+                <MenubarItem className="cursor-pointer">
                 Redo <MenubarShortcut>Shift+Ctrl+Z</MenubarShortcut>
                 </MenubarItem>
                 <MenubarSeparator />
-                <MenubarItem>
+                <MenubarItem className="cursor-pointer">
                 Cut <MenubarShortcut>Ctrl+X</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem>
+                <MenubarItem className="cursor-pointer">
                 Copy <MenubarShortcut>Ctrl+C</MenubarShortcut>
                 </MenubarItem>
-                <MenubarItem>
+                <MenubarItem className="cursor-pointer">
                 Paste <MenubarShortcut>Ctrl+V</MenubarShortcut>
                 </MenubarItem>
               </MenubarContent>
               </MenubarMenu>
               <MenubarMenu>
-              <MenubarTrigger>Settings</MenubarTrigger>
+              <MenubarTrigger className="cursor-pointer">Settings</MenubarTrigger>
               <MenubarContent className="dark:bg-navbar-dark">
                 <MenubarSub>
-                <MenubarSubTrigger inset>Theme</MenubarSubTrigger>
+                <MenubarSubTrigger inset className="cursor-pointer">Theme</MenubarSubTrigger>
                 <MenubarSubContent className="dark:bg-navbar-dark">
-                  <ThemeToggle />
+                <MenubarItem className={`cursor-pointer flex items-center ${theme === 'light' ? 'bg-blue-100 dark:bg-blue-900' : ''}`} onClick={() => toggleTheme('light')}>
+                  <FontAwesomeIcon icon={faCheck} className={`${theme === 'light' ? '' : 'text-transparent'} mr-2`} />
+                  Light
+                </MenubarItem>
+                <MenubarItem className={`cursor-pointer flex items-center ${theme === 'dark' ? 'bg-blue-100 dark:bg-blue-900' : ''}`} onClick={() => toggleTheme('dark')}>
+                  <FontAwesomeIcon icon={faCheck} className={`${theme === 'dark' ? '' : 'text-transparent'} mr-2`} />
+                  Dark
+                </MenubarItem>
                 </MenubarSubContent>
                 </MenubarSub>
-                <MenubarCheckboxItem checked={isGridVisible} onCheckedChange={toggleGrid}>
+                <MenubarCheckboxItem className="cursor-pointer" checked={isGridVisible} onCheckedChange={toggleGrid}>
                   {isGridVisible ? 'Grid' : 'Grid'} <MenubarShortcut>Ctrl+G</MenubarShortcut>
                 </MenubarCheckboxItem>
-                <MenubarCheckboxItem checked={isMiniMapVisible} onCheckedChange={toggleMiniMap}>
+                <MenubarCheckboxItem className="cursor-pointer" checked={isMiniMapVisible} onCheckedChange={toggleMiniMap}>
                   {isMiniMapVisible ? 'MiniMap' : 'MiniMap'} <MenubarShortcut>Ctrl+M</MenubarShortcut>
                 </MenubarCheckboxItem>
                 <MenubarSeparator />
-                <MenubarCheckboxItem checked={isFullScreen} onCheckedChange={toggleFullScreen}>
+                <MenubarCheckboxItem className="cursor-pointer" checked={isFullScreen} onCheckedChange={toggleFullScreen}>
                     {isFullScreen ? 'Fullscreen' : 'Fullscreen'} <MenubarShortcut>F11</MenubarShortcut>
                 </MenubarCheckboxItem>
-                <MenubarItem inset>Advanced Settings</MenubarItem>
+                <MenubarItem inset className="cursor-pointer">Advanced Settings</MenubarItem>
               </MenubarContent>
               </MenubarMenu>
               <MenubarMenu>
-              <MenubarTrigger>Help</MenubarTrigger>
+              <MenubarTrigger className="cursor-pointer">Help</MenubarTrigger>
               <MenubarContent className="dark:bg-navbar-dark">
-                <MenubarItem onClick={() => { if (!isHelpMenuVisible) toggleHelpMenu(); setHelpMenuPage('Tutorial'); }}>Tutorial</MenubarItem>
-                <MenubarItem onClick={() => window.open('https://sirius-labs.no/imf/')}>IMF Documentation</MenubarItem>
-                <MenubarItem onClick={() => { if (!isHelpMenuVisible) toggleHelpMenu(); setHelpMenuPage('Credits'); }}>Credits</MenubarItem>
+                <MenubarItem className="cursor-pointer" onClick={() => { if (!isHelpMenuVisible) toggleHelpMenu(); setHelpMenuPage('Tutorial'); }}>Tutorial</MenubarItem>
+                <MenubarItem className="cursor-pointer" onClick={() => window.open('https://sirius-labs.no/imf/')}>IMF Documentation</MenubarItem>
+                <MenubarItem className="cursor-pointer" onClick={() => { if (!isHelpMenuVisible) toggleHelpMenu(); setHelpMenuPage('Credits'); }}>Credits</MenubarItem>
               </MenubarContent>
               </MenubarMenu>
             </Menubar>
           )}
         </div>
         <div className="flex items-center justify-center">
-          {currentPage !== AppPage.Login && <ViewDashboard />}
-          {currentPage !== AppPage.Login && <Logout />}
+          {currentPage !== AppPage.Login && <ViewDashboard/>}
+          {currentPage !== AppPage.Login && <Logout/>}
         </div>
       </div>
       {isHelpMenuVisible && <HelpMenu close={() => setIsHelpMenuVisible(false)} page={helpMenuPage}/>}
@@ -145,7 +154,7 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer',
             className
           )}
           {...props}

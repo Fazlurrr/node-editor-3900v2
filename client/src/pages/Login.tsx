@@ -10,7 +10,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/lib/config.ts';
 import { TextField } from '@mui/material';
 
 const formSchema = z.object({
@@ -44,25 +45,25 @@ const Login = () => {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormControl>
-                    <TextField
-                    {...field}
-                    label="username"
-                    variant="outlined"
-                    margin="normal"
-                    fullWidth
-                    className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
-                                dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
-                                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
-                                dark:[&_.MuiInputBase-input]:text-[#9facbc]
-                                dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
-                                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
-                                dark:[&_.MuiInputLabel-root]:text-white
-                                dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
-                                dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
-                    />
-                    </FormControl>
-                    <FormMessage className="text-xs text-red-600" />
+                      <FormControl>
+                        <TextField
+                        {...field}
+                        label="username"
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                                    dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                                    dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                                    dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                                    dark:[&_.MuiInputLabel-root]:text-white
+                                    dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                                    dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs text-red-600" style={{ marginBottom: '15px' }} />
                   </FormItem>
                 )}
               />
@@ -93,11 +94,11 @@ const Login = () => {
                   </FormItem>
                 )}
               />
-              <div className="mt-6 flex justify-center">
-                <Button className={buttonVariants({ variant: 'default' })} onClick={ form.handleSubmit(handleSubmit)}>
+              <div className="mt-6 flex justify-center ">
+                        <Button className={buttonVariants.confirm} >
                           Login
-                </Button>
-              </div>
+                        </Button>
+                        </div>
             </form>
           </Form>
         </CardContent>
