@@ -36,7 +36,6 @@ export const useKeyboardShortcuts = (
     () => {
       if (selectedElement) {
         clipboardRef.current = JSON.parse(JSON.stringify(selectedElement));
-        toast.success('Copied');
       }
     },
     [selectedElement]
@@ -47,7 +46,6 @@ export const useKeyboardShortcuts = (
     () => {
       if (selectedElement) {
         clipboardRef.current = JSON.parse(JSON.stringify(selectedElement));
-        toast.success('Cut');
         onTriggerDelete();
       }
     },
@@ -58,7 +56,6 @@ export const useKeyboardShortcuts = (
     'ctrl+v, command+v',
     () => {
       if (clipboardRef.current) {
-        toast.success('Pasted');
         onPaste(clipboardRef.current);
       }
     },

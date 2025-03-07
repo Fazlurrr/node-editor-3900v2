@@ -65,8 +65,6 @@ export const createEdge = async (edge: Edge): Promise<Edge | null> => {
 
     const createdEdge = await response.json();
 
-    toast.success('Edge created successfully!');
-
     if (createdEdge) {
       createdEdge.id = createdEdge.id.toString();
       const newEdges = edges.concat(createdEdge as Edge);
@@ -113,8 +111,6 @@ export const uploadEdges = async (edgesToAdd: Edge[]): Promise<boolean> => {
       toast.error(`Error uploading edges - Status: ${status}`);
       return false;
     }
-
-    toast.success('Edges uploaded successfully!');
 
     return true;
   } catch (error) {
@@ -166,7 +162,7 @@ export const deleteEdge = async (
 
     if (!response.ok) {
       const status = response.status;
-      toast.error(`Error deleting edge - Status: ${status}`);
+      toast.success(`Error deleting edge - Status: ${status}`);
       return null;
     }
 
@@ -231,7 +227,7 @@ export const updateEdge = async (
     }
 
     toast.success('Edge updated successfully!');
-
+    
     const updatedEdge = await response.json();
 
     if (updatedEdge) {

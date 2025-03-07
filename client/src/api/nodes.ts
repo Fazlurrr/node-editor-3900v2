@@ -91,7 +91,6 @@ export const uploadNodes = async (nodesToAdd: Node[]): Promise<boolean> => {
       return false;
     }
 
-    toast.success('Nodes uploaded successfully!');
 
     return true;
   } catch (error) {
@@ -130,15 +129,12 @@ export const createNode = async (node: Node): Promise<Node | null> => {
 
     if (!response.ok) {
       const status = response.status;
-      toast.success(`Error creating node - Status: ${status}`);
+      toast.error(`Error creating node - Status: ${status}`);
       return null;
     }
 
     const createdNode = await response.json();
-
-    toast.success('Node created successfully!');
     
-
     if (createdNode) {
       setNodes([...nodes, createdNode]);
     }
@@ -213,10 +209,6 @@ export const updateNode = async (
 
     const updatedNode = await response.json();
 
-    if (newNodeData) {
-      toast.success('Node updated successfully!');
-    }
-
     if (updatedNode) {
       const newNodes = nodes.map(node => {
         if (node.id === updatedNode.id) {
@@ -286,7 +278,7 @@ export const deleteNode = async (
 
     if (!response.ok) {
       const status = response.status;
-      toast.success(`Error deleting node - Status: ${status}`);
+      toast.error(`Error deleting node - Status: ${status}`);
       return null;
     }
 
@@ -330,7 +322,7 @@ export const deleteNodes = async (): Promise<boolean> => {
 
     if (!response.ok) {
       const status = response.status;
-      toast.success(`Error deleting nodes - Status: ${status}`);
+      toast.error(`Error deleting nodes - Status: ${status}`);
       return false;
     }
 
