@@ -5,6 +5,7 @@ import type { CustomNodeProps } from '@/lib/types';
 import { capitalizeFirstLetter } from '@/lib/utils';
 import { Asterisk } from 'lucide-react'; 
 import { updateNode } from '@/api/nodes';
+import { selectionColor } from '@/lib/config';
 
 const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -54,7 +55,8 @@ const Block = (props: CustomNodeProps) => {
     >
       <div
         className={`h-[66px] w-[110px] border-2 border-black dark:border-white
-          bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+        bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+        style={ props.selected ? { boxShadow: `0 0 0 2px ${selectionColor}` }: {}}
       >
         <header className="flex min-h-16 w-full items-center justify-center">
           {isEditing ? (

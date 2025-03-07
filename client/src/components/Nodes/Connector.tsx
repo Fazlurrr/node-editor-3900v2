@@ -8,6 +8,7 @@ import {
 } from '../ui/tooltip';
 import { Asterisk } from 'lucide-react';
 import { useStore } from 'reactflow';
+import { selectionColor } from '@/lib/config';
 
 const Connector = (props: CustomNodeProps) => {
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
@@ -23,6 +24,7 @@ const Connector = (props: CustomNodeProps) => {
           <figure id={props.data.label} className="relative">
             <div
               className={`h-[44px] w-[44px] overflow-hidden whitespace-nowrap rounded-full border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+              style={props.selected ? { boxShadow: `0 0 0 2px ${selectionColor}` } : {}}
             >
               <header className="flex h-full w-full items-center justify-center">
                 <p

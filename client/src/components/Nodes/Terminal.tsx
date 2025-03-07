@@ -8,6 +8,7 @@ import {
 } from '../ui/tooltip';
 import { Asterisk } from 'lucide-react'; 
 import { useStore } from 'reactflow';
+import { selectionColor } from '@/lib/config';
 
 const Terminal = (props: CustomNodeProps) => {
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
@@ -19,7 +20,11 @@ const Terminal = (props: CustomNodeProps) => {
     <figure id={props.data.label} className="relative m-0 p-0 block" style={{ lineHeight: 0 }}>
       <div
         className={`h-[22px] w-[22px] overflow-hidden whitespace-nowrap border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
-        style={{ display: 'inline-block', verticalAlign: 'top' }}
+        style={{ 
+          display: 'inline-block', 
+          verticalAlign: 'top', 
+          ...(props.selected ? { boxShadow: `0 0 0 2px ${selectionColor}` } : {}) 
+        }}
       >
         <header className="flex h-full w-full items-center justify-center">
           <p
