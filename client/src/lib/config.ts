@@ -16,3 +16,5 @@ export const buttonVariants = {
   verbose:
     'border-yellow-500 dark:border-yellow-500 text-yellow-500 dark:text-yellow-500 hover:bg-yellow-500 hover:text-white dark:hover:bg-yellow-500 dark:hover:text-white',
 };
+
+export const selectionColor = 'lightGreen';
