@@ -11,11 +11,10 @@
     "serve": "cd dist && serve -s"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
     "@hookform/resolvers": "^3.3.4",
     "@mui/icons-material": "^6.4.3",
-    "@mui/material": "^6.4.3",
+    "@mui/material": "^6.4.7",
+    "@mui/system": "^6.4.7",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -71,6 +70,6 @@
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^6.2.1"
   }
 }
