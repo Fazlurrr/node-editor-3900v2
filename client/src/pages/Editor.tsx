@@ -12,7 +12,7 @@ import {
 import { shallow } from 'zustand/shallow';
 import 'reactflow/dist/style.css';
 import { Block, Connector, Terminal } from '@/components/Nodes';
-import { onConnect } from '@/lib/utils/edges';
+import { onConnect  } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
 import {
   Connected,
@@ -37,12 +37,14 @@ import { fetchEdges } from '@/api/edges';
 import { addNode, addTerminalToBlock } from '@/lib/utils/nodes';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useUndoRedo } from '@/hooks/useUndoRedo';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { deleteNode } from '@/api/nodes';
 import { deleteEdge } from '@/api/edges';
 import { createNode } from '@/api/nodes';
 import { v4 as uuidv4 } from 'uuid';
 import { GridProvider, useGridContext } from '@/components/ui/toogleGrid';
+
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -51,6 +53,10 @@ const Editor = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
   const { isGridVisible } = useGridContext();
+  const { theme } = useTheme();
+  const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
+    useStore(storeSelector, shallow);
+  const { pushHistory } = useUndoRedo();
 
   const nodeTypes = useMemo(
     () => ({
@@ -74,11 +80,6 @@ const Editor = () => {
     }),
     []
   );
-
-  const { theme } = useTheme();
-
-  const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
-    useStore(storeSelector, shallow);
 
   useEffect(() => {
     (async () => {
@@ -259,6 +260,7 @@ const Editor = () => {
           // For all other nodes
           await updateNode(node.id);
         }
+        pushHistory();
       }
       delete initialPositions.current[node.id];
     }
@@ -317,6 +319,7 @@ const Editor = () => {
           absolutePosition, // For storage
           data.aspect
         );
+        pushHistory();
         return;
       }
     }
@@ -325,6 +328,7 @@ const Editor = () => {
       x: position.x - 25,
       y: position.y - 25
     });
+    pushHistory();
   };
 
   const handleNodeClick = (_: React.MouseEvent, node: Node) => {
@@ -340,6 +344,11 @@ const Editor = () => {
       setShowDeleteDialog(true);
     }
   };
+
+  const handleConnect = useCallback((params: any) => {
+    onConnect(params);
+    pushHistory();
+  }, [pushHistory]);
 
   const handlePaste = async (clipboardElement: Node | Edge) => {
     
@@ -357,6 +366,7 @@ const Editor = () => {
     const newNode = { ...nodeWithoutId, id: `${clonedNode.type}-${uuidv4()}` };
     await createNode(newNode);
     setNodes([...nodes, newNode]);
+    pushHistory();
   };
   
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);
@@ -370,6 +380,7 @@ const Editor = () => {
     }
     setShowDeleteDialog(false);
     setSelectedElement(null);
+    pushHistory();
   };
 
   return (
@@ -382,7 +393,7 @@ const Editor = () => {
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
+              onConnect={handleConnect}
               nodeTypes={nodeTypes as unknown as NodeTypes}
               edgeTypes={edgeTypes as unknown as EdgeTypes}
               onNodeDragStart={(_, node) => {
