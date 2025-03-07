@@ -156,7 +156,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   };
 
   const handleDeleteNode = async () => {
-    const deleted = await deleteNode(currentNode.id);
+    await deleteNode(currentNode.id);
   };
 
   const handleAspectChange = async (newAspect: AspectType) => {
