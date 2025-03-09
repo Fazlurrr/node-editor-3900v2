@@ -8,7 +8,7 @@ import DataTable from './DataTable';
 import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { SetStateAction, useState } from 'react';
-import { useTheme } from '@/hooks';
+import { useTheme, useSession } from '@/hooks';
 import {
   darkTheme,
   lightTheme,
@@ -17,6 +17,7 @@ import { ThemeProvider } from 'styled-components';
 
 const AdminDashboard = () => {
   const { theme } = useTheme();
+  const { setDashboard } = useSession();
   const [selectedTab, setSelectedTab] = useState('manage');
   const { data, error, isRefetching, refetch } = useQuery({
     queryKey: ['users'],
@@ -62,7 +63,9 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <div className="mt-6 flex justify-center ">
-          <Button className={buttonVariants.cancel}>
+          <Button 
+          className={buttonVariants.cancel}
+          onClick={() => setDashboard(false)}>
             Go back to editor
           </Button>
           </div>
