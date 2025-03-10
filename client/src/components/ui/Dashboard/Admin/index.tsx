@@ -68,7 +68,7 @@ const AdminDashboard = () => {
           onClick={() => setDashboard(false)}>
             Go back to editor
           </Button>
-          </div>
+        </div>
       </Tabs>
     </ThemeProvider>
   );
