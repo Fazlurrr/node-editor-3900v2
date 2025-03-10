@@ -6,7 +6,6 @@ import {
   BackgroundVariant,
   EdgeTypes,
   NodeTypes,
-  ReactFlowProvider,
   ReactFlowInstance
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
@@ -37,7 +36,7 @@ import { fetchEdges } from '@/api/edges';
 import { addNode, addTerminalToBlock } from '@/lib/utils/nodes';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { GridProvider, useGridContext } from '@/components/ui/toogleGrid';
+import { useGridContext } from '@/components/ui/toogleGrid';
 import { useClipboard } from '@/hooks/useClipboard';
 
 const Editor = () => {
@@ -335,9 +334,7 @@ const Editor = () => {
 
 
   return (
-    <GridProvider>
       <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-        <ReactFlowProvider>
           <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
             <ReactFlowStyled
               nodes={nodes}
@@ -387,10 +384,7 @@ const Editor = () => {
               )}
             </ReactFlowStyled>
           </div>
-          
-        </ReactFlowProvider>
       </ThemeProvider>
-    </GridProvider>
   );
 };
 

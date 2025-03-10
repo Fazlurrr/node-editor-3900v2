@@ -3,6 +3,7 @@ import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { downloadFile } from '@/lib/utils/download';
 import { TextField, MenuItem } from '@mui/material';
+import DownloadImage from './DownloadImage';
 
 interface ExportFileProps {
     close: () => void;
@@ -52,6 +53,7 @@ const ExportFile: React.FC<ExportFileProps> = ({close}) => {
                 >
                     <MenuItem value="imf">.imf</MenuItem>
                     <MenuItem value="rdf">.rdf</MenuItem>
+                    <MenuItem value="png">.png</MenuItem>
                 </TextField>
             </div>
           
@@ -62,13 +64,17 @@ const ExportFile: React.FC<ExportFileProps> = ({close}) => {
             >
                 Cancel
             </Button>
-            <Button
+            {fileType === 'png' ? (
+              <DownloadImage fileName={fileName} />
+            ) : (
+              <Button
               className={`w-1/4 ${buttonVariants.confirm}`}
               onClick={() => downloadFile(fileType, fileName)}
               disabled={!fileName.trim()}
-            >
+              >
               Export
-            </Button>
+              </Button>
+            )}
           </div>
         </div>
     );
