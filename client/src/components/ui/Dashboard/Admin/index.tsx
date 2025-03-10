@@ -8,15 +8,10 @@ import DataTable from './DataTable';
 import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { SetStateAction, useState } from 'react';
-import { useTheme, useSession } from '@/hooks';
-import {
-  darkTheme,
-  lightTheme,
-} from '@/components/ui/styled';
-import { ThemeProvider } from 'styled-components';
+import { useSession } from '@/hooks';
+
 
 const AdminDashboard = () => {
-  const { theme } = useTheme();
   const { setDashboard } = useSession();
   const [selectedTab, setSelectedTab] = useState('manage');
   const { data, error, isRefetching, refetch } = useQuery({
@@ -42,35 +37,33 @@ const AdminDashboard = () => {
   };
 
   return (
-    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <Tabs defaultValue={selectedTab} 
-            onValueChange={handleTabChange} 
-            className="mt-14 flex w-screen flex-col items-center justify-start"
-      >
-        <TabsList className="bg-transparent grid w-[300px] grid-cols-3">
-          <TabsTrigger value="manage" style={{ fontSize: '1.25rem' }}>Manage users</TabsTrigger>
-          <Separator orientation="vertical" className="mx-auto" />
-          <TabsTrigger value="register" style={{ fontSize: '1.25rem' }}>Register user</TabsTrigger>
-      </TabsList>
+    <Tabs defaultValue={selectedTab} 
+          onValueChange={handleTabChange} 
+          className="mt-14 flex w-screen flex-col items-center justify-start"
+    >
+      <TabsList className="bg-transparent grid w-[300px] grid-cols-3">
+        <TabsTrigger value="manage" style={{ fontSize: '1.25rem' }}>Manage users</TabsTrigger>
+        <Separator orientation="vertical" className="mx-auto" />
+        <TabsTrigger value="register" style={{ fontSize: '1.25rem' }}>Register user</TabsTrigger>
+    </TabsList>
 
-        <TabsContent value="manage">
-          <div className="mt-4">
-            <DataTable columns={columns} data={data ?? []} />
-          </div>
-        </TabsContent>
-        <TabsContent value="register" className="h-full">
-          <Register />
-        </TabsContent>
-
-        <div className="mt-6 flex justify-center ">
-          <Button 
-          className={buttonVariants.cancel}
-          onClick={() => setDashboard(false)}>
-            Go back to editor
-          </Button>
+      <TabsContent value="manage">
+        <div className="mt-4">
+          <DataTable columns={columns} data={data ?? []} />
         </div>
-      </Tabs>
-    </ThemeProvider>
+      </TabsContent>
+      <TabsContent value="register" className="h-full">
+        <Register />
+      </TabsContent>
+
+      <div className="mt-6 flex justify-center ">
+        <Button 
+        className={buttonVariants.cancel}
+        onClick={() => setDashboard(false)}>
+          Go back to editor
+        </Button>
+      </div>
+    </Tabs>
   );
 };
 

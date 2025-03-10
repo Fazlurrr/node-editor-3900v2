@@ -35,18 +35,18 @@ const UserDashboard = () => {
         className="mt-14 flex w-screen flex-col items-center justify-start"
       >
         <TabsList className="bg-tansparent">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="dashboard" className="text-lg">Dashboard</TabsTrigger>
         </TabsList>
         <TabsContent value="dashboard">
           <Card>
-            <CardContent className="w-[350px] bg-white dark:bg-black">
+            <CardContent>
               <div className="mt-4">
                 <div className="flex">
                   <span className="text-muted-foreground">Username:</span>
                   <span className="ml-2">{user?.username}</span>
                 </div>
                 <DialogTrigger onClick={() => setDialogOpen(true)}>
-                  <Button className="mt-2" size="sm">
+                  <Button className={`mt-2 ${buttonVariants.cancel}`} size="sm">
                     Update password
                   </Button>
                 </DialogTrigger>
