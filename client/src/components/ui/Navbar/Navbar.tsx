@@ -24,14 +24,13 @@ import { useMiniMapContext } from '../toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
 import Modal from './FileMenu/Modal';
 import { toast } from 'react-toastify';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { Check } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
   const { theme, toggleTheme } = useTheme();
-  const { currentPage, setDashboard } = useSession();
+  const { currentPage, setDashboard, user } = useSession();
   const { isGridVisible, setGridVisible } = useGridContext();
   const [ isFullScreen ] = React.useState(false);
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
@@ -159,14 +158,14 @@ const Navbar = () => {
                         className={`cursor-pointer flex items-center ${theme === 'light' ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
                         onClick={() => toggleTheme('light')}
                       >
-                        <FontAwesomeIcon icon={faCheck} className={`${theme === 'light' ? '' : 'text-transparent'} mr-2`} />
+                        <Check size="16" className={`${theme === 'light' ? '' : 'text-transparent'} mr-2`} />
                         Light
                       </MenubarItem>
                       <MenubarItem
                         className={`cursor-pointer flex items-center ${theme === 'dark' ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
                         onClick={() => toggleTheme('dark')}
                       >
-                        <FontAwesomeIcon icon={faCheck} className={`${theme === 'dark' ? '' : 'text-transparent'} mr-2`} />
+                        <Check size="16" className={`${theme === 'dark' ? '' : 'text-transparent'} mr-2`} />
                         Dark
                       </MenubarItem>
                     </MenubarSubContent>
@@ -208,7 +207,14 @@ const Navbar = () => {
           )}
         </div>
         <div className="flex items-center justify-center">
-          {currentPage !== AppPage.Login && <ViewDashboard/>}
+          {currentPage !== AppPage.Login && currentPage !== AppPage.Dashboard && <ViewDashboard/>}
+          {currentPage === AppPage.Dashboard && 
+          <span className="ml-2 text-gray-700 dark:text-gray-300">
+            Logged in as 
+            <span className="font-semibold ml-1">
+              {user?.username}
+            </span>
+          </span>}
           {currentPage !== AppPage.Login && <Logout/>}
         </div>
       </div>

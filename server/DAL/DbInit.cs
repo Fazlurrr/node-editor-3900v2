@@ -13,12 +13,14 @@ namespace server.DAL
       context.Database.EnsureDeleted();
       context.Database.EnsureCreated();
 
+      
+
       if (!context.Users.Any())
       {
         byte[] salt = PasswordHasher.GenerateSalt();
-
         string hashedPassword = PasswordHasher.HashPassword("admin", salt);
-
+        
+        // Add admin user
         User admin = new()
         {
           Username = "admin",
@@ -26,13 +28,30 @@ namespace server.DAL
           Salt = Convert.ToBase64String(salt),
           Role = UserRole.Admin
         };
+        context.Users.Add(admin);
 
-        context.Users.AddRange(admin);
-        context.SaveChanges();
-      }
+        // Add normal users
+        string[] users = new string[] { "baifan", "yuanwei", "fazlur", "lars", "filip", "eskil" };
+
+        foreach (string user in users)
+        {
+          salt = PasswordHasher.GenerateSalt();
+          hashedPassword = PasswordHasher.HashPassword(user, salt);
+
+          User newUser = new()
+          {
+            Username = user,
+            Password = hashedPassword,
+            Salt = Convert.ToBase64String(salt),
+            Role = UserRole.User
+          };
+
+          context.Users.Add(newUser);
+        }
 
       context.SaveChanges();
-    }
+      }
 
+    }
   }
 }
