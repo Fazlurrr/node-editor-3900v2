@@ -335,7 +335,7 @@ const Editor = () => {
 
   return (
       <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-          <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
+          <div ref={reactFlowWrapper} className='mx-56 h-full'>
             <ReactFlowStyled
               nodes={nodes}
               edges={edges}
