@@ -1,5 +1,5 @@
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useRef } from 'react';
+import { useClipboard } from './useClipboard';
 import { Node, Edge } from 'reactflow';
 
 export const useKeyboardShortcuts = (
@@ -7,7 +7,7 @@ export const useKeyboardShortcuts = (
   onTriggerDelete: () => void,
   onPaste: (clipboardElement: Node | Edge) => void,
 ) => {
-  const clipboardRef = useRef<Node | Edge | null>(null);
+  const { copy, cut, paste } = useClipboard();
 
   useHotkeys(
     'delete, backspace',
@@ -29,12 +29,12 @@ export const useKeyboardShortcuts = (
     { enableOnFormTags: false },
     [selectedElement]
   );
-
+  
   useHotkeys(
     'ctrl+c, command+c',
     () => {
       if (selectedElement) {
-        clipboardRef.current = JSON.parse(JSON.stringify(selectedElement));
+        copy(selectedElement);
       }
     },
     [selectedElement]
@@ -44,8 +44,7 @@ export const useKeyboardShortcuts = (
     'ctrl+x, command+x',
     () => {
       if (selectedElement) {
-        clipboardRef.current = JSON.parse(JSON.stringify(selectedElement));
-        onTriggerDelete();
+        cut(selectedElement, onTriggerDelete);
       }
     },
     [selectedElement]
@@ -54,9 +53,7 @@ export const useKeyboardShortcuts = (
   useHotkeys(
     'ctrl+v, command+v',
     () => {
-      if (clipboardRef.current) {
-        onPaste(clipboardRef.current);
-      }
-    },
+      paste(onPaste);
+    }
   );
 };
