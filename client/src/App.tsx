@@ -8,6 +8,7 @@ import { Navbar, Loader } from './components/ui';
 import { GridProvider } from './components/ui/toogleGrid';
 import { MiniMapProvider } from './components/ui/toggleMiniMap';
 import { AdminDashboard } from './components/ui/Dashboard';
+import { ReactFlowProvider } from 'reactflow';
 
 const routeConfig = {
   [AppPage.Login]: Login,
@@ -35,6 +36,7 @@ const App: React.FC = () => {
   }, [dashboard, setCurrentPage, token]);
 
   return (
+    <ReactFlowProvider>
     <MiniMapProvider>
       <GridProvider>
           <>
@@ -68,6 +70,7 @@ const App: React.FC = () => {
           </>
         </GridProvider>
     </MiniMapProvider>
+    </ReactFlowProvider>
   );
 };
 

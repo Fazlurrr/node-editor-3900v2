@@ -6,7 +6,6 @@ import {
   BackgroundVariant,
   EdgeTypes,
   NodeTypes,
-  ReactFlowProvider,
   ReactFlowInstance
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
@@ -42,7 +41,7 @@ import { deleteNode } from '@/api/nodes';
 import { deleteEdge } from '@/api/edges';
 import { createNode } from '@/api/nodes';
 import { v4 as uuidv4 } from 'uuid';
-import { GridProvider, useGridContext } from '@/components/ui/toogleGrid';
+import { useGridContext } from '@/components/ui/toogleGrid';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -373,9 +372,7 @@ const Editor = () => {
   };
 
   return (
-    <GridProvider>
       <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-        <ReactFlowProvider>
           <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
             <ReactFlowStyled
               nodes={nodes}
@@ -431,9 +428,7 @@ const Editor = () => {
             onConfirm={handleConfirmDelete}
             onCancel={() => setShowDeleteDialog(false)}
           />
-        </ReactFlowProvider>
       </ThemeProvider>
-    </GridProvider>
   );
 };
 
