@@ -36,18 +36,12 @@ import { fetchEdges } from '@/api/edges';
 import { addNode, addTerminalToBlock } from '@/lib/utils/nodes';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
-import { deleteNode } from '@/api/nodes';
-import { deleteEdge } from '@/api/edges';
-import { createNode } from '@/api/nodes';
-import { v4 as uuidv4 } from 'uuid';
 import { useGridContext } from '@/components/ui/toogleGrid';
+import { useClipboard } from '@/hooks/useClipboard';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
-  const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
   const { isGridVisible } = useGridContext();
 
@@ -334,42 +328,10 @@ const Editor = () => {
     setSelectedElement(edge);
   };
 
-  const handleTriggerDelete = () => {
-    if (selectedElement) {
-      setShowDeleteDialog(true);
-    }
-  };
-
-  const handlePaste = async (clipboardElement: Node | Edge) => {
-    
-  const clonedNode = JSON.parse(JSON.stringify(clipboardElement)) as Node;
-  const { id, ...nodeWithoutId } = clonedNode;
-  void id;
-  
-  if (nodeWithoutId.position) {
-    nodeWithoutId.position = {
-      x: nodeWithoutId.position.x + 20,
-      y: nodeWithoutId.position.y + 20,
-    };
-  }
-    
-    const newNode = { ...nodeWithoutId, id: `${clonedNode.type}-${uuidv4()}` };
-    await createNode(newNode);
-    setNodes([...nodes, newNode]);
-  };
+  const { selectedElement, setSelectedElement, handleTriggerDelete, handlePaste } = useClipboard();
   
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);
 
-  const handleConfirmDelete = async () => {
-    if (!selectedElement) return;
-    if ('source' in selectedElement) {
-      await deleteEdge(selectedElement.id as string);
-    } else {
-      await deleteNode(selectedElement.id);
-    }
-    setShowDeleteDialog(false);
-    setSelectedElement(null);
-  };
 
   return (
       <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -422,12 +384,6 @@ const Editor = () => {
               )}
             </ReactFlowStyled>
           </div>
-          <DeleteConfirmationDialog
-            open={showDeleteDialog}
-            elementType={selectedElement && 'source' in selectedElement ? 'edge' : 'node'}
-            onConfirm={handleConfirmDelete}
-            onCancel={() => setShowDeleteDialog(false)}
-          />
       </ThemeProvider>
   );
 };

@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { z } from 'zod';
+import { buttonVariants } from '@/lib/config.ts';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -20,7 +21,7 @@ import { useState } from 'react';
 import { updatePasswordUser } from '@/lib/schemas';
 
 const UserDashboard = () => {
-  const { user } = useSession();
+  const { user, setDashboard } = useSession();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   return (
     <Dialog
@@ -34,18 +35,18 @@ const UserDashboard = () => {
         className="mt-14 flex w-screen flex-col items-center justify-start"
       >
         <TabsList className="bg-tansparent">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="dashboard" className="text-lg">Dashboard</TabsTrigger>
         </TabsList>
         <TabsContent value="dashboard">
           <Card>
-            <CardContent className="w-[350px] bg-white dark:bg-black">
+            <CardContent>
               <div className="mt-4">
                 <div className="flex">
                   <span className="text-muted-foreground">Username:</span>
                   <span className="ml-2">{user?.username}</span>
                 </div>
                 <DialogTrigger onClick={() => setDialogOpen(true)}>
-                  <Button className="mt-2" size="sm">
+                  <Button className={`mt-2 ${buttonVariants.cancel}`} size="sm">
                     Update password
                   </Button>
                 </DialogTrigger>
@@ -58,6 +59,14 @@ const UserDashboard = () => {
         id={user?.id as string}
         setDialogOpen={setDialogOpen}
       />
+
+              <div className="mt-6 flex justify-center ">
+                <Button 
+                className={buttonVariants.cancel}
+                onClick={() => setDashboard(false)}>
+                  Go back to editor
+                </Button>
+              </div>
     </Dialog>
   );
 };
