@@ -316,7 +316,7 @@ const Editor = () => {
     }
 
     const offsetX = 199 / currentZoom;
-    const offsetY = 20 / currentZoom;
+    const offsetY = 25 / currentZoom;
     
     addNode(data.aspect, data.nodeType, {
       x: position.x + offsetX,
@@ -389,7 +389,7 @@ const Editor = () => {
             </ReactFlowStyled>
           </div>
           <NodesPanel />
-              <PropertiesPanel selectedElement={selectedElement} />
+          <PropertiesPanel selectedElement={selectedElement} />
       </ThemeProvider>
   );
 };
