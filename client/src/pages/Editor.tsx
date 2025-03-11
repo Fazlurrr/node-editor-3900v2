@@ -268,15 +268,23 @@ const Editor = () => {
     const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
   
     if (!data) return;
+
+    const offsetX = 199 / currentZoom;
+    const offsetY = 25 / currentZoom;
   
     const position = reactFlowInstance.screenToFlowPosition({
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top,
     });
+
+    const adjustedPosition = {
+      x: position.x + offsetX,
+      y: position.y - offsetY
+    };
   
     if (data.nodeType === "terminal") {
       const blockNode = nodes.find(
-        (node) => isPointInsideNode(position, node) && node.type === "block"
+        (node) => isPointInsideNode(adjustedPosition, node) && node.type === "block"
       );
       
       if (blockNode) {
@@ -314,9 +322,6 @@ const Editor = () => {
         return;
       }
     }
-
-    const offsetX = 199 / currentZoom;
-    const offsetY = 25 / currentZoom;
     
     addNode(data.aspect, data.nodeType, {
       x: position.x + offsetX,
