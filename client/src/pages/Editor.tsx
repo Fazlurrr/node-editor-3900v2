@@ -257,6 +257,7 @@ const Editor = () => {
     }
   };
 
+  const [currentZoom, setCurrentZoom] = useState(1);
    
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -313,10 +314,13 @@ const Editor = () => {
         return;
       }
     }
+
+    const offsetX = 199 / currentZoom;
+    const offsetY = 20 / currentZoom;
     
     addNode(data.aspect, data.nodeType, {
-      x: position.x - 25,
-      y: position.y - 25
+      x: position.x + offsetX,
+      y: position.y - offsetY
     });
   };
 
@@ -363,9 +367,9 @@ const Editor = () => {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'move';
               }}
+              onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
             >
-              <NodesPanel />
-              <PropertiesPanel selectedElement={selectedElement} />
+              
               <ControlsStyled
                 style={{
                   position: 'absolute',
@@ -384,6 +388,8 @@ const Editor = () => {
               )}
             </ReactFlowStyled>
           </div>
+          <NodesPanel />
+              <PropertiesPanel selectedElement={selectedElement} />
       </ThemeProvider>
   );
 };
