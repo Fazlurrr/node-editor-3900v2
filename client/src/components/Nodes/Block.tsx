@@ -7,12 +7,14 @@ import { capitalizeFirstLetter } from '@/lib/utils';
 import { Asterisk } from 'lucide-react'; 
 import { updateNode } from '@/api/nodes';
 import { selectionColor } from '@/lib/config';
+import { useTransformMode } from '@/hooks/useTransformMode';
 
 const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(props.data.customName || props.data.label || '');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
+  const { transformMode } = useTransformMode();
 
   const [dimensions, setDimensions] = useState({
     width: props.data.width || 110,
@@ -82,7 +84,7 @@ const Block = (props: CustomNodeProps) => {
             <NodeResizer
         minWidth={110}
         minHeight={66}
-        isVisible={props.selected}
+        isVisible={props.selected && transformMode}
         lineStyle={{ border: selectionColor }}
         handleStyle={{ borderColor: 'black' ,backgroundColor: 'white', width: '7px', height: '7px' }}
         onResize={onResize}
