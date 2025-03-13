@@ -129,6 +129,16 @@ const Navbar = () => {
                   <MenubarItem className="cursor-pointer">
                     Redo <MenubarShortcut>Shift+Ctrl+Z</MenubarShortcut>
                   </MenubarItem>
+                  <MenubarItem
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (selectedElement) {
+                        handleTriggerDelete();
+                      }
+                    }}
+                  >
+                    Delete <MenubarShortcut>Backspace</MenubarShortcut>
+                  </MenubarItem>
                   <MenubarSeparator/>
                   <MenubarItem
                     className="cursor-pointer"
