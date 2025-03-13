@@ -207,9 +207,24 @@ export const updateNode = async (
       return null;
     }
 
-    const updatedNode = await response.json();
+    let updatedNode = await response.json();
 
     if (updatedNode) {
+      if (
+        updatedNode.type === 'block' &&
+        updatedNode.width !== undefined &&
+        updatedNode.height !== undefined
+      ) {
+        updatedNode = {
+          ...updatedNode,
+          data: {
+            ...updatedNode.data,
+            width: updatedNode.width,
+            height: updatedNode.height,
+          },
+        };
+      }
+      
       const newNodes = nodes.map(node => {
         if (node.id === updatedNode.id) {
           // For terminal nodes with parents, maintain the relative position for rendering

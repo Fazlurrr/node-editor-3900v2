@@ -117,8 +117,15 @@ public class DB : DbContext
                             .HasColumnType("json");
                     });
 
+        modelBuilder.Entity<Block>()
+            .Property(b => b.Width)
+            .HasDefaultValue(110);
+        modelBuilder.Entity<Block>()
+            .Property(b => b.Height)
+            .HasDefaultValue(66);
+
         modelBuilder.Entity<Edge>()
-.OwnsOne(e => e.Data);
+            .OwnsOne(e => e.Data);
     }
 
     public DbSet<Node> Nodes { get; set; }

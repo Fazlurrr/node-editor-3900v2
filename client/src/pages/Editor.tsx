@@ -76,7 +76,22 @@ const Editor = () => {
   useEffect(() => {
     (async () => {
       const fetchedEdges = (await fetchEdges()) ?? [];
-      const fetchedNodes = (await fetchNodes()) ?? [];
+      let fetchedNodes = (await fetchNodes()) ?? [];
+
+      fetchedNodes = fetchedNodes.map((node) => {
+        if (node.type === 'block' && node.width && node.height) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              width: node.width,
+              height: node.height,
+            },
+          };
+        }
+        return node;
+      });
+
       setNodes(fetchedNodes as Node[]);
       setEdges(fetchedEdges as Edge[]);
     })();

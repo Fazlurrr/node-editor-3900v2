@@ -31,7 +31,9 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                     Id = b.Id,
                     Position = b.Position,
                     Type = b.Type,
-                    Data = b.Data
+                    Data = b.Data,
+                    Width = b.Width,   
+                    Height = b.Height
                 })
                 .ToListAsync();
 
@@ -330,8 +332,10 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             switch (type)
             {
                 case "block":
-                    var blockToUpdate = await _db.Nodes.OfType<Block>().Include(b => b.Data).FirstOrDefaultAsync(b => b.Id == id);
-
+                    var blockToUpdate = await _db.Nodes
+                        .OfType<Block>()
+                        .Include(b => b.Data)
+                        .FirstOrDefaultAsync(b => b.Id == id);
 
                     if (blockToUpdate == null)
                     {
@@ -340,35 +344,42 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
 
                     blockToUpdate.Position = position;
 
-                    var blockData = JsonSerializer.Deserialize<BlockData>(data.GetProperty("data").GetRawText(), options);
+                    if (data.TryGetProperty("width", out JsonElement widthElement))
+                    {
+                        blockToUpdate.Width = widthElement.GetInt32();
+                    }
+                    if (data.TryGetProperty("height", out JsonElement heightElement))
+                    {
+                        blockToUpdate.Height = heightElement.GetInt32();
+                    }
 
+                    var blockData = JsonSerializer.Deserialize<BlockData>(data.GetProperty("data").GetRawText(), options);
                     if (blockData == null)
                     {
                         return BadRequest("Block data is missing required fields.");
                     }
-
                     blockToUpdate.Data = blockData;
 
                     _db.Nodes.Update(blockToUpdate);
                     await _db.SaveChangesAsync();
 
                     return CreatedAtAction(nameof(FetchNode), new { id = blockToUpdate.Id }, blockToUpdate);
+
                 case "terminal":
-                    var terminalToUpdate = await _db.Nodes.OfType<Terminal>().Include(t => t.Data).FirstOrDefaultAsync(t => t.Id == id);
+                    var terminalToUpdate = await _db.Nodes.OfType<Terminal>()
+                        .Include(t => t.Data)
+                        .FirstOrDefaultAsync(t => t.Id == id);
 
                     if (terminalToUpdate == null)
                     {
                         return NotFound("Terminal with id " + id + " does not exist.");
                     }
 
-
                     var terminalData = JsonSerializer.Deserialize<TerminalData>(data.GetProperty("data").GetRawText(), options);
-
                     if (terminalData == null)
                     {
                         return BadRequest("Terminal data is missing required fields.");
                     }
-
                     terminalToUpdate.Data = terminalData;
                     terminalToUpdate.Position = position;
 
@@ -376,8 +387,11 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                     await _db.SaveChangesAsync();
 
                     return CreatedAtAction(nameof(FetchNode), new { id = terminalToUpdate.Id }, terminalToUpdate);
+
                 case "connector":
-                    var connectorToUpdate = await _db.Nodes.OfType<Connector>().Include(c => c.Data).FirstOrDefaultAsync(c => c.Id == id);
+                    var connectorToUpdate = await _db.Nodes.OfType<Connector>()
+                        .Include(c => c.Data)
+                        .FirstOrDefaultAsync(c => c.Id == id);
 
                     if (connectorToUpdate == null)
                     {
@@ -385,12 +399,10 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                     }
 
                     var connectorData = JsonSerializer.Deserialize<ConnectorData>(data.GetProperty("data").GetRawText(), options);
-
                     if (connectorData == null)
                     {
                         return BadRequest("Connector data is missing required fields.");
                     }
-
                     connectorToUpdate.Data = connectorData;
                     connectorToUpdate.Position = position;
 
@@ -398,6 +410,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                     await _db.SaveChangesAsync();
 
                     return CreatedAtAction(nameof(FetchNode), new { id = connectorToUpdate.Id }, connectorToUpdate);
+
                 default:
                     return BadRequest("Node type is not recognized.");
             }
@@ -413,5 +426,6 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
+
 
 }

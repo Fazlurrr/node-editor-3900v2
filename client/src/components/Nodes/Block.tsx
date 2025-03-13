@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
-import { useStore } from 'reactflow';
+import type { ResizeParams } from 'reactflow';
+import { useStore, NodeResizer } from 'reactflow';
 import Handles from './Handles';
 import type { CustomNodeProps } from '@/lib/types';
 import { capitalizeFirstLetter } from '@/lib/utils';
@@ -12,6 +13,18 @@ const Block = (props: CustomNodeProps) => {
   const [tempName, setTempName] = useState(props.data.customName || props.data.label || '');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
+
+  const [dimensions, setDimensions] = useState({
+    width: props.data.width || 110,
+    height: props.data.height || 66,
+  });
+
+  useEffect(() => {
+    setDimensions({
+      width: props.data.width || 110,
+      height: props.data.height || 66,
+    });
+  }, [props.data.width, props.data.height]);
 
   useEffect(() => {
     setTempName(props.data.customName || props.data.label || '');
@@ -44,51 +57,69 @@ const Block = (props: CustomNodeProps) => {
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
 
+  const onResize = (_event: any, params: ResizeParams) => {
+    setDimensions({ width: params.width, height: params.height });
+  };
+
+  const onResizeEnd = async (_event: any, params: ResizeParams) => {
+    setDimensions({ width: params.width, height: params.height });
+    try {
+      await updateNode(props.id, { width: params.width, height: params.height });
+    } catch (err) {
+      console.error("Error updating node dimensions:", err);
+    }
+  };
+
   return (
     <figure
-     id={props.data.label}
+      id={props.data.label}
       className="relative"
       onDoubleClick={(e) => {
         e.stopPropagation();
         setIsEditing(true);
-      }}
-    >
-      <div
-        className={`h-[66px] w-[110px] border-2 border-black dark:border-white
-        bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
-        style={ props.selected ? { boxShadow: `0 0 0 2px ${selectionColor}` }: {}}
-      >
-        <header className="flex min-h-16 w-full items-center justify-center">
-          {isEditing ? (
-        <input
-          ref={inputRef}
-          className={`w-full h-full bg-transparent text-center focus:outline-none 
-          text-${props.data.aspect}-foreground-light 
-          dark:text-${props.data.aspect}-foreground-dark`}
-          value={tempName}
-          onChange={(e) => setTempName(e.target.value)}
-          onBlur={handleSubmit}
-          onKeyDown={handleKeyDown}
-        />
-      
-          ) : (
-        <p
-          className={`text-center text-${props.data.aspect}-foreground-light 
-            dark:text-${props.data.aspect}-foreground-dark`}
+            }}
+          >
+            <NodeResizer
+        minWidth={110}
+        minHeight={66}
+        isVisible={props.selected}
+        lineStyle={{ border: selectionColor }}
+        handleStyle={{ borderColor: 'black' ,backgroundColor: 'white', width: '7px', height: '7px' }}
+        onResize={onResize}
+        onResizeEnd={onResizeEnd}
+            />
+        <div
+          style={{
+            width: dimensions.width,
+            height: dimensions.height,
+            boxShadow: props.selected ? `0 0 0 2px ${selectionColor}` : 'none',
+          }}
+          className={`border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
         >
-          {props.data.customName === ''
-            ? capitalizeFirstLetter(props.data.label)
-            : props.data.customName}
-        </p>
-          )}
-        </header>
-      </div>
+          <header className="flex items-center justify-center h-full w-full">
+            {isEditing ? (
+              <input
+                ref={inputRef}
+                className="w-full h-full bg-transparent text-center focus:outline-none text-black"
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                onBlur={handleSubmit}
+                onKeyDown={handleKeyDown}
+              />
+            ) : (
+              <p className="text-center text-black">
+                {props.data.customName === ''
+                  ? capitalizeFirstLetter(props.data.label)
+                  : props.data.customName}
+              </p>
+            )}
+          </header>
+        </div>
 
-      {/* Icon + Amount Indicator */}
       {hasCustomAttributes && (
         <div className="absolute -top-6 -right-10 flex items-center space-x-1 bg-white dark:bg-[#232528] px-1 border-2 border-black dark:border-white rounded shadow">
-          <Asterisk className="" size={14} />
-          <span className="text-xs font-bold ">{amountOfCustomAttributes}</span>
+          <Asterisk size={14} />
+          <span className="text-xs font-bold">{amountOfCustomAttributes}</span>
         </div>
       )}
 

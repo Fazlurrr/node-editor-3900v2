@@ -84,6 +84,8 @@ export type UpdateNode = {
   aspect?: AspectType;
   customAttributes?: CustomAttribute[];
   label?: string;
+  width?: number;
+  height?: number;
 };
 
 export type Relation = {
@@ -117,6 +119,8 @@ export type NodeData = {
   updatedAt: number;
   customName?: string;
   createdBy: string;
+  width?: number;
+  height?: number;
 };
 
 export type QuantityDatums = {
