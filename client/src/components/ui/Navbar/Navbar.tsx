@@ -187,10 +187,10 @@ const Navbar = () => {
                     </MenubarSubContent>
                   </MenubarSub>
                   <MenubarCheckboxItem className="cursor-pointer" checked={isGridVisible} onCheckedChange={toggleGrid}>
-                    {isGridVisible ? 'Grid' : 'Grid'} <MenubarShortcut>Ctrl+G</MenubarShortcut>
+                    {isGridVisible ? 'Grid' : 'Grid'} <MenubarShortcut>Ctrl+Shift+G</MenubarShortcut>
                   </MenubarCheckboxItem>
                   <MenubarCheckboxItem className="cursor-pointer" checked={isMiniMapVisible} onCheckedChange={toggleMiniMap}>
-                    {isMiniMapVisible ? 'MiniMap' : 'MiniMap'} <MenubarShortcut>Ctrl+M</MenubarShortcut>
+                    {isMiniMapVisible ? 'MiniMap' : 'MiniMap'} <MenubarShortcut className="ml-4">Ctrl+Shift+M</MenubarShortcut>
                   </MenubarCheckboxItem>
                   <MenubarSeparator />
                   <MenubarCheckboxItem className="cursor-pointer" checked={isFullScreen} onCheckedChange={toggleFullScreen}>
