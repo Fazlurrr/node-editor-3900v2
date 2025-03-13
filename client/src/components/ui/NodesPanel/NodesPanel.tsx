@@ -278,10 +278,10 @@ const NodesPanel: React.FC = () => {
         ))}
         </>
         )}
-        <div className="p-1 pl-4 mt-0 mb-2 border-b border-[#9facbc]" onClick={toggleRelations}>
+        <div className="pt-1 pb-2 pl-4 mt-0 mb-2 border-b border-[#9facbc]" onClick={toggleRelations}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg text-black dark:text-white font-semibold">Relations</h2>
-            {collapseElements ? <ChevronUp className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" /> :
+            {collapseRelations ? <ChevronUp className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" /> :
             <ChevronDown className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" />}
           </div>
         </div>
