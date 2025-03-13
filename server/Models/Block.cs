@@ -6,6 +6,8 @@ public class BlockDto
     public required Position Position { get; set; }
     public NodeType Type { get; set; }
     public required BlockData Data { get; set; }
+    public int? Width { get; set; }
+    public int? Height { get; set; }
 }
 
 public class BlockData : NodeData
@@ -20,6 +22,7 @@ public class BlockData : NodeData
     public List<Relation> ConnectedBy { get; set; } = [];
     public string DirectPartOf { get; set; } = string.Empty;
 }
+
 public class Block : Node
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -29,6 +32,8 @@ public class Block : Node
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public BlockData Data { get; set; }
+    public int? Width { get; set; }
+    public int? Height { get; set; }
 
     public Block(string id, Position position, BlockData blockData)
         : base(id, position, NodeType.Block)
