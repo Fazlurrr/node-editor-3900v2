@@ -40,16 +40,16 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
         // Store the absolute position
         const absolutePosition = { ...node.position };
         
-        // Calculate relative position
+        /* REMEMBER (Is this needed?):Calculate relative position
         const relativePosition = {
           x: node.position.x - parentNode.position.x,
           y: node.position.y - parentNode.position.y
-        };
+        };*/
 
         return {
           ...node,
           parentId: node.data.terminalOf,  // Restore the parent relationship
-          position: relativePosition,       // Set relative position for rendering
+          position: absolutePosition,       // Set relative position for rendering
           positionAbsolute: absolutePosition // Keep absolute position for storage
         };
       }

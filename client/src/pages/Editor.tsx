@@ -272,6 +272,7 @@ const Editor = () => {
     }
   };
 
+  const [currentZoom, setCurrentZoom] = useState(1);
    
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -282,15 +283,23 @@ const Editor = () => {
     const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
   
     if (!data) return;
+
+    const offsetX = 199 / currentZoom;
+    const offsetY = 25 / currentZoom;
   
     const position = reactFlowInstance.screenToFlowPosition({
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top,
     });
+
+    const adjustedPosition = {
+      x: position.x + offsetX,
+      y: position.y - offsetY
+    };
   
     if (data.nodeType === "terminal") {
       const blockNode = nodes.find(
-        (node) => isPointInsideNode(position, node) && node.type === "block"
+        (node) => isPointInsideNode(adjustedPosition, node) && node.type === "block"
       );
       
       if (blockNode) {
@@ -330,8 +339,8 @@ const Editor = () => {
     }
     
     addNode(data.aspect, data.nodeType, {
-      x: position.x - 25,
-      y: position.y - 25
+      x: position.x + offsetX,
+      y: position.y - offsetY
     });
   };
 
@@ -378,9 +387,9 @@ const Editor = () => {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'move';
               }}
+              onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
             >
-              <NodesPanel />
-              <PropertiesPanel selectedElement={selectedElement} />
+              
               <ControlsStyled
                 style={{
                   position: 'absolute',
@@ -399,6 +408,8 @@ const Editor = () => {
               )}
             </ReactFlowStyled>
           </div>
+          <NodesPanel />
+          <PropertiesPanel selectedElement={selectedElement} />
       </ThemeProvider>
   );
 };
