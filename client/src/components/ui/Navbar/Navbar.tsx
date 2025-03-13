@@ -27,6 +27,7 @@ import { toast } from 'react-toastify';
 import { Check } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useTransformMode } from '@/hooks/useTransformMode';
+import AdvancedSettingsModal from './_components/AdvancedSettings';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
@@ -41,6 +42,7 @@ const Navbar = () => {
   const [ modalPage, setModalPage ] = React.useState('');
   const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
   const { transformMode, setTransformMode } = useTransformMode();
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = React.useState(false);
 
   // used for debugging
   const toggleGrid = () => {
@@ -196,7 +198,13 @@ const Navbar = () => {
                   <MenubarCheckboxItem className="cursor-pointer" checked={isFullScreen} onCheckedChange={toggleFullScreen}>
                     {isFullScreen ? 'Fullscreen' : 'Fullscreen'} <MenubarShortcut>F11</MenubarShortcut>
                   </MenubarCheckboxItem>
-                  <MenubarItem inset className="cursor-pointer">Advanced Settings</MenubarItem>
+                  <MenubarItem
+                    inset
+                    className="cursor-pointer"
+                    onClick={() => setIsAdvancedSettingsOpen(true)}
+                  >
+                    Advanced Settings
+                  </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
               <MenubarMenu>
@@ -236,6 +244,7 @@ const Navbar = () => {
       </div>
       {isHelpMenuVisible && <HelpMenu close={() => setIsHelpMenuVisible(false)} page={helpMenuPage}/>}
       {isModalVisible && <Modal close={() => setIsModalVisible(false)} page={modalPage}/>}
+      <AdvancedSettingsModal open={isAdvancedSettingsOpen} onOpenChange={setIsAdvancedSettingsOpen} />
     </NavigationMenu>
   );
 };

@@ -7,6 +7,8 @@ import { EdgeType } from '@/lib/types';
 import { useStore } from '@/hooks';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { buttonVariants } from '@/lib/config';
+import { useClipboard } from '@/hooks/useClipboard';
+import { useSettings } from '@/hooks/useSettings';
 
 interface CurrentEdgeProps {
   currentEdge: any;
@@ -17,6 +19,8 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
   const sourceNode = nodes.find((node: any) => node.id === currentEdge.source);
   const targetNode = nodes.find((node: any) => node.id === currentEdge.target);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { setSelectedElement } = useClipboard(); 
+  const { confirmDeletion } = useSettings();
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
     const updatedEdge = await updateEdge(currentEdge.id, newEdgeType);
@@ -31,9 +35,17 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
     }
   };
 
+  const handleDeleteEdgeClick = async () => {
+    if (!confirmDeletion) {
+      await handleDeleteEdge();
+    } else {
+      setShowDeleteDialog(true);
+    }
+  };
+
   const handleDeleteEdge = async () => {
     await deleteEdge(currentEdge.id);
-    setShowDeleteDialog(false);
+    setSelectedElement(null);
   };
 
   return (
@@ -98,7 +110,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
         </Select>
       </div>
       <div className="mx-4 mb-4">
-              <Button className={buttonVariants.danger} variant="outline" onClick={() => setShowDeleteDialog(true)}>
+              <Button className={buttonVariants.danger} variant="outline" onClick={handleDeleteEdgeClick}>
                 Delete Edge
               </Button>
             </div>
