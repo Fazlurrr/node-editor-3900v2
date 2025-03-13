@@ -19,7 +19,7 @@ import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import { Logout, ViewDashboard } from './_components';
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
-import { useGridContext } from '../toogleGrid';
+import { useGridContext } from '../toggleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
 import Modal from './FileMenu/Modal';
@@ -129,6 +129,16 @@ const Navbar = () => {
                   <MenubarItem className="cursor-pointer">
                     Redo <MenubarShortcut>Shift+Ctrl+Z</MenubarShortcut>
                   </MenubarItem>
+                  <MenubarItem
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (selectedElement) {
+                        handleTriggerDelete();
+                      }
+                    }}
+                  >
+                    Delete <MenubarShortcut>Backspace</MenubarShortcut>
+                  </MenubarItem>
                   <MenubarSeparator/>
                   <MenubarItem
                     className="cursor-pointer"
@@ -177,10 +187,10 @@ const Navbar = () => {
                     </MenubarSubContent>
                   </MenubarSub>
                   <MenubarCheckboxItem className="cursor-pointer" checked={isGridVisible} onCheckedChange={toggleGrid}>
-                    {isGridVisible ? 'Grid' : 'Grid'} <MenubarShortcut>Ctrl+G</MenubarShortcut>
+                    {isGridVisible ? 'Grid' : 'Grid'} <MenubarShortcut>Ctrl+Shift+G</MenubarShortcut>
                   </MenubarCheckboxItem>
                   <MenubarCheckboxItem className="cursor-pointer" checked={isMiniMapVisible} onCheckedChange={toggleMiniMap}>
-                    {isMiniMapVisible ? 'MiniMap' : 'MiniMap'} <MenubarShortcut>Ctrl+M</MenubarShortcut>
+                    {isMiniMapVisible ? 'MiniMap' : 'MiniMap'} <MenubarShortcut className="ml-4">Ctrl+Shift+M</MenubarShortcut>
                   </MenubarCheckboxItem>
                   <MenubarSeparator />
                   <MenubarCheckboxItem className="cursor-pointer" checked={isFullScreen} onCheckedChange={toggleFullScreen}>

@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useTheme, useSession } from '@/hooks';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { Navbar, Loader } from './components/ui';
-import { GridProvider } from './components/ui/toogleGrid';
+import { GridProvider } from './components/ui/toggleGrid';
 import { MiniMapProvider } from './components/ui/toggleMiniMap';
 import { AdminDashboard } from './components/ui/Dashboard';
 import { ReactFlowProvider } from 'reactflow';
