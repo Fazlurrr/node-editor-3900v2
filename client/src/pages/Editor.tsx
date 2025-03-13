@@ -36,7 +36,7 @@ import { fetchEdges } from '@/api/edges';
 import { addNode, addTerminalToBlock } from '@/lib/utils/nodes';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { useGridContext } from '@/components/ui/toogleGrid';
+import { useGridContext } from '@/components/ui/toggleGrid';
 import { useClipboard } from '@/hooks/useClipboard';
 
 const Editor = () => {
