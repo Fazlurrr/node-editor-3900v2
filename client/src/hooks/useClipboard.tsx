@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useRef, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useRef, useState, ReactNode, useCallback } from 'react';
 import { Node, Edge } from 'reactflow';
 import { createNode, deleteNode } from '@/api/nodes';
 import { deleteEdge } from '@/api/edges';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/hooks/useStore';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
+import { useSettings } from '@/hooks/useSettings';
 
 interface ClipboardContextType {
   selectedElement: Node | Edge | null;
@@ -22,6 +23,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
   const clipboardRef = useRef<any>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { confirmDeletion } = useSettings();
 
   const { nodes, setNodes, edges, setEdges } = useStore((state) => ({
     nodes: state.nodes,
@@ -59,10 +61,14 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     setNodes([...nodes, newNode]);
   };
 
-  const handleTriggerDelete = () => {
+  const handleTriggerDelete = useCallback(() => {
     if (!selectedElement) return;
-    setShowDeleteDialog(true);
-  };
+    if (confirmDeletion) {
+      setShowDeleteDialog(true);
+    } else {
+      handleConfirmDelete();
+    }
+  }, [selectedElement, confirmDeletion]);
 
   const handleConfirmDelete = async () => {
     if (!selectedElement) return;
