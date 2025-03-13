@@ -1,6 +1,7 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useClipboard } from './useClipboard';
 import { Node, Edge } from 'reactflow';
+import { useTransformMode } from '@/hooks/useTransformMode';
 
 export const useKeyboardShortcuts = (
   selectedElement: Node | Edge | null,
@@ -8,6 +9,7 @@ export const useKeyboardShortcuts = (
   onPaste: (clipboardElement: Node | Edge) => void,
 ) => {
   const { copy, cut, paste } = useClipboard();
+  const { transformMode, setTransformMode } = useTransformMode();
 
   useHotkeys(
     'delete, backspace',
@@ -55,5 +57,13 @@ export const useKeyboardShortcuts = (
     () => {
       paste(onPaste);
     }
+  );
+
+  useHotkeys(
+    'ctrl+alt+t',
+    () => {
+      setTransformMode(!transformMode);
+    },
+    [transformMode]
   );
 };

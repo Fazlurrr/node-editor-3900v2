@@ -26,6 +26,7 @@ import Modal from './FileMenu/Modal';
 import { toast } from 'react-toastify';
 import { Check } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
+import { useTransformMode } from '@/hooks/useTransformMode';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
@@ -39,6 +40,7 @@ const Navbar = () => {
   const [ isModalVisible, setIsModalVisible ] = React.useState(false);
   const [ modalPage, setModalPage ] = React.useState('');
   const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
+  const { transformMode, setTransformMode } = useTransformMode();
 
   // used for debugging
   const toggleGrid = () => {
@@ -127,7 +129,7 @@ const Navbar = () => {
                   <MenubarItem className="cursor-pointer">
                     Redo <MenubarShortcut>Shift+Ctrl+Z</MenubarShortcut>
                   </MenubarItem>
-                  <MenubarSeparator />
+                  <MenubarSeparator/>
                   <MenubarItem
                     className="cursor-pointer"
                     onClick={() => { if (selectedElement) cut(selectedElement, handleTriggerDelete); }}
@@ -146,6 +148,10 @@ const Navbar = () => {
                   >
                     Paste <MenubarShortcut>Ctrl+V</MenubarShortcut>
                   </MenubarItem>
+                  <MenubarSeparator/>
+                    <MenubarItem className="cursor-pointer" onClick={() => setTransformMode(!transformMode)}>
+                    Transform <MenubarShortcut>Ctrl+Alt+T</MenubarShortcut>
+                    </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
               <MenubarMenu>
