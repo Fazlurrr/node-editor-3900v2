@@ -19,7 +19,7 @@ import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import { Logout, ViewDashboard } from './_components';
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
-import { useGridContext } from '../toogleGrid';
+import { useGridContext } from '../toggleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
 import Modal from './FileMenu/Modal';

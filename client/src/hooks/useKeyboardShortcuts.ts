@@ -2,6 +2,8 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useClipboard } from './useClipboard';
 import { Node, Edge } from 'reactflow';
 import { useTransformMode } from '@/hooks/useTransformMode';
+import { useGridContext } from '@/components/ui/toggleGrid';
+import { useMiniMapContext } from '@/components/ui/toggleMiniMap';
 
 export const useKeyboardShortcuts = (
   selectedElement: Node | Edge | null,
@@ -10,6 +12,8 @@ export const useKeyboardShortcuts = (
 ) => {
   const { copy, cut, paste } = useClipboard();
   const { transformMode, setTransformMode } = useTransformMode();
+  const { isGridVisible, setGridVisible } = useGridContext();
+  const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
 
   useHotkeys(
     'delete, backspace',
@@ -66,4 +70,22 @@ export const useKeyboardShortcuts = (
     },
     [transformMode]
   );
+  useHotkeys(
+    'ctrl+shift+g',
+    () => {
+      setGridVisible(!isGridVisible);
+    },
+    { preventDefault: true },
+    [isGridVisible]
+  );
+
+  useHotkeys(
+    'ctrl+shift+m',
+    () => {
+      setMiniMapVisible(!isMiniMapVisible);
+    },
+    { preventDefault: true },
+    [isMiniMapVisible]
+  );
+
 };
