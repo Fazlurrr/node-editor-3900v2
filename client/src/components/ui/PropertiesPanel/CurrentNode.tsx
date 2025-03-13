@@ -168,7 +168,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   };
 
   return (
-    <div className="">
+    <div className="flex flex-col flex-1 h-full">
       <div className="mb-2 p-4 flex gap-2 justify-between items-center border-b border-[#9facbc]">
         <div className="flex items-start gap-2">
             {editLabel ? (
@@ -261,7 +261,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       </div>
 
       {/* Custom Attributes Section */}
-      <div className="mb-4 px-4 border-b border-[#9facbc]">
+      <div className="flex-1 pb-12 px-4 h-96 overflow-hidden">
         <div className="flex justify-between items-center mb-2 relative">
           <p className="text-black dark:text-white">
             <strong>Custom attributes</strong>
@@ -536,7 +536,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         {/* List existing custom attributes */}
         {customAttributes.length > 0 && (
           <div
-            className="mb-4 border border-[#9facbc] max-h-80
+            className="border border-[#9facbc] h-full
             overflow-y-auto
             [&::-webkit-scrollbar]:w-1
             [&::-webkit-scrollbar-track]:bg-white
