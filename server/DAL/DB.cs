@@ -118,11 +118,10 @@ public class DB : DbContext
                     });
 
         modelBuilder.Entity<Block>()
-            .Property(b => b.Width)
-            .HasDefaultValue(110);
+            .Property(b => b.Width);
         modelBuilder.Entity<Block>()
-            .Property(b => b.Height)
-            .HasDefaultValue(66);
+            .Property(b => b.Height);
+            
 
         modelBuilder.Entity<Edge>()
             .OwnsOne(e => e.Data);

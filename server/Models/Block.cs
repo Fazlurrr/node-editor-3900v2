@@ -39,6 +39,8 @@ public class Block : Node
         : base(id, position, NodeType.Block)
     {
         Data = blockData;
+        if (Width == null) Width = 110;
+        if (Height == null) Height = 66;
     }
 
 }
