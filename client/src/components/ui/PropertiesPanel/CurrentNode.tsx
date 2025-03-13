@@ -7,7 +7,7 @@ import { Input } from '../input';
 import { Button } from '../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
-import { Edit2, Plus, Minus,  X} from 'lucide-react';
+import { Edit2, Plus, Minus,  X, Trash2} from 'lucide-react';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode, deleteNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
@@ -168,30 +168,34 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   };
 
   return (
-    <div className="">
-      <div className="mb-2 p-4">
-      <strong>Name:</strong>{' '}
-        {editLabel ? (
-          <Input
-            value={tempName}
-            onChange={(e) => setTempName(e.target.value)}
-            onBlur={handleUpdateCustomName}
-            autoFocus
-            onKeyDown={handleKeyDown}
-          />
-        ) : (
-          <span
-            title="Edit Name"
-            onClick={() => {
-              setTempName(currentNode.data.customName || currentNode.data.label || '');
-              setEditLabel(true);
-            }}
-            className="cursor-pointer"
-          >
-            {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
-            <Edit2 size={18} className="inline ml-1" />
-          </span>
-        )}
+    <div className="flex flex-col flex-1 h-full">
+      <div className="mb-2 p-4 flex gap-2 justify-between items-center border-b border-[#9facbc]">
+        <div className="flex items-start gap-2">
+            {editLabel ? (
+              <Input
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                onBlur={handleUpdateCustomName}
+                autoFocus
+                onKeyDown={handleKeyDown}
+              />
+            ) : (
+              <span
+                title="Edit Name"
+                onClick={() => {
+                  setTempName(currentNode.data.customName || currentNode.data.label || '');
+                  setEditLabel(true);
+                }}
+                className="cursor-pointer font-bold flex items-center"
+              >
+                {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
+                <Edit2 size={18} className="ml-1" />
+              </span>
+            )}
+        </div>
+        <button onClick={() => setShowDeleteDialog(true)} title='Delete Node'>
+          <Trash2 size={18} className="mr-2 text-red-700" />
+        </button>
       </div>
 
       {/* Aspect Type */}
@@ -257,7 +261,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       </div>
 
       {/* Custom Attributes Section */}
-      <div className="mb-4 px-4 border-b border-[#9facbc]">
+      <div className="flex-1 pb-12 px-4 h-96 overflow-hidden">
         <div className="flex justify-between items-center mb-2 relative">
           <p className="text-black dark:text-white">
             <strong>Custom attributes</strong>
@@ -532,7 +536,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         {/* List existing custom attributes */}
         {customAttributes.length > 0 && (
           <div
-            className="mb-4 border border-[#9facbc] max-h-80
+            className="border border-[#9facbc] h-full
             overflow-y-auto
             [&::-webkit-scrollbar]:w-1
             [&::-webkit-scrollbar-track]:bg-white
@@ -600,11 +604,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             ))}
           </div>
         )}
-      </div>
-      <div className="mx-4 mb-4">
-        <Button className={buttonVariants.danger} variant="outline" onClick={() => setShowDeleteDialog(true)}>
-          Delete Node
-        </Button>
       </div>
       <DeleteConfirmationDialog
         open={showDeleteDialog}
