@@ -347,6 +347,7 @@ const Editor = () => {
   const handleNodeClick = (_: React.MouseEvent, node: Node) => {
     setSelectedElement(node);
   };
+  
 
   const handleEdgeClick = (_: React.MouseEvent, edge: Edge) => {
     setSelectedElement(edge);
@@ -374,6 +375,7 @@ const Editor = () => {
                   y: node.position.y,
                 };
               }}
+              deleteKeyCode={null}
               onNodeDragStop={onNodeDragStop}
               onNodeDrag={onNodeDrag}
               onNodeClick={handleNodeClick}
