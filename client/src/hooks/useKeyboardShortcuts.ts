@@ -64,7 +64,7 @@ export const useKeyboardShortcuts = (
   );
 
   useHotkeys(
-    'ctrl+alt+t',
+    't',
     () => {
       setTransformMode(!transformMode);
     },
