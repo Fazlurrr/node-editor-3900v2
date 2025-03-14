@@ -47,26 +47,34 @@ const Editor = () => {
   const { isGridVisible } = useGridContext();
   const [canvasMenu, setCanvasMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null);
 
-  const updateNodeZIndex = (nodeId: string, newZIndex: number) => {
-    const currentNodes = useStore.getState().nodes;
-    const updatedNodes = currentNodes.map((node) =>
-      node.id === nodeId
-        ? { ...node, data: { ...node.data, zIndex: newZIndex } }
-        : node
+  const handleRightClick = ({ x, y, nodeId }: { x: number; y: number; nodeId: string }) => {
+    setNodes(
+      nodes.map((node) => ({
+        ...node,
+        selected: node.id === nodeId,
+      }))
     );
-    useStore.getState().setNodes(updatedNodes);
+    const selectedNode = nodes.find((n) => n.id === nodeId);
+    if (selectedNode) {
+      setSelectedElement(selectedNode);
+    }
+    setCanvasMenu({ x, y, nodeId });
   };
 
   const moveNodeToFront = (nodeId: string) => {
-    updateNodeZIndex(nodeId, 1000);
+    const currentNodes = useStore.getState().nodes;
+    const targetNode = currentNodes.find((n) => n.id === nodeId);
+    if (!targetNode) return;
+    const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
+    setNodes([...remainingNodes, targetNode]);
   };
-
+  
   const moveNodeToBack = (nodeId: string) => {
-    updateNodeZIndex(nodeId, 1);
-  };
-
-  const handleRightClick = ({ x, y, nodeId }: { x: number; y: number; nodeId: string }) => {
-    setCanvasMenu({ x, y, nodeId });
+    const currentNodes = useStore.getState().nodes;
+    const targetNode = currentNodes.find((n) => n.id === nodeId);
+    if (!targetNode) return;
+    const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
+    setNodes([targetNode, ...remainingNodes]);
   };
   
   const nodeTypes = useMemo(
@@ -77,6 +85,7 @@ const Editor = () => {
     }),
     [handleRightClick]
   );
+  
 
   const edgeTypes = useMemo(
     () => ({

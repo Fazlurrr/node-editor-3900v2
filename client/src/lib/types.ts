@@ -121,7 +121,6 @@ export type NodeData = {
   createdBy: string;
   width?: number;
   height?: number;
-  zIndex?: number;
 };
 
 export type QuantityDatums = {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface CanvasMenuProps {
@@ -10,12 +10,19 @@ interface CanvasMenuProps {
 }
 
 const CanvasMenu: React.FC<CanvasMenuProps> = ({ x, y, onMoveToFront, onMoveToBack, onClose }) => {
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        menuRef.current?.focus();
+    }, []);
+
     return (
         <div
+            ref={menuRef}
             tabIndex={0}
             className={cn("absolute bg-white border shadow-lg rounded z-50")}
             style={{ top: y, left: x, width: "150px" }}
-            onBlur={onClose} 
+            onBlur={onClose}
         >
             <ul>
                 <li

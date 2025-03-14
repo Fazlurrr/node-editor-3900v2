@@ -15,7 +15,6 @@ const Block = (props: CustomNodeProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
   const { transformMode } = useTransformMode();
-  const nodeZIndex = props.data.zIndex ?? (props.selected ? 1000 : 1);
 
   const [dimensions, setDimensions] = useState({
     width: props.data.width || 110,
@@ -104,7 +103,6 @@ const Block = (props: CustomNodeProps) => {
           width: dimensions.width,
           height: dimensions.height,
           boxShadow: props.selected ? `0 0 0 2px ${selectionColor}` : 'none',
-          zIndex: nodeZIndex,
         }}
         className={`border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
       >
