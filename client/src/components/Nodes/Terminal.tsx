@@ -17,7 +17,15 @@ const Terminal = (props: CustomNodeProps) => {
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
 
   const terminalContent = (
-    <figure id={props.data.label} className="relative m-0 p-0 block" style={{ lineHeight: 0 }}>
+    <figure
+      id={props.data.label}
+      className="relative m-0 p-0 block"
+      style={{ lineHeight: 0 }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        props.onRightClick?.({ x: e.clientX, y: e.clientY, nodeId: props.id });
+      }}
+    >
       <div
         className={`h-[22px] w-[22px] overflow-hidden whitespace-nowrap border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
         style={{ 

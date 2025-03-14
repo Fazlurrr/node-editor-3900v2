@@ -149,6 +149,7 @@ export type CustomEdgeProps = Omit<EdgeProps, 'data'> &
 export type CustomNodeProps = Omit<NodeProps, 'data'> &
   NodeData & {
     data: NodeData;
+    onRightClick?: (info: { x: number; y: number; nodeId: string }) => void;
   };
 
 export type NodeRelation = {

@@ -38,21 +38,54 @@ import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useGridContext } from '@/components/ui/toggleGrid';
 import { useClipboard } from '@/hooks/useClipboard';
+import CanvasMenu from '@/components/ui/CanvasMenu';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
   const { isGridVisible } = useGridContext();
+  const [canvasMenu, setCanvasMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null);
 
+  const handleRightClick = ({ x, y, nodeId }: { x: number; y: number; nodeId: string }) => {
+    setNodes(
+      nodes.map((node) => ({
+        ...node,
+        selected: node.id === nodeId,
+      }))
+    );
+    const selectedNode = nodes.find((n) => n.id === nodeId);
+    if (selectedNode) {
+      setSelectedElement(selectedNode);
+    }
+    setCanvasMenu({ x, y, nodeId });
+  };
+
+  const moveNodeToFront = (nodeId: string) => {
+    const currentNodes = useStore.getState().nodes;
+    const targetNode = currentNodes.find((n) => n.id === nodeId);
+    if (!targetNode) return;
+    const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
+    setNodes([...remainingNodes, targetNode]);
+  };
+  
+  const moveNodeToBack = (nodeId: string) => {
+    const currentNodes = useStore.getState().nodes;
+    const targetNode = currentNodes.find((n) => n.id === nodeId);
+    if (!targetNode) return;
+    const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
+    setNodes([targetNode, ...remainingNodes]);
+  };
+  
   const nodeTypes = useMemo(
     () => ({
-      block: Block,
-      connector: Connector,
-      terminal: Terminal,
+      block: (nodeProps: any) => <Block {...nodeProps} onRightClick={handleRightClick} />,
+      connector: (nodeProps: any) => <Connector {...nodeProps} onRightClick={handleRightClick} />,
+      terminal: (nodeProps: any) => <Terminal {...nodeProps} onRightClick={handleRightClick} />,
     }),
-    []
+    [handleRightClick]
   );
+  
 
   const edgeTypes = useMemo(
     () => ({
@@ -347,6 +380,7 @@ const Editor = () => {
   const handleNodeClick = (_: React.MouseEvent, node: Node) => {
     setSelectedElement(node);
   };
+  
 
   const handleEdgeClick = (_: React.MouseEvent, edge: Edge) => {
     setSelectedElement(edge);
@@ -356,61 +390,71 @@ const Editor = () => {
   
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);
 
+  
 
   return (
-      <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-          <div ref={reactFlowWrapper} className='mx-56 h-full'>
-            <ReactFlowStyled
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              nodeTypes={nodeTypes as unknown as NodeTypes}
-              edgeTypes={edgeTypes as unknown as EdgeTypes}
-              onNodeDragStart={(_, node) => {
-                initialPositions.current[node.id] = {
-                  x: node.position.x,
-                  y: node.position.y,
-                };
-              }}
-              onNodeDragStop={onNodeDragStop}
-              onNodeDrag={onNodeDrag}
-              onNodeClick={handleNodeClick}
-              onEdgeClick={handleEdgeClick}
-              onPaneClick={() => setSelectedElement(null)}
-              onInit={onLoad}
-              snapToGrid={true}
-              snapGrid={[11, 11]}
-              onDrop={handleDrop}
-              onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'move';
-              }}
-              onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
-            >
-              
-              <ControlsStyled
-                style={{
-                  position: 'absolute',
-                  top: '95%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                }}
-              />
-              {isGridVisible && (
-                <Background
-                  color={theme === 'dark' ? '#2f3237' : '#eee'}
-                  gap={11}
-                  lineWidth={1}
-                  variant={BackgroundVariant.Lines}
-                />
-              )}
-            </ReactFlowStyled>
-          </div>
-          <NodesPanel />
-          <PropertiesPanel selectedElement={selectedElement} />
-      </ThemeProvider>
+    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+      <div ref={reactFlowWrapper} className='mx-56 h-full'>
+        <ReactFlowStyled
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          nodeTypes={nodeTypes as unknown as NodeTypes}
+          edgeTypes={edgeTypes as unknown as EdgeTypes}
+          onNodeDragStart={(_, node) => {
+            initialPositions.current[node.id] = {
+              x: node.position.x,
+              y: node.position.y,
+            };
+          }}
+          deleteKeyCode={null}
+          onNodeDragStop={onNodeDragStop}
+          onNodeDrag={onNodeDrag}
+          onNodeClick={handleNodeClick}
+          onEdgeClick={handleEdgeClick}
+          onPaneClick={() => setSelectedElement(null)}
+          onInit={onLoad}
+          snapToGrid={true}
+          snapGrid={[11, 11]}
+          onDrop={handleDrop}
+          onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+          }}
+          onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
+        >
+          <ControlsStyled
+            style={{
+              position: 'absolute',
+              top: '95%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          />
+          {isGridVisible && (
+            <Background
+              color={theme === 'dark' ? '#2f3237' : '#eee'}
+              gap={11}
+              lineWidth={1}
+              variant={BackgroundVariant.Lines}
+            />
+          )}
+        </ReactFlowStyled>
+        {canvasMenu && (
+          <CanvasMenu
+            x={canvasMenu.x}
+            y={canvasMenu.y}
+            onMoveToFront={() => moveNodeToFront(canvasMenu.nodeId)}
+            onMoveToBack={() => moveNodeToBack(canvasMenu.nodeId)}
+            onClose={() => setCanvasMenu(null)}
+          />
+        )}
+      </div>
+      <NodesPanel />
+      <PropertiesPanel selectedElement={selectedElement} />
+    </ThemeProvider>
   );
 };
 
