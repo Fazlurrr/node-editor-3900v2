@@ -414,6 +414,15 @@ const Editor = () => {
           onNodeDrag={onNodeDrag}
           onNodeClick={handleNodeClick}
           onEdgeClick={handleEdgeClick}
+
+          //TEMPORARY FIX
+          onSelectionChange={(elements) => {
+            if (elements.nodes && elements.nodes.length > 0) {
+              setSelectedElement(elements.nodes[0]);
+            } else {
+              setSelectedElement(null);
+            }
+          }}
           onPaneClick={() => setSelectedElement(null)}
           onInit={onLoad}
           snapToGrid={true}
