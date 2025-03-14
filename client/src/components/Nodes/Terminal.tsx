@@ -34,15 +34,6 @@ const Terminal = (props: CustomNodeProps) => {
           ...(props.selected ? { boxShadow: `0 0 0 2px ${selectionColor}` } : {}) 
         }}
       >
-        <header className="flex h-full w-full items-center justify-center">
-          <p
-            className={`truncate text-center text-xs leading-none text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark m-0 p-0`}
-          >
-            {props.data.customName === ''
-              ? props.data.label.replace('terminal', 'T')
-              : props.data.customName}
-          </p>
-        </header>
       </div>
 
       {hasCustomAttributes && (
@@ -52,11 +43,9 @@ const Terminal = (props: CustomNodeProps) => {
         </div>
       )}
 
-      <div 
-        className="absolute" 
+      <div
         style={{ 
           visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden',
-          top: 0 
         }}
       >
         <Handles nodeId={props.data.label} />
