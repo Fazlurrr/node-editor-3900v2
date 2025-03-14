@@ -26,15 +26,6 @@ const Connector = (props: CustomNodeProps) => {
               className={`h-[44px] w-[44px] overflow-hidden whitespace-nowrap rounded-full border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
               style={props.selected ? { boxShadow: `0 0 0 2px ${selectionColor}` } : {}}
             >
-              <header className="flex h-full w-full items-center justify-center">
-                <p
-                  className={`truncate text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
-                >
-                  {props.data.customName === ''
-                    ? props.data.label
-                    : props.data.customName}
-                </p>
-              </header>
             </div>
 
             {/* Custom Attribute Indicator */}
