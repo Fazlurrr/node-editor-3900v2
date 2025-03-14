@@ -162,7 +162,7 @@ const Navbar = () => {
                   </MenubarItem>
                   <MenubarSeparator/>
                     <MenubarItem className="cursor-pointer" onClick={() => setTransformMode(!transformMode)}>
-                    Transform <MenubarShortcut>Ctrl+Alt+T</MenubarShortcut>
+                    Transform Mode <MenubarShortcut>T</MenubarShortcut>
                     </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
