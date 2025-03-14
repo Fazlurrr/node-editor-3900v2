@@ -15,6 +15,7 @@ const Block = (props: CustomNodeProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
   const { transformMode } = useTransformMode();
+  const nodeZIndex = props.data.zIndex ?? (props.selected ? 1000 : 1);
 
   const [dimensions, setDimensions] = useState({
     width: props.data.width || 110,
@@ -79,44 +80,53 @@ const Block = (props: CustomNodeProps) => {
       onDoubleClick={(e) => {
         e.stopPropagation();
         setIsEditing(true);
-            }}
-          >
-            <NodeResizer
+      }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        props.onRightClick?.({ 
+          x: e.clientX, 
+          y: e.clientY, 
+          nodeId: props.id 
+        });
+      }}
+    >
+      <NodeResizer
         minWidth={110}
         minHeight={66}
         isVisible={props.selected && transformMode}
         lineStyle={{ border: selectionColor }}
-        handleStyle={{ borderColor: 'black' ,backgroundColor: 'white', width: '7px', height: '7px' }}
+        handleStyle={{ borderColor: 'black', backgroundColor: 'white', width: '7px', height: '7px' }}
         onResize={onResize}
         onResizeEnd={onResizeEnd}
+      />
+      <div
+        style={{
+          width: dimensions.width,
+          height: dimensions.height,
+          boxShadow: props.selected ? `0 0 0 2px ${selectionColor}` : 'none',
+          zIndex: nodeZIndex,
+        }}
+        className={`border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+      >
+        <header className="flex items-center justify-center h-full w-full">
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              className="w-full h-full bg-transparent text-center focus:outline-none text-black"
+              value={tempName}
+              onChange={(e) => setTempName(e.target.value)}
+              onBlur={handleSubmit}
+              onKeyDown={handleKeyDown}
             />
-        <div
-          style={{
-            width: dimensions.width,
-            height: dimensions.height,
-            boxShadow: props.selected ? `0 0 0 2px ${selectionColor}` : 'none',
-          }}
-          className={`border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
-        >
-          <header className="flex items-center justify-center h-full w-full">
-            {isEditing ? (
-              <input
-                ref={inputRef}
-                className="w-full h-full bg-transparent text-center focus:outline-none text-black"
-                value={tempName}
-                onChange={(e) => setTempName(e.target.value)}
-                onBlur={handleSubmit}
-                onKeyDown={handleKeyDown}
-              />
-            ) : (
-              <p className="text-center text-black">
-                {props.data.customName === ''
-                  ? capitalizeFirstLetter(props.data.label)
-                  : props.data.customName}
-              </p>
-            )}
-          </header>
-        </div>
+          ) : (
+            <p className="text-center text-black">
+              {props.data.customName === ''
+                ? capitalizeFirstLetter(props.data.label)
+                : props.data.customName}
+            </p>
+          )}
+        </header>
+      </div>
 
       {hasCustomAttributes && (
         <div className="absolute -top-6 -right-10 flex items-center space-x-1 bg-white dark:bg-[#232528] px-1 border-2 border-black dark:border-white rounded shadow">
