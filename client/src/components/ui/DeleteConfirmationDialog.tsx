@@ -3,6 +3,7 @@ import { Button } from './button';
 import { buttonVariants } from '@/lib/config.ts';
 import { X } from 'lucide-react';
 import { useTheme } from '@/hooks';
+import { useSettings } from '@/hooks/useSettings'
 
 interface DeleteConfirmationDialogProps {
   open: boolean;
@@ -20,6 +21,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
   const { theme } = useTheme();
+  const { confirmDeletion, setConfirmDeletion } = useSettings()
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -52,9 +54,15 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
               <div className='flex justify-center text-center'>
                   <div>
                       <h1 className='font-semibold'>Are you sure you want to delete this {elementType}?</h1>
-                      <p>{elementType === 'element'
-                ? 'All relations and references to this node will be deleted. You can undo this action if needed.'
-                : 'This relation will be deleted. You can undo this action if needed.'}</p>
+                        <div className='flex gap-2 items-center justify-center'>
+                        <input
+                          type="checkbox"
+                          id="confirmDeletion"
+                          checked={!confirmDeletion}
+                          onChange={(e) => setConfirmDeletion(!e.target.checked)}
+                        />
+                        <p className='pb-0.5'>Don't show this again?</p>
+                        </div>
                   </div>
               </div>
               <div className="flex justify-center mt-6 gap-4">
