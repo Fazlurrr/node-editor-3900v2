@@ -13,6 +13,7 @@ const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(props.data.customName || props.data.label || '');
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const resizeNodeRef = useRef<HTMLDivElement>(null);
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
   const { transformMode } = useTransformMode();
 
@@ -55,12 +56,14 @@ const Block = (props: CustomNodeProps) => {
     }
   }, [isEditing]);
 
-  // Check if the node has custom attributes
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
 
   const onResize = (_event: any, params: ResizeParams) => {
-    setDimensions({ width: params.width, height: params.height });
+    if (resizeNodeRef.current) {
+      resizeNodeRef.current.style.width = `${params.width}px`;
+      resizeNodeRef.current.style.height = `${params.height}px`;
+    }
   };
 
   const onResizeEnd = async (_event: any, params: ResizeParams) => {
@@ -99,6 +102,7 @@ const Block = (props: CustomNodeProps) => {
         onResizeEnd={onResizeEnd}
       />
       <div
+        ref={resizeNodeRef}
         style={{
           width: dimensions.width,
           height: dimensions.height,
