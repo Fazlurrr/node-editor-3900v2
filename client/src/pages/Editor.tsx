@@ -47,36 +47,28 @@ const Editor = () => {
   const { isGridVisible } = useGridContext();
   const [canvasMenu, setCanvasMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null);
 
-  const handleRightClick = ({ x, y, nodeId }: { x: number; y: number; nodeId: string }) => {
-    setNodes(
-      nodes.map((node) => ({
+  const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
+    useStore(storeSelector, shallow);
+  const { selectedElement, setSelectedElement, handleTriggerDelete, handlePaste } = useClipboard();
+  const { theme } = useTheme();
+
+  const handleRightClick = useCallback(
+    ({ x, y, nodeId }: { x: number; y: number; nodeId: string }) => {
+      const currentNodes = useStore.getState().nodes;
+      const updatedNodes = currentNodes.map((node) => ({
         ...node,
         selected: node.id === nodeId,
-      }))
-    );
-    const selectedNode = nodes.find((n) => n.id === nodeId);
-    if (selectedNode) {
-      setSelectedElement(selectedNode);
-    }
-    setCanvasMenu({ x, y, nodeId });
-  };
+      }));
+      setNodes(updatedNodes);
+      const selectedNode = updatedNodes.find((n) => n.id === nodeId);
+      if (selectedNode) {
+        setSelectedElement(selectedNode);
+      }
+      setCanvasMenu({ x, y, nodeId });
+    },
+    [setNodes, setSelectedElement]
+  );
 
-  const moveNodeToFront = (nodeId: string) => {
-    const currentNodes = useStore.getState().nodes;
-    const targetNode = currentNodes.find((n) => n.id === nodeId);
-    if (!targetNode) return;
-    const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
-    setNodes([...remainingNodes, targetNode]);
-  };
-  
-  const moveNodeToBack = (nodeId: string) => {
-    const currentNodes = useStore.getState().nodes;
-    const targetNode = currentNodes.find((n) => n.id === nodeId);
-    if (!targetNode) return;
-    const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
-    setNodes([targetNode, ...remainingNodes]);
-  };
-  
   const nodeTypes = useMemo(
     () => ({
       block: (nodeProps: any) => <Block {...nodeProps} onRightClick={handleRightClick} />,
@@ -85,7 +77,6 @@ const Editor = () => {
     }),
     [handleRightClick]
   );
-  
 
   const edgeTypes = useMemo(
     () => ({
@@ -101,11 +92,28 @@ const Editor = () => {
     []
   );
 
-  const { theme } = useTheme();
+  const moveNodeToFront = useCallback(
+    (nodeId: string) => {
+      const currentNodes = useStore.getState().nodes;
+      const targetNode = currentNodes.find((n) => n.id === nodeId);
+      if (!targetNode) return;
+      const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
+      setNodes([...remainingNodes, targetNode]);
+    },
+    [setNodes]
+  );
 
-  const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
-    useStore(storeSelector, shallow);
-
+  const moveNodeToBack = useCallback(
+    (nodeId: string) => {
+      const currentNodes = useStore.getState().nodes;
+      const targetNode = currentNodes.find((n) => n.id === nodeId);
+      if (!targetNode) return;
+      const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
+      setNodes([targetNode, ...remainingNodes]);
+    },
+    [setNodes]
+  );
+  
   useEffect(() => {
     (async () => {
       const fetchedEdges = (await fetchEdges()) ?? [];
@@ -386,11 +394,7 @@ const Editor = () => {
     setSelectedElement(edge);
   };
 
-  const { selectedElement, setSelectedElement, handleTriggerDelete, handlePaste } = useClipboard();
-  
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);
-
-  
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -414,15 +418,6 @@ const Editor = () => {
           onNodeDrag={onNodeDrag}
           onNodeClick={handleNodeClick}
           onEdgeClick={handleEdgeClick}
-
-          //TEMPORARY FIX
-          onSelectionChange={(elements) => {
-            if (elements.nodes && elements.nodes.length > 0) {
-              setSelectedElement(elements.nodes[0]);
-            } else {
-              setSelectedElement(null);
-            }
-          }}
           onPaneClick={() => setSelectedElement(null)}
           onInit={onLoad}
           snapToGrid={true}
