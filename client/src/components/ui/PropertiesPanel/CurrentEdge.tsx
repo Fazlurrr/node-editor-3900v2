@@ -116,7 +116,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
             </div>
       <DeleteConfirmationDialog
         open={showDeleteDialog}
-        elementType="edge"
+        elementType="relation"
         onConfirm={handleDeleteEdge}
         onCancel={() => setShowDeleteDialog(false)}
       />
