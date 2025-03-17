@@ -23,18 +23,6 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   const { theme } = useTheme();
   const { confirmDeletion, setConfirmDeletion } = useSettings()
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      event.preventDefault();
-
-      if (document.activeElement === cancelButtonRef.current) {
-        deleteButtonRef.current?.focus();
-      } else {
-        cancelButtonRef.current?.focus();
-      }
-    }
-  };
-
   return (
     <>
       {open && (
