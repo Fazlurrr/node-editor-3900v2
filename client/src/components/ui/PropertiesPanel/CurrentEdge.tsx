@@ -7,6 +7,7 @@ import { EdgeType } from '@/lib/types';
 import { useStore } from '@/hooks';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { buttonVariants } from '@/lib/config';
+import { Trash2 } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useSettings } from '@/hooks/useSettings';
 
@@ -62,6 +63,13 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           {targetNode ? targetNode.data.label : currentEdge.target}
         </div>
       </div>
+      <div className="mx-4 mb-4 flex justify-between items-center">
+    <Button className={`${buttonVariants.danger} flex items-center`} variant="outline" onClick={handleDeleteEdgeClick}>
+      <Trash2 size={18} className="mr-2 text-red-700" /> {/* Legg til ikon her */}
+      Delete Relation
+    </Button>
+    </div>
+
       <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
         <strong>Relation Type:</strong>
         <div className="mb-2"></div>
@@ -109,11 +117,6 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           </SelectContent>
         </Select>
       </div>
-      <div className="mx-4 mb-4">
-              <Button className={buttonVariants.danger} variant="outline" onClick={handleDeleteEdgeClick}>
-                Delete Edge
-              </Button>
-            </div>
       <DeleteConfirmationDialog
         open={showDeleteDialog}
         elementType="relation"

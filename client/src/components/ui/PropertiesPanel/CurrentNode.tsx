@@ -186,6 +186,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         <div className="flex items-start gap-2">
             {editLabel ? (
               <Input
+                className="min-w-[100px] w-full break-words overflow-hidden text-overflow-ellipsis"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 onBlur={handleUpdateCustomName}
@@ -199,14 +200,14 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                   setTempName(currentNode.data.customName || currentNode.data.label || '');
                   setEditLabel(true);
                 }}
-                className="cursor-pointer font-bold flex items-center"
+                className="flex-grow cursor-pointer font-bold flex items-center break-all"
               >
                 {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
                 <Edit2 size={18} className="ml-1" />
               </span>
             )}
         </div>
-        <button onClick={handleDeleteClick} title='Delete Node'>
+        <button onClick={handleDeleteClick} title='Delete Element'>
           <Trash2 size={18} className="mr-2 text-red-700" />
         </button>
       </div>
@@ -565,7 +566,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                   <div className="w-full">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <strong className="text-sm break-words">{attr.name}</strong>
+                        <strong className="text-sm break-words break-all">{attr.name}</strong>
                         <div title="Edit Attribute">
                           <Edit2
                             size={16}

@@ -7,7 +7,7 @@ import { useSettings } from '@/hooks/useSettings'
 
 interface DeleteConfirmationDialogProps {
   open: boolean;
-  elementType: 'element' | 'relation';
+  elementType: 'relation' | 'element';
   onConfirm: () => void;
   onCancel: () => void;
 }

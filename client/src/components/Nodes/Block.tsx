@@ -8,11 +8,12 @@ import { Asterisk } from 'lucide-react';
 import { updateNode } from '@/api/nodes';
 import { selectionColor } from '@/lib/config';
 import { useTransformMode } from '@/hooks/useTransformMode';
+import { set } from 'zod';
 
 const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(props.data.customName || props.data.label || '');
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resizeNodeRef = useRef<HTMLDivElement>(null);
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
   const { transformMode } = useTransformMode();
@@ -53,6 +54,7 @@ const Block = (props: CustomNodeProps) => {
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
+      inputRef.current.select();
       inputRef.current.focus();
     }
   }, [isEditing]);
@@ -80,7 +82,8 @@ const Block = (props: CustomNodeProps) => {
     <figure
       id={props.data.label}
       className="relative"
-      onDoubleClick={(e) => {
+      onDoubleClick={(e: React.MouseEvent) => {
+        e.preventDefault();
         e.stopPropagation();
         setIsEditing(true);
       }}
@@ -113,21 +116,23 @@ const Block = (props: CustomNodeProps) => {
       >
         <header className="flex items-center justify-center h-full w-full">
           {isEditing ? (
-            <input
-              ref={inputRef}
-              className="w-full h-full bg-transparent text-center focus:outline-none text-black"
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onBlur={handleSubmit}
-              onKeyDown={handleKeyDown}
-            />
-          ) : (
-            <p className="text-center text-black">
-              {props.data.customName === ''
-                ? capitalizeFirstLetter(props.data.label)
-                : props.data.customName}
-            </p>
-          )}
+              <div className="flex items-center justify-center h-full w-full">
+                <textarea
+                ref={inputRef}
+                className="w-full h-full bg-transparent text-center text-black resize-none"
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                onBlur={handleSubmit}
+                onKeyDown={handleKeyDown}
+                />
+              </div>
+            ) : (
+              <p className="text-center text-black overflow-hidden">
+                {props.data.customName === ''
+                  ? capitalizeFirstLetter(props.data.label)
+                  : props.data.customName}
+              </p>
+            )}
         </header>
       </div>
 
