@@ -64,12 +64,29 @@ export const useKeyboardShortcuts = (
   );
 
   useHotkeys(
+    'v',
+    () => {
+      setMode('move');
+    },
+    [mode]
+  );
+
+  useHotkeys(
     't',
     () => {
       setMode(mode === 'transform' ? 'move' : 'transform');
     },
     [mode]
   );
+
+  useHotkeys(
+    'r',
+    () => {
+      setMode(mode === 'relation' ? 'move' : 'relation');
+    },
+    [mode]
+  );
+
   useHotkeys(
     'ctrl+shift+g',
     () => {
