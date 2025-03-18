@@ -41,7 +41,7 @@ const Navbar = () => {
   const [ isModalVisible, setIsModalVisible ] = React.useState(false);
   const [ modalPage, setModalPage ] = React.useState('');
   const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
-  const { mode, setMode } = useMode();
+  const { setMode } = useMode();
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = React.useState(false);
 
   // used for debugging
