@@ -139,11 +139,16 @@ export const addTerminalToBlock = async (
     return;
   }
 
-  // Add to React Flow state
-  setNodes([...nodes, terminal]);
+  // Ensure the blockNode's terminals array exists and add new terminal
+  blockNode.data.terminals = Array.isArray(blockNode.data.terminals)
+    ? [...blockNode.data.terminals, { id: terminal.id }]
+    : [{ id: terminal.id }];
 
   // Immediately update the position to ensure it's stored correctly
-  await updateNode(terminal.id);
+  await updateNode(blockNode.id);
+
+  // Add to React Flow state
+  setNodes([...nodes, terminal]);
 
   return terminal;
 };
