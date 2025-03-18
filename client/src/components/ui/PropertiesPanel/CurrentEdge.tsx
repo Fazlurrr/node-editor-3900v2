@@ -36,7 +36,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
     }
   };
 
-  const handleDeleteEdgeClick = async () => {
+  const handleDeleteClick = async () => {
     if (!confirmDeletion) {
       await handleDeleteEdge();
     } else {
@@ -51,24 +51,24 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
 
   return (
     <div className="">
-      <div className="mb-1 px-4 p-4 flex items-center">
-        <strong>Edge from:</strong>
-        <div className="ml-2 text-black-600">
-          {sourceNode ? sourceNode.data.label : currentEdge.source}
+      <div className="mb-2 p-4 flex flex-col gap-2 items-start border-b border-[#9facbc]">
+        <div className="flex items-center gap-2">
+          <strong>Edge from:</strong>
+          <div className="ml-2 text-black-600">
+            {sourceNode ? sourceNode.data.label : currentEdge.source}
+          </div>
+          <button onClick={handleDeleteClick} title='Delete Relation' className="flex items-center">
+            <Trash2 size={18} className="text-red-700" />
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <strong>To:</strong>
+          <div className="ml-2 text-black-600 flex-grow">
+            {targetNode ? targetNode.data.label : currentEdge.target}
+          </div>
         </div>
       </div>
-      <div className="mb-0 px-4 pb-4 flex items-center">
-        <strong>To:</strong>
-        <div className="ml-2 text-black-600">
-          {targetNode ? targetNode.data.label : currentEdge.target}
-        </div>
-      </div>
-      <div className="mx-4 mb-4 flex justify-between items-center">
-    <Button className={`${buttonVariants.danger} flex items-center`} variant="outline" onClick={handleDeleteEdgeClick}>
-      <Trash2 size={18} className="mr-2 text-red-700" /> {/* Legg til ikon her */}
-      Delete Relation
-    </Button>
-    </div>
+
 
       <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
         <strong>Relation Type:</strong>
@@ -123,7 +123,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
         onConfirm={handleDeleteEdge}
         onCancel={() => setShowDeleteDialog(false)}
       />
-    </div>
+  </div>
   );
 };
 
