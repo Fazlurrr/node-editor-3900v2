@@ -283,8 +283,6 @@ export const deleteNode = async (
       return null;
     }
 
-    toast.success('Node deleted successfully!');
-
     return nodeToDelete.id;
   } catch (error) {
     toast.error(`Error deleting node: ${(error as Error).message}`);
