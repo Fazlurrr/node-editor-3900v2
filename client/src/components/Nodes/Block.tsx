@@ -8,6 +8,7 @@ import { Asterisk } from 'lucide-react';
 import { updateNode } from '@/api/nodes';
 import { selectionColor } from '@/lib/config';
 import { useMode } from '@/hooks/useMode';
+import { useTerminalResizeHandling } from '@/lib/utils/nodes';
 
 const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -15,6 +16,7 @@ const Block = (props: CustomNodeProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const resizeNodeRef = useRef<HTMLDivElement>(null);
   const { mode } = useMode();
+  const { onResize: onTerminalResize, onResizeEnd: onTerminalResizeEnd } = useTerminalResizeHandling();
 
   // Keep dimensions in state for final value (used on mount or after resize ends)
   const [dimensions, setDimensions] = useState({
@@ -63,6 +65,9 @@ const Block = (props: CustomNodeProps) => {
     if (resizeNodeRef.current) {
       resizeNodeRef.current.style.width = `${params.width}px`;
       resizeNodeRef.current.style.height = `${params.height}px`;
+
+      // Update terminal positions on block resize
+      onTerminalResize(props.id, params);
     }
   };
 
@@ -70,6 +75,9 @@ const Block = (props: CustomNodeProps) => {
     setDimensions({ width: params.width, height: params.height });
     try {
       await updateNode(props.id, { width: params.width, height: params.height });
+
+      // Update terminal positions on block resize
+      onTerminalResizeEnd(props.id, params);
     } catch (err) {
       console.error("Error updating node dimensions:", err);
     }

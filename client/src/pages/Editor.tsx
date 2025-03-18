@@ -31,15 +31,15 @@ import {
 } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
 import { NodesPanel } from '@/components/ui';
-import { fetchNodes, updateNode } from '@/api/nodes';
+import { fetchNodes } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
-import { addNode, addTerminalToBlock } from '@/lib/utils/nodes';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import Toolbar from '@/components/ui/Toolbar/Toolbar';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useGridContext } from '@/components/ui/toggleGrid';
 import { useClipboard } from '@/hooks/useClipboard';
 import CanvasMenu from '@/components/ui/CanvasMenu';
+import { useNodeOperations } from '@/hooks/useNodeOperations';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -47,7 +47,12 @@ const Editor = () => {
   const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
   const { isGridVisible } = useGridContext();
   const [canvasMenu, setCanvasMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null);
-
+  const { 
+    onNodeDrag, 
+    onNodeDragStop, 
+    handleDrop,
+  } = useNodeOperations(reactFlowWrapper, reactFlowInstance, initialPositions);
+  const [, setCurrentZoom] = useState<number>(1);
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
     useStore(storeSelector, shallow);
   const { selectedElement, setSelectedElement, handleTriggerDelete, handlePaste } = useClipboard();
@@ -140,251 +145,6 @@ const Editor = () => {
   }, [setNodes, setEdges]);
 
   const onLoad = (instance: ReactFlowInstance) => setReactFlowInstance(instance);
-  
-  const isPointInsideNode = (point: { x: number; y: number }, node: Node) => {
-    if (!node.positionAbsolute && !node.position) return false;
-
-    const { x, y } = node.positionAbsolute ?? node.position;
-    const width = node.width ?? 150;
-    const height = node.height ?? 150;
-
-    const inside = 
-      point.x >= x && 
-      point.x <= x + width && 
-      point.y >= y && 
-      point.y <= y + height;
-
-      return inside;
-  };
-
-  const getSnappedPosition = (node: Node, blockNode: Node) => {
-    if (!blockNode) return { x: node.position.x, y: node.position.y };
-  
-    // Get dimensions
-    const childWidth = node.width ?? 22;
-    const childHeight = node.height ?? 22;
-    const parentWidth = blockNode.width ?? 110;
-    const parentHeight = blockNode.height ?? 66;
-  
-    // Calculate relative position
-    const relativeX = node.position.x;
-    const relativeY = node.position.y;
-  
-    // Calculate distances to edges
-    const distances = [
-      { edge: "left", distance: Math.abs(relativeX + childWidth) },
-      { edge: "right", distance: Math.abs(relativeX - parentWidth) },
-      { edge: "top", distance: Math.abs(relativeY + childHeight) },
-      { edge: "bottom", distance: Math.abs(relativeY - parentHeight) },
-    ];
-  
-    const closestEdge = distances.reduce((prev, curr) =>
-      curr.distance < prev.distance ? curr : prev
-    );
-  
-    let newX = relativeX;
-    let newY = relativeY;
-  
-    // Snap to closest edge
-    switch (closestEdge.edge) {
-      case "left":
-        newX = -childWidth;
-        newY = Math.max(-childHeight, Math.min(relativeY, parentHeight));
-        break;
-      case "right":
-        newX = parentWidth;
-        newY = Math.max(-childHeight, Math.min(relativeY, parentHeight));
-        break;
-      case "top":
-        newY = -childHeight;
-        newX = Math.max(-childWidth, Math.min(relativeX, parentWidth));
-        break;
-      case "bottom":
-        newY = parentHeight;
-        newX = Math.max(-childWidth, Math.min(relativeX, parentWidth));
-        break;
-    }
-  
-    return { x: newX, y: newY };
-  };
-  
-
-  const onNodeDrag = useCallback(
-    (_: unknown, node: Node) => {
-      if (node.type !== "terminal" || !node.parentId) return;
-  
-      const { nodes, setNodes } = useStore.getState();
-      const blockNode = nodes.find((n) => n.id === node.parentId);
-  
-      if (!blockNode) return;
-  
-      // Get the snapped position relative to parent
-      const { x: newX, y: newY } = getSnappedPosition(node, blockNode);
-  
-      // Update node position for visual feedback
-      const updatedNodes = nodes.map((n) => {
-        if (n.id === node.id) {
-          return {
-            ...n,
-            position: { x: newX, y: newY },
-          };
-        }
-        return n;
-      });
-  
-      setNodes(updatedNodes);
-    },
-    []
-  );
-
-  const onNodeDragStop = async (_: unknown, node: Node) => {
-    const { nodes } = useStore.getState();
-    const initialPos = initialPositions.current[node.id];
-    if (initialPos) {
-      const hasPositionChanged =
-        node.position.x !== initialPos.x ||
-        node.position.y !== initialPos.y;
-      if (hasPositionChanged) {
-        if (node.type === "block") {
-          // Update the block's position
-          await updateNode(node.id);
-      
-          // Update all child terminals with their absolute positions
-          const childTerminals = nodes.filter(
-            n => n.type === "terminal" && n.parentId === node.id
-          );
-      
-          for (const terminal of childTerminals) {
-            // Calculate absolute position based on parent block's position
-            const absolutePosition = {
-              x: node.position.x + terminal.position.x,
-              y: node.position.y + terminal.position.y
-            };
-      
-            // Update terminal in state with absolute position
-            const updatedNodes = nodes.map((n) => {
-              if (n.id === terminal.id) {
-                return {
-                  ...n,
-                  position: terminal.position,
-                  positionAbsolute: absolutePosition
-                };
-              }
-              return n;
-            });
-            setNodes(updatedNodes);
-      
-            // Update in backend
-            await updateNode(terminal.id);
-          }
-        } else if (node.type === "terminal" && node.parentId) {
-          const blockNode = nodes.find((n) => n.id === node.parentId);
-          if (blockNode) {
-            // Get the final snapped position relative to parent
-            const snappedPosition = getSnappedPosition(node, blockNode);
-            
-            // Calculate the absolute position based on the snapped position
-            const absolutePosition = {
-              x: blockNode.position.x + snappedPosition.x,
-              y: blockNode.position.y + snappedPosition.y
-            };
-      
-            // Update terminal in state with both positions
-            const updatedNodes = nodes.map((n) => {
-              if (n.id === node.id) {
-                return {
-                  ...n,
-                  position: snappedPosition,        // Relative position for React Flow
-                  positionAbsolute: absolutePosition // Absolute position for storage
-                };
-              }
-              return n;
-            });
-            setNodes(updatedNodes);
-      
-            // Update in backend
-            await updateNode(node.id);
-          }
-        } else {
-          // For all other nodes
-          await updateNode(node.id);
-        }
-      }
-      delete initialPositions.current[node.id];
-    }
-  };
-
-  const [currentZoom, setCurrentZoom] = useState(1);
-   
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  
-    if (!reactFlowWrapper.current || !reactFlowInstance) return;
-  
-    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-    const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-  
-    if (!data) return;
-
-    const offsetX = 199 / currentZoom;
-    const offsetY = 25 / currentZoom;
-  
-    const position = reactFlowInstance.screenToFlowPosition({
-      x: event.clientX - reactFlowBounds.left,
-      y: event.clientY - reactFlowBounds.top,
-    });
-
-    const adjustedPosition = {
-      x: position.x + offsetX,
-      y: position.y - offsetY
-    };
-  
-    if (data.nodeType === "terminal") {
-      const blockNode = nodes.find(
-        (node) => isPointInsideNode(adjustedPosition, node) && node.type === "block"
-      );
-      
-      if (blockNode) {
-        // Calculate position relative to the block
-        const relativePosition = {
-          x: position.x - blockNode.position.x,
-          y: position.y - blockNode.position.y
-        };
-  
-        // Create temporary node for position calculation
-        const tempNode = {
-          id: 'temp',
-          type: 'terminal',
-          position: relativePosition,
-          width: 22,
-          height: 22,
-          data
-        };
-  
-        // Get snapped position relative to block
-        const snappedPosition = getSnappedPosition(tempNode, blockNode);
-        
-        // Calculate absolute position for storage
-        const absolutePosition = {
-          x: blockNode.position.x + snappedPosition.x,
-          y: blockNode.position.y + snappedPosition.y
-        };
-        
-        addTerminalToBlock(
-          blockNode.id, 
-          snappedPosition,  // For React Flow rendering
-          absolutePosition, // For storage
-          data.aspect
-        );
-        return;
-      }
-    }
-    
-    addNode(data.aspect, data.nodeType, {
-      x: position.x + offsetX,
-      y: position.y - offsetY
-    });
-  };
 
   const handleNodeClick = (_: React.MouseEvent, node: Node) => {
     setSelectedElement(node);
