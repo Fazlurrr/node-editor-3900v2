@@ -5,14 +5,13 @@ import { updateNode } from '@/api/nodes';
 import { isPointInsideNode, getSnappedPosition } from "@/lib/utils/nodes";
 import { shallow } from 'zustand/shallow';
 import { storeSelector, useStore} from '@/hooks';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 export const useNodeOperations = (
     reactFlowWrapper: React.RefObject<HTMLDivElement>,
     reactFlowInstance: ReactFlowInstance | null,
     initialPositions: React.MutableRefObject<Record<string, { x: number; y: number }>>
 ) => {
-    const [currentZoom ] = useState(1);
     const { nodes } =
         useStore(storeSelector, shallow);
     const onNodeDrag = useCallback(
