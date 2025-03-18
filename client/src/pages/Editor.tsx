@@ -396,6 +396,7 @@ const Editor = () => {
 
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);
 
+
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <div ref={reactFlowWrapper} className='mx-56 h-full'>
@@ -428,6 +429,21 @@ const Editor = () => {
             event.dataTransfer.dropEffect = 'move';
           }}
           onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
+          onSelectionChange={(selection) => {
+            if (!selection) {
+              setSelectedElement(null);
+              return;
+            }
+            const { nodes: selNodes = [], edges: selEdges = [] } = selection;
+            const combined: (Node | Edge)[] = [...selNodes, ...selEdges];
+            if (combined.length === 0) {
+              setSelectedElement(null);
+            } else if (combined.length === 1) {
+              setSelectedElement(combined[0]);
+            } else {
+              setSelectedElement(combined);
+            }
+          }}
         >
           <ControlsStyled
             style={{

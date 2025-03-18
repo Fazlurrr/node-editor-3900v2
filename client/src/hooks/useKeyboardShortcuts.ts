@@ -6,9 +6,9 @@ import { useGridContext } from '@/components/ui/toggleGrid';
 import { useMiniMapContext } from '@/components/ui/toggleMiniMap';
 
 export const useKeyboardShortcuts = (
-  selectedElement: Node | Edge | null,
+  selectedElement: Node | Edge | (Node | Edge)[] | null,
   onTriggerDelete: () => void,
-  onPaste: (clipboardElement: Node | Edge) => void,
+  onPaste: (clipboardElement: Node | Edge | (Node | Edge)[]) => void,
 ) => {
   const { copy, cut, paste } = useClipboard();
   const { transformMode, setTransformMode } = useTransformMode();
@@ -87,5 +87,4 @@ export const useKeyboardShortcuts = (
     { preventDefault: true },
     [isMiniMapVisible]
   );
-
 };

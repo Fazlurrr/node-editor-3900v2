@@ -1,16 +1,15 @@
 import { Node, Edge } from 'reactflow';
 import CurrentNode from './CurrentNode';
 import CurrentEdge from './CurrentEdge';
+import CurrentMultipleElements from './CurrentMultipleElements';
 import { MiniMapStyled } from '@/components/ui/styled';
-import { AspectType} from '@/lib/types';
+import { AspectType } from '@/lib/types';
 import React from 'react';
-import {  MiniMapProvider ,useMiniMapContext } from '../toggleMiniMap';
+import { MiniMapProvider, useMiniMapContext } from '../toggleMiniMap';
 import { Info } from 'lucide-react';
 
-
-
 interface PropertiesPanelProps {
-  selectedElement: Node | Edge | null;
+  selectedElement: Node | Edge | (Node | Edge)[] | null;
 }
 
 function isEdgeElement(element: Node | Edge): element is Edge {
@@ -38,7 +37,16 @@ const getAspectColor = (node: any): string => {
 };
 
 const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) => {
-  const { isMiniMapVisible } = useMiniMapContext();
+const { isMiniMapVisible } = useMiniMapContext();
+
+const isMultiple = Array.isArray(selectedElement) && selectedElement.length > 1;
+const getSingleElement = (element: Node | Edge | (Node | Edge)[] | null) => {
+  if (!element) return null;
+  if (!Array.isArray(element)) return element;
+  return element.length === 1 ? element[0] : null;
+};
+const singleElement = getSingleElement(selectedElement);
+
 
   return (
     <MiniMapProvider>
@@ -47,24 +55,27 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
         flex flex-col"
       >
         <div className="pb-2 pl-4 mt-14 mb-2 border-b border-[#9facbc]">
-        <h2 className="text-lg font-semibold text-black dark:text-white">Properties</h2>
+          <h2 className="text-lg font-semibold text-black dark:text-white">Properties</h2>
         </div>
         <div className="flex-1 overflow-auto">
-        {selectedElement ? (
-          isEdgeElement(selectedElement) ? (
-          <CurrentEdge currentEdge={selectedElement} />
+          {selectedElement ? (
+            isMultiple ? (
+              <CurrentMultipleElements selectedElements={selectedElement as (Node | Edge)[]} />
+            ) : (singleElement && !Array.isArray(singleElement) && isEdgeElement(singleElement)) ? (
+              <CurrentEdge currentEdge={singleElement} />
+            ) : singleElement ? (
+              <CurrentNode currentNode={singleElement} />
+            ) : null
           ) : (
-          <CurrentNode currentNode={selectedElement} />
-          )
-        ) : (
-          <div className="flex items-center justify-center p-4">
-              <Info name="info" className="mr-2" />
-              <p className="text-normal text-black dark:text-white">No element or relation selected</p>
-          </div>
-        )}
+            <div className="flex items-center justify-center p-4">
+              <Info className="mr-2" />
+              <p className="text-normal text-black dark:text-white">
+                No element or relation selected
+              </p>
+            </div>
+          )}
         </div>
         {isMiniMapVisible && (
-          
           <MiniMapStyled
             nodeColor={getAspectColor}
             pannable={true}

@@ -17,7 +17,6 @@ const Block = (props: CustomNodeProps) => {
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
   const { transformMode } = useTransformMode();
 
-  // Keep dimensions in state for final value (used on mount or after resize ends)
   const [dimensions, setDimensions] = useState({
     width: props.data.width || 110,
     height: props.data.height || 66,

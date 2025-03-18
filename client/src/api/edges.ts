@@ -162,7 +162,7 @@ export const deleteEdge = async (
 
     if (!response.ok) {
       const status = response.status;
-      toast.success(`Error deleting edge - Status: ${status}`);
+      toast.error(`Error deleting edge - Status: ${status}`);
       return null;
     }
 
