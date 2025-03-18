@@ -157,6 +157,7 @@ const Editor = () => {
       return inside;
   };
 
+  // Function for snapping terminal to block on the outside parameter
   const getSnappedPosition = (node: Node, blockNode: Node) => {
     if (!blockNode) return { x: node.position.x, y: node.position.y };
   
@@ -218,7 +219,6 @@ const Editor = () => {
       return { x: newX, y: newY };
     }
     
-    // If terminal is already outside, we need to ensure it's aligned with an edge and not floating
     
     // Check which side of the block the terminal is on
     const isLeftSide = terminalCenterX < 0;
@@ -408,16 +408,9 @@ const Editor = () => {
         // Get snapped position relative to block
         const snappedPosition = getSnappedPosition(tempNode, blockNode);
         
-        // Calculate absolute position for storage
-        const absolutePosition = {
-          x: blockNode.position.x + snappedPosition.x,
-          y: blockNode.position.y + snappedPosition.y
-        };
-        
         addTerminalToBlock(
           blockNode.id, 
           snappedPosition,  // For React Flow rendering
-          absolutePosition, // For storage
           data.aspect
         );
         return;

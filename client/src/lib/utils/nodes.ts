@@ -93,7 +93,6 @@ export const addNode = async (aspect: AspectType, type: NodeType, position: { x:
 export const addTerminalToBlock = async (
   blockNodeId: string, 
   relativePosition: { x: number; y: number },
-  absolutePosition: { x: number; y: number },
   aspect: string
 ) => {
   const { nodes, setNodes } = useStore.getState();
@@ -110,12 +109,11 @@ export const addTerminalToBlock = async (
   const labelNum = getMaxNumber(type) + 1;
   const label = `T${labelNum}`;
 
-  // Create the terminal node
+  // Create the terminal node with relative position
   const terminal: Node = {
     type: type,
     id: `${type}-${uuidv4()}`,
-    position: relativePosition,
-    positionAbsolute: absolutePosition,
+    position: relativePosition, // This is already relative to the parent
     data: {
       aspect,
       label,
@@ -130,8 +128,7 @@ export const addTerminalToBlock = async (
 
   // First create the node
   const response = await createNode({
-    ...terminal,
-    position: absolutePosition
+    ...terminal
   });
 
   if (!response) {
@@ -152,7 +149,6 @@ export const addTerminalToBlock = async (
 
   return terminal;
 };
-
 
 // This function is called to update props of a node when a connection is deleted or a node connected to it is deleted
 export const updateNodeRelations = async (
