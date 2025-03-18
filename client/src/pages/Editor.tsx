@@ -166,58 +166,88 @@ const Editor = () => {
     const parentWidth = blockNode.width ?? 110;
     const parentHeight = blockNode.height ?? 66;
   
-    // Calculate the position of the terminal
-    const terminalLeft = node.position.x;
-    const terminalTop = node.position.y;
+    // Calculate the position of the terminal's center
+    const terminalCenterX = node.position.x + childWidth / 2;
+    const terminalCenterY = node.position.y + childHeight / 2;
     
-    // Calculate the center position (for determining closest edge)
-    const terminalCenterX = terminalLeft + childWidth / 2;
-    const terminalCenterY = terminalTop + childHeight / 2;
+    // Check if terminal is inside the block
+    const isInside = 
+      terminalCenterX >= 0 && 
+      terminalCenterX <= parentWidth && 
+      terminalCenterY >= 0 && 
+      terminalCenterY <= parentHeight;
     
-    // Calculate distances to each edge from the terminal's center
-    const distances = [
-      { edge: "left", distance: Math.abs(terminalCenterX) },
-      { edge: "right", distance: Math.abs(terminalCenterX - parentWidth) },
-      { edge: "top", distance: Math.abs(terminalCenterY) },
-      { edge: "bottom", distance: Math.abs(terminalCenterY - parentHeight) },
-    ];
+    // If it's inside, we need to move it outside
+    if (isInside) {
+      // Calculate distances to each edge from the terminal's center
+      const distances = [
+        { edge: "left", distance: terminalCenterX },
+        { edge: "right", distance: parentWidth - terminalCenterX },
+        { edge: "top", distance: terminalCenterY },
+        { edge: "bottom", distance: parentHeight - terminalCenterY },
+      ];
   
-    // Find the closest edge
-    const closestEdge = distances.reduce((prev, curr) =>
-      curr.distance < prev.distance ? curr : prev
-    );
+      // Find the closest edge
+      const closestEdge = distances.reduce((prev, curr) =>
+        curr.distance < prev.distance ? curr : prev
+      );
   
+      let newX = node.position.x;
+      let newY = node.position.y;
+  
+      // Move terminal outside through the closest edge
+      switch (closestEdge.edge) {
+        case "left":
+          // Position terminal so its right edge touches the left edge of the block
+          newX = -childWidth;
+          break;
+        case "right":
+          // Position terminal so its left edge touches the right edge of the block
+          newX = parentWidth;
+          break;
+        case "top":
+          // Position terminal so its bottom edge touches the top edge of the block
+          newY = -childHeight;
+          break;
+        case "bottom":
+          // Position terminal so its top edge touches the bottom edge of the block
+          newY = parentHeight;
+          break;
+      }
+  
+      return { x: newX, y: newY };
+    }
+    
+    // If terminal is already outside, we need to ensure it's aligned with an edge and not floating
+    
+    // Check which side of the block the terminal is on
+    const isLeftSide = terminalCenterX < 0;
+    const isRightSide = terminalCenterX > parentWidth;
+    const isTopSide = terminalCenterY < 0;
+    const isBottomSide = terminalCenterY > parentHeight;
+    
     let newX = node.position.x;
     let newY = node.position.y;
-  
-    // Snap to closest edge, making the terminal touch the block border exactly
-    switch (closestEdge.edge) {
-      case "left":
-        // Position terminal so its right edge touches the left edge of the block
-        newX = -childWidth;
-        // Keep Y position but ensure it stays within parent bounds
-        newY = Math.max(0, Math.min(newY, parentHeight - childHeight));
-        break;
-      case "right":
-        // Position terminal so its left edge touches the right edge of the block
-        newX = parentWidth;
-        // Keep Y position but ensure it stays within parent bounds
-        newY = Math.max(0, Math.min(newY, parentHeight - childHeight));
-        break;
-      case "top":
-        // Position terminal so its bottom edge touches the top edge of the block
-        newY = -childHeight;
-        // Preserve X position but ensure it stays within parent bounds
-        newX = Math.max(0, Math.min(newX, parentWidth - childWidth));
-        break;
-      case "bottom":
-        // Position terminal so its top edge touches the bottom edge of the block
-        newY = parentHeight;
-        // Preserve X position but ensure it stays within parent bounds
-        newX = Math.max(0, Math.min(newX, parentWidth - childWidth));
-        break;
+    
+    // Align with edges
+    if (isLeftSide) {
+      newX = -childWidth;
+      // Allow free movement along the y-axis but constrain to block's height
+      newY = Math.max(-childHeight + 1, Math.min(newY, parentHeight - 1));
+    } else if (isRightSide) {
+      newX = parentWidth;
+      // Allow free movement along the y-axis but constrain to block's height
+      newY = Math.max(-childHeight + 1, Math.min(newY, parentHeight - 1));
+    } else if (isTopSide) {
+      newY = -childHeight;
+      // Allow free movement along the x-axis but constrain to block's width
+      newX = Math.max(-childWidth + 1, Math.min(newX, parentWidth - 1));
+    } else if (isBottomSide) {
+      newY = parentHeight;
+      // Allow free movement along the x-axis but constrain to block's width
+      newX = Math.max(-childWidth + 1, Math.min(newX, parentWidth - 1));
     }
-  
+    
     return { x: newX, y: newY };
   };
   
