@@ -208,7 +208,7 @@ const NodesPanel: React.FC = () => {
     }
   
     return (
-      <div className="h-full w-56 text-white border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 left-0 z-10
+      <div className="h-full w-56 text-white border-t border-r border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 left-0 z-10
         overflow-y-auto
         [&::-webkit-scrollbar]:w-1
         [&::-webkit-scrollbar-track]:bg-white
@@ -217,7 +217,7 @@ const NodesPanel: React.FC = () => {
         dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
         [scrollbar-width:thin] 
         [scrollbar-color:lightGray_transparent]">
-        <div className="pb-2 pl-4 mt-14 mb-2 border-b border-[#9facbc]" onClick={toggleElements}>
+        <div className="pb-2 pl-4 mt-20 pt-2 mb-2 border-b border-[#9facbc]" onClick={toggleElements}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg text-black dark:text-white font-semibold">Elements</h2>
             {collapseElements ? <ChevronUp className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" /> :

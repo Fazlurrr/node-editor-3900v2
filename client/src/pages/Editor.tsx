@@ -34,6 +34,7 @@ import { NodesPanel } from '@/components/ui';
 import { fetchNodes } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
+import Toolbar from '@/components/ui/Toolbar/Toolbar';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useGridContext } from '@/components/ui/toggleGrid';
 import { useClipboard } from '@/hooks/useClipboard';
@@ -216,6 +217,7 @@ const Editor = () => {
           />
         )}
       </div>
+      <Toolbar />
       <NodesPanel />
       <PropertiesPanel selectedElement={selectedElement} />
     </ThemeProvider>
