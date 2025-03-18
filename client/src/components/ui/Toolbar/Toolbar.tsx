@@ -1,10 +1,10 @@
 import { Move, Scaling, Workflow, Clipboard, ClipboardPaste,
     Scissors, Trash2, Undo2, Redo2, ZoomIn, ZoomOut, Fullscreen, Lock} from 'lucide-react';
-import { useState } from 'react';
 import { useClipboard } from '@/hooks/useClipboard';
+import { useMode } from '@/hooks/useMode';
 
 const Toolbar = () => {
-    const [mode, setMode] = useState('move');
+    const { mode, setMode } = useMode();
     const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
 
     const iconStyle = 'w-5 h-5 ml-1.5 mt-1.5';
