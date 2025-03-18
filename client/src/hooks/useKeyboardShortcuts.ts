@@ -1,7 +1,7 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useClipboard } from './useClipboard';
 import { Node, Edge } from 'reactflow';
-import { useTransformMode } from '@/hooks/useTransformMode';
+import { useMode } from '@/hooks/useMode';
 import { useGridContext } from '@/components/ui/toggleGrid';
 import { useMiniMapContext } from '@/components/ui/toggleMiniMap';
 
@@ -11,7 +11,7 @@ export const useKeyboardShortcuts = (
   onPaste: (clipboardElement: Node | Edge | (Node | Edge)[]) => void,
 ) => {
   const { copy, cut, paste } = useClipboard();
-  const { transformMode, setTransformMode } = useTransformMode();
+  const { mode, setMode } = useMode();
   const { isGridVisible, setGridVisible } = useGridContext();
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
 
@@ -64,12 +64,29 @@ export const useKeyboardShortcuts = (
   );
 
   useHotkeys(
+    'v',
+    () => {
+      setMode('move');
+    },
+    [mode]
+  );
+
+  useHotkeys(
     't',
     () => {
-      setTransformMode(!transformMode);
+      setMode(mode === 'transform' ? 'move' : 'transform');
     },
-    [transformMode]
+    [mode]
   );
+
+  useHotkeys(
+    'r',
+    () => {
+      setMode(mode === 'relation' ? 'move' : 'relation');
+    },
+    [mode]
+  );
+
   useHotkeys(
     'ctrl+shift+g',
     () => {

@@ -1,21 +1,22 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import type { ResizeParams } from 'reactflow';
-import { useStore, NodeResizer } from 'reactflow';
+import { NodeResizer } from 'reactflow';
 import Handles from './Handles';
 import type { CustomNodeProps } from '@/lib/types';
 import { capitalizeFirstLetter } from '@/lib/utils';
 import { Asterisk } from 'lucide-react'; 
 import { updateNode } from '@/api/nodes';
 import { selectionColor } from '@/lib/config';
-import { useTransformMode } from '@/hooks/useTransformMode';
+import { useMode } from '@/hooks/useMode';
+import { useTerminalResizeHandling } from '@/lib/utils/nodes';
 
 const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(props.data.customName || props.data.label || '');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const resizeNodeRef = useRef<HTMLDivElement>(null);
-  const connectionStartHandle = useStore((store) => store.connectionStartHandle);
-  const { transformMode } = useTransformMode();
+  const { mode } = useMode();
+  const { onResize: onTerminalResize, onResizeEnd: onTerminalResizeEnd } = useTerminalResizeHandling();
 
   const [dimensions, setDimensions] = useState({
     width: props.data.width || 110,
@@ -63,6 +64,9 @@ const Block = (props: CustomNodeProps) => {
     if (resizeNodeRef.current) {
       resizeNodeRef.current.style.width = `${params.width}px`;
       resizeNodeRef.current.style.height = `${params.height}px`;
+
+      // Update terminal positions on block resize
+      onTerminalResize(props.id, params);
     }
   };
 
@@ -70,6 +74,9 @@ const Block = (props: CustomNodeProps) => {
     setDimensions({ width: params.width, height: params.height });
     try {
       await updateNode(props.id, { width: params.width, height: params.height });
+
+      // Update terminal positions on block resize
+      onTerminalResizeEnd(props.id, params);
     } catch (err) {
       console.error("Error updating node dimensions:", err);
     }
@@ -95,7 +102,7 @@ const Block = (props: CustomNodeProps) => {
       <NodeResizer
         minWidth={110}
         minHeight={66}
-        isVisible={props.selected && transformMode}
+        isVisible={props.selected && mode === 'transform'}
         lineStyle={{ border: selectionColor }}
         handleStyle={{ borderColor: 'black', backgroundColor: 'white', width: '7px', height: '7px' }}
         onResize={onResize}
@@ -137,7 +144,7 @@ const Block = (props: CustomNodeProps) => {
         </div>
       )}
 
-      <div style={{ visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden' }}>
+      <div style={{ visibility: mode === 'relation' ? 'visible' : 'hidden' }}>
         <Handles nodeId={props.data.label} />
       </div>
     </figure>

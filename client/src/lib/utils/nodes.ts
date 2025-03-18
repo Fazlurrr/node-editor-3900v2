@@ -93,7 +93,6 @@ export const addNode = async (aspect: AspectType, type: NodeType, position: { x:
 export const addTerminalToBlock = async (
   blockNodeId: string, 
   relativePosition: { x: number; y: number },
-  absolutePosition: { x: number; y: number },
   aspect: string
 ) => {
   const { nodes, setNodes } = useStore.getState();
@@ -110,12 +109,11 @@ export const addTerminalToBlock = async (
   const labelNum = getMaxNumber(type) + 1;
   const label = `T${labelNum}`;
 
-  // Create the terminal node
+  // Create the terminal node with relative position
   const terminal: Node = {
     type: type,
     id: `${type}-${uuidv4()}`,
-    position: relativePosition,
-    positionAbsolute: absolutePosition,
+    position: relativePosition, // This is already relative to the parent
     data: {
       aspect,
       label,
@@ -130,8 +128,7 @@ export const addTerminalToBlock = async (
 
   // First create the node
   const response = await createNode({
-    ...terminal,
-    position: absolutePosition
+    ...terminal
   });
 
   if (!response) {
@@ -139,15 +136,19 @@ export const addTerminalToBlock = async (
     return;
   }
 
+  // Ensure the blockNode's terminals array exists and add new terminal
+  blockNode.data.terminals = Array.isArray(blockNode.data.terminals)
+    ? [...blockNode.data.terminals, { id: terminal.id }]
+    : [{ id: terminal.id }];
+
+  // Immediately update the position to ensure it's stored correctly
+  await updateNode(blockNode.id);
+
   // Add to React Flow state
   setNodes([...nodes, terminal]);
 
-  // Immediately update the position to ensure it's stored correctly
-  await updateNode(terminal.id);
-
   return terminal;
 };
-
 
 // This function is called to update props of a node when a connection is deleted or a node connected to it is deleted
 export const updateNodeRelations = async (
@@ -501,3 +502,194 @@ export const updateNodeConnectionData = async (
 
   return true;
 };
+
+export const isPointInsideNode = (point: { x: number; y: number }, node: Node) => {
+  if (!node.position) return false;
+
+  const { x, y } = node.position;
+  const width = node.width ?? 150;
+  const height = node.height ?? 150;
+  const padding = 22; // Padding for easier selection
+
+  const inside = 
+    point.x >= x - padding && 
+    point.x <= x + width + padding && 
+    point.y >= y - padding && 
+    point.y <= y + height + padding;
+
+    return inside;
+};
+
+export const updateTerminalPositionsOnBlockResize = async (
+  blockId: string,
+  newWidth: number,
+  newHeight: number,
+  updateDatabase: boolean = false
+): Promise<void> => {
+  const { nodes, setNodes } = useStore.getState();
+  
+  // Find the block node
+  const blockNode = nodes.find(node => node.id === blockId);
+  if (!blockNode || blockNode.type !== 'block') return;
+
+  // Create a modified block with the new dimensions for position calculations
+  const modifiedBlock = {
+    ...blockNode,
+    width: newWidth,
+    height: newHeight
+  };
+
+  // Find all terminals attached to this block
+  const childTerminals = nodes.filter(
+    node => node.type === 'terminal' && node.parentId === blockId
+  );
+  
+  if (childTerminals.length === 0) return;
+  
+  // Create a copy of nodes to update
+  const updatedNodes = [...nodes];
+  
+  // Update each terminal's position
+  for (const terminal of childTerminals) {
+    // Get the snapped position based on the new block dimensions
+    const snappedPosition = getSnappedPosition(terminal, modifiedBlock);
+    
+    // Calculate the absolute position based on the block's position
+    const absolutePosition = {
+      x: blockNode.position.x + snappedPosition.x,
+      y: blockNode.position.y + snappedPosition.y
+    };
+    
+    // Find and update the terminal in our nodes copy
+    const terminalIndex = updatedNodes.findIndex(node => node.id === terminal.id);
+    if (terminalIndex !== -1) {
+      updatedNodes[terminalIndex] = {
+        ...updatedNodes[terminalIndex],
+        position: snappedPosition,          // Relative position for React Flow
+        positionAbsolute: absolutePosition  // Absolute position for storage
+      };
+      
+      // Update in database if requested
+      if (updateDatabase) {
+        await updateNode(terminal.id);
+      }
+    }
+  }
+  
+  // Update nodes state
+  setNodes(updatedNodes);
+};
+
+export const useTerminalResizeHandling = () => {
+  const onResize = (
+    blockId: string,
+    params: { width: number, height: number }
+  ) => {
+    // Only update the visual positions during active resize, don't update database
+    updateTerminalPositionsOnBlockResize(blockId, params.width, params.height, false);
+  };
+  
+  const onResizeEnd = async (
+    blockId: string,
+    params: { width: number, height: number }
+  ) => {
+    // Update positions and persist to database when resize ends
+    await updateTerminalPositionsOnBlockResize(blockId, params.width, params.height, true);
+  };
+  
+  return { onResize, onResizeEnd };
+};
+
+// Function for snapping terminal to block on the outside parameter
+export const getSnappedPosition = (node: Node, blockNode: Node) => {
+  if (!blockNode) return { x: node.position.x, y: node.position.y };
+
+  // Get dimensions
+  const childWidth = node.width ?? 22;
+  const childHeight = node.height ?? 22;
+  const parentWidth = blockNode.width ?? 110;
+  const parentHeight = blockNode.height ?? 66;
+
+  // Calculate the position of the terminal's center
+  const terminalCenterX = node.position.x + childWidth / 2;
+  const terminalCenterY = node.position.y + childHeight / 2;
+  
+  // Check if terminal is inside the block
+  const isInside = 
+    terminalCenterX >= 0 && 
+    terminalCenterX <= parentWidth && 
+    terminalCenterY >= 0 && 
+    terminalCenterY <= parentHeight;
+  
+  // If it's inside, we need to move it outside
+  if (isInside) {
+    // Calculate distances to each edge from the terminal's center
+    const distances = [
+      { edge: "left", distance: terminalCenterX },
+      { edge: "right", distance: parentWidth - terminalCenterX },
+      { edge: "top", distance: terminalCenterY },
+      { edge: "bottom", distance: parentHeight - terminalCenterY },
+    ];
+
+    // Find the closest edge
+    const closestEdge = distances.reduce((prev, curr) =>
+      curr.distance < prev.distance ? curr : prev
+    );
+
+    let newX = node.position.x;
+    let newY = node.position.y;
+
+    // Move terminal outside through the closest edge
+    switch (closestEdge.edge) {
+      case "left":
+        // Position terminal so its right edge touches the left edge of the block
+        newX = -childWidth;
+        break;
+      case "right":
+        // Position terminal so its left edge touches the right edge of the block
+        newX = parentWidth;
+        break;
+      case "top":
+        // Position terminal so its bottom edge touches the top edge of the block
+        newY = -childHeight;
+        break;
+      case "bottom":
+        // Position terminal so its top edge touches the bottom edge of the block
+        newY = parentHeight;
+        break;
+    }
+
+    return { x: newX, y: newY };
+  }
+  
+  
+  // Check which side of the block the terminal is on
+  const isLeftSide = terminalCenterX < 0;
+  const isRightSide = terminalCenterX > parentWidth;
+  const isTopSide = terminalCenterY < 0;
+  const isBottomSide = terminalCenterY > parentHeight;
+  
+  let newX = node.position.x;
+  let newY = node.position.y;
+  
+  // Align with edges
+  if (isLeftSide) {
+    newX = -childWidth;
+    // Allow free movement along the y-axis but constrain to block's height
+    newY = Math.max(-childHeight + 1, Math.min(newY, parentHeight - 1));
+  } else if (isRightSide) {
+    newX = parentWidth;
+    // Allow free movement along the y-axis but constrain to block's height
+    newY = Math.max(-childHeight + 1, Math.min(newY, parentHeight - 1));
+  } else if (isTopSide) {
+    newY = -childHeight;
+    // Allow free movement along the x-axis but constrain to block's width
+    newX = Math.max(-childWidth + 1, Math.min(newX, parentWidth - 1));
+  } else if (isBottomSide) {
+    newY = parentHeight;
+    // Allow free movement along the x-axis but constrain to block's width
+    newX = Math.max(-childWidth + 1, Math.min(newX, parentWidth - 1));
+  }
+  
+  return { x: newX, y: newY };
+};  

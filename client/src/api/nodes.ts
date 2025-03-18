@@ -33,26 +33,11 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
   // Process nodes to restore parent-child relationships
   const processedNodes = nodes.map((node: Node) => {
     if (node.type === 'terminal' && node.data.terminalOf) {
-      // Find the parent block
-      const parentNode = nodes.find((n: { id: unknown; }) => n.id === node.data.terminalOf);
-      
-      if (parentNode) {
-        // Store the absolute position
-        const absolutePosition = { ...node.position };
-        
-        /* REMEMBER (Is this needed?):Calculate relative position
-        const relativePosition = {
-          x: node.position.x - parentNode.position.x,
-          y: node.position.y - parentNode.position.y
-        };*/
-
-        return {
-          ...node,
-          parentId: node.data.terminalOf,  // Restore the parent relationship
-          position: absolutePosition,       // Set relative position for rendering
-          positionAbsolute: absolutePosition // Keep absolute position for storage
-        };
-      }
+      // Restore the parent relationship for terminals
+      return {
+        ...node,
+        parentId: node.data.terminalOf,  // This is all ReactFlow needs to establish the relationship
+      };
     }
     return node;
   });
@@ -91,7 +76,6 @@ export const uploadNodes = async (nodesToAdd: Node[]): Promise<boolean> => {
       return false;
     }
 
-
     return true;
   } catch (error) {
     toast.error(`Error uploading nodes: ${(error as Error).message}`);
@@ -112,6 +96,7 @@ export const createNode = async (node: Node): Promise<Node | null> => {
   startLoading();
 
   try {
+    // Prepare node for storage - should already have relative positions if it's a terminal
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
       method: 'POST',
       headers: {
@@ -136,6 +121,11 @@ export const createNode = async (node: Node): Promise<Node | null> => {
     const createdNode = await response.json();
     
     if (createdNode) {
+      // If this is a terminal with a parent, make sure parentId is set for ReactFlow
+      if (createdNode.type === 'terminal' && createdNode.data.terminalOf) {
+        createdNode.parentId = createdNode.data.terminalOf;
+      }
+      
       setNodes([...nodes, createdNode]);
     }
 
@@ -147,6 +137,7 @@ export const createNode = async (node: Node): Promise<Node | null> => {
     stopLoading();
   }
 };
+
 export const updateNode = async (
   nodeToUpdateId: string,
   newNodeData?: UpdateNode
@@ -175,10 +166,7 @@ export const updateNode = async (
     };
   } else {
     // If no newNodeData is provided, this is a position update
-    // For terminals with parents, use positionAbsolute if available
-    if (nodeToUpdate.type === 'terminal' && nodeToUpdate.parentId) {
-      updatedNodeData.position = nodeToUpdate.positionAbsolute || nodeToUpdate.position;
-    }
+    // For terminals with parents, we're already using relative positions
     updatedNodeData.data = {
       ...updatedNodeData.data,
       updatedAt: Date.now()
@@ -227,12 +215,10 @@ export const updateNode = async (
       
       const newNodes = nodes.map(node => {
         if (node.id === updatedNode.id) {
-          // For terminal nodes with parents, maintain the relative position for rendering
+          // For terminal nodes with parents, ensure parentId is maintained
           if (node.type === 'terminal' && node.parentId) {
             return {
               ...updatedNode,
-              position: node.position, // Keep the relative position for rendering
-              positionAbsolute: updatedNode.position, // Store the absolute position
               parentId: node.parentId // Maintain the parent relationship
             };
           }
