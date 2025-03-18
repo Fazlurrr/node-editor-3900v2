@@ -244,6 +244,6 @@ export const useNodeOperations = (
       return {
         onNodeDrag,
         onNodeDragStop,
-        handleDrop,
+        handleDrop
       }
 };

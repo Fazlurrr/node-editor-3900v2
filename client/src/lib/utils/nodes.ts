@@ -520,6 +520,86 @@ export const isPointInsideNode = (point: { x: number; y: number }, node: Node) =
     return inside;
 };
 
+export const updateTerminalPositionsOnBlockResize = async (
+  blockId: string,
+  newWidth: number,
+  newHeight: number,
+  updateDatabase: boolean = false
+): Promise<void> => {
+  const { nodes, setNodes } = useStore.getState();
+  
+  // Find the block node
+  const blockNode = nodes.find(node => node.id === blockId);
+  if (!blockNode || blockNode.type !== 'block') return;
+
+  // Create a modified block with the new dimensions for position calculations
+  const modifiedBlock = {
+    ...blockNode,
+    width: newWidth,
+    height: newHeight
+  };
+
+  // Find all terminals attached to this block
+  const childTerminals = nodes.filter(
+    node => node.type === 'terminal' && node.parentId === blockId
+  );
+  
+  if (childTerminals.length === 0) return;
+  
+  // Create a copy of nodes to update
+  const updatedNodes = [...nodes];
+  
+  // Update each terminal's position
+  for (const terminal of childTerminals) {
+    // Get the snapped position based on the new block dimensions
+    const snappedPosition = getSnappedPosition(terminal, modifiedBlock);
+    
+    // Calculate the absolute position based on the block's position
+    const absolutePosition = {
+      x: blockNode.position.x + snappedPosition.x,
+      y: blockNode.position.y + snappedPosition.y
+    };
+    
+    // Find and update the terminal in our nodes copy
+    const terminalIndex = updatedNodes.findIndex(node => node.id === terminal.id);
+    if (terminalIndex !== -1) {
+      updatedNodes[terminalIndex] = {
+        ...updatedNodes[terminalIndex],
+        position: snappedPosition,          // Relative position for React Flow
+        positionAbsolute: absolutePosition  // Absolute position for storage
+      };
+      
+      // Update in database if requested
+      if (updateDatabase) {
+        await updateNode(terminal.id);
+      }
+    }
+  }
+  
+  // Update nodes state
+  setNodes(updatedNodes);
+};
+
+export const useTerminalResizeHandling = () => {
+  const onResize = (
+    blockId: string,
+    params: { width: number, height: number }
+  ) => {
+    // Only update the visual positions during active resize, don't update database
+    updateTerminalPositionsOnBlockResize(blockId, params.width, params.height, false);
+  };
+  
+  const onResizeEnd = async (
+    blockId: string,
+    params: { width: number, height: number }
+  ) => {
+    // Update positions and persist to database when resize ends
+    await updateTerminalPositionsOnBlockResize(blockId, params.width, params.height, true);
+  };
+  
+  return { onResize, onResizeEnd };
+};
+
 // Function for snapping terminal to block on the outside parameter
 export const getSnappedPosition = (node: Node, blockNode: Node) => {
   if (!blockNode) return { x: node.position.x, y: node.position.y };
