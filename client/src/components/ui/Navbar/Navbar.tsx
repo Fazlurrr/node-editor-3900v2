@@ -26,7 +26,7 @@ import Modal from './FileMenu/Modal';
 import { toast } from 'react-toastify';
 import { Check } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
-import { useTransformMode } from '@/hooks/useTransformMode';
+import { useMode } from '@/hooks/useMode';
 import AdvancedSettingsModal from './_components/AdvancedSettings';
 
 const Navbar = () => {
@@ -41,7 +41,7 @@ const Navbar = () => {
   const [ isModalVisible, setIsModalVisible ] = React.useState(false);
   const [ modalPage, setModalPage ] = React.useState('');
   const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
-  const { transformMode, setTransformMode } = useTransformMode();
+  const { mode, setMode } = useMode();
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = React.useState(false);
 
   // used for debugging
@@ -161,7 +161,7 @@ const Navbar = () => {
                     Paste <MenubarShortcut>Ctrl+V</MenubarShortcut>
                   </MenubarItem>
                   <MenubarSeparator/>
-                    <MenubarItem className="cursor-pointer" onClick={() => setTransformMode(!transformMode)}>
+                    <MenubarItem className="cursor-pointer" onClick={() => setMode('transform')}>
                     Transform Mode <MenubarShortcut>T</MenubarShortcut>
                     </MenubarItem>
                 </MenubarContent>
