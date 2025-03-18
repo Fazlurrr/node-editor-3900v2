@@ -99,7 +99,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       if (updated) {
         currentNode.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
-        toast.success('Attribute added successfully');
         form.reset();
         setIsAttributesVisible(false);
       }
@@ -124,7 +123,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       if (updated) {
         currentNode.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
-        toast.success('Attribute updated');
         form.reset();
         setEditingIndex(null);
         setIsAttributesVisible(false);
@@ -138,7 +136,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     const updated = await updateNode(currentNode.id, { customAttributes: updatedAttributes });
     if (updated) {
       currentNode.data.customAttributes = updatedAttributes;
-      toast.success('Attribute deleted');
     }
   };
 
@@ -176,7 +173,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     const updated = await updateNode(currentNode.id, { aspect: newAspect });
     if (updated) {
       currentNode.data.aspect = newAspect;
-      toast.success('Aspect updated successfully');
     }
   };
 
