@@ -182,63 +182,48 @@ export const useNodeOperations = (
 
       const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
-      
+        
         if (!reactFlowWrapper.current || !reactFlowInstance) return;
-      
-        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+        
         const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-      
+        
         if (!data) return;
-      
-        const offsetX = 199 / currentZoom;
-        const offsetY = 25 / currentZoom;
-      
+        
+        // Let ReactFlow handle the basic positioning
         const position = reactFlowInstance.screenToFlowPosition({
-          x: event.clientX - reactFlowBounds.left,
-          y: event.clientY - reactFlowBounds.top,
+          x: event.clientX,
+          y: event.clientY
         });
-      
-        const adjustedPosition = {
-          x: position.x + offsetX,
-          y: position.y - offsetY
-        };
-      
+        
         if (data.nodeType === "terminal") {
           const blockNode = nodes.find(
-            (node) => isPointInsideNode(adjustedPosition, node) && node.type === "block"
+            (node) => isPointInsideNode(position, node) && node.type === "block"
           );
           
           if (blockNode) {
             // Calculate position relative to the block
             const relativePosition = {
-              x: adjustedPosition.x - blockNode.position.x,
-              y: adjustedPosition.y - blockNode.position.y
+              x: position.x - blockNode.position.x,
+              y: position.y - blockNode.position.y
             };
-      
-      
-            // Create temporary node for position calculation with correct position
-            const tempNode = {
+            
+            // Use your existing function for terminal positioning
+            const snappedPosition = getSnappedPosition({
               id: 'temp',
               type: 'terminal',
               position: relativePosition,
               width: 22,
               height: 22,
               data
-            };
-      
-            // Get snapped position relative to block
-            const snappedPosition = getSnappedPosition(tempNode, blockNode);
+            }, blockNode);
             
-            addTerminalToBlock(
-              blockNode.id, 
-              snappedPosition,  // For React Flow rendering
-              data.aspect
-            );
+            addTerminalToBlock(blockNode.id, snappedPosition, data.aspect);
             return;
           }
         }
         
-        addNode(data.aspect, data.nodeType, adjustedPosition);
+        // Let grid snapping be handled by ReactFlow's props
+        addNode(data.aspect, data.nodeType, position);
       };
 
       return {
