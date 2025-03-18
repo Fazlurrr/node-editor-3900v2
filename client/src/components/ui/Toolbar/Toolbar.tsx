@@ -1,9 +1,11 @@
 import { Move, Scaling, Workflow, Clipboard, ClipboardPaste,
     Scissors, Trash2, Undo2, Redo2, ZoomIn, ZoomOut, Fullscreen, Lock} from 'lucide-react';
 import { useState } from 'react';
+import { useClipboard } from '@/hooks/useClipboard';
 
 const Toolbar = () => {
     const [mode, setMode] = useState('move');
+    const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
 
     const iconStyle = 'w-5 h-5 ml-1.5 mt-1.5';
     const iconContainerStyle = 'w-8 h-full hover:text-black dark:hover:text-white mr-2';
@@ -35,16 +37,24 @@ const Toolbar = () => {
                     <Workflow className={iconStyle} />
                 </div>
                 <div className={dividerStyle}></div>
-                <div title="Copy (Ctrl+C)" className={iconContainerStyle}>
+                <div title="Copy (Ctrl+C)" className={iconContainerStyle}
+                    onClick={() => { if (selectedElement) copy(selectedElement); }}
+                >
                     <Clipboard className={iconStyle} />
                 </div>
-                <div title="Paste (Ctrl+V)" className={iconContainerStyle}>
+                <div title="Paste (Ctrl+V)" className={iconContainerStyle}
+                    onClick={() => paste(handlePaste)}
+                >
                     <ClipboardPaste className={iconStyle} />
                 </div>
-                <div title="Cut (Ctrl+X)" className={iconContainerStyle}>
+                <div title="Cut (Ctrl+X)" className={iconContainerStyle}
+                    onClick={() => { if (selectedElement) cut(selectedElement, handleTriggerDelete); }}
+                >
                     <Scissors className={iconStyle} />
                 </div>
-                <div title="Delete (Backspace)" className={iconContainerStyle}>
+                <div title="Delete (Backspace)" className={iconContainerStyle} 
+                    onClick={() => { if (selectedElement) handleTriggerDelete(); }}
+                >
                     <Trash2 className={iconStyle} />
                 </div>
                 <div className={dividerStyle}></div>
