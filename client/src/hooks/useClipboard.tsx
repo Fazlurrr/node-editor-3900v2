@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useRef, useState, ReactNode, useCallback } from 'react';
 import { Node, Edge } from 'reactflow';
-import { createNode, deleteNode } from '@/api/nodes';
+import { createNode, uploadNodes, deleteNode } from '@/api/nodes';
 import { uploadEdges, deleteEdge } from '@/api/edges';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/hooks/useStore';
@@ -22,6 +22,8 @@ interface ClipboardContextType {
 const ClipboardContext = createContext<ClipboardContextType | undefined>(undefined);
 
 export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const isNode = (element: Node | Edge): element is Node => 'data' in element && !('source' in element);
+  const isEdge = (element: Node | Edge): element is Edge => 'source' in element && 'target' in element;
   const [selectedElement, setSelectedElement] = useState<Node | Edge | (Node | Edge)[] | null>(null);
   const clipboardRef = useRef<any>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -53,54 +55,74 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const handlePaste = async (clipboardElement: Node | Edge | (Node | Edge)[]) => {
+    if (!clipboardElement) return;
+  
     if (Array.isArray(clipboardElement)) {
-      const clipboardNodes = clipboardElement.filter(elem => 'data' in elem && !('source' in elem)) as Node[];
-      const clipboardEdges = clipboardElement.filter(elem => 'source' in elem && 'target' in elem) as Edge[];
-      
-      const idMap: Record<string, string> = {};
-      const newNodes = clipboardNodes.map(node => {
-        const newId = `${node.type}-${uuidv4()}`;
-        idMap[node.id] = newId;
-        return {
-          ...node,
-          id: newId,
-          position: { x: node.position.x + 20, y: node.position.y + 20 },
-        };
-      });
-
-      setNodes([...nodes, ...newNodes]);
-      await Promise.all(newNodes.map(n => createNode(n)));
-
-      const newEdges = clipboardEdges
-        .filter(edge => idMap[edge.source] && idMap[edge.target])
-        .map(edge => ({
-          ...edge,
-          id: `edge-${uuidv4()}`,
-          source: idMap[edge.source],
-          target: idMap[edge.target],
-        }));
-
-      setEdges([...edges, ...newEdges]);
-      if (newEdges.length > 0) await uploadEdges(newEdges);
+      await handleMultiplePaste(clipboardElement);
     } else {
-      if ('data' in clipboardElement && !('source' in clipboardElement)) {
-        const newNodeId = `${clipboardElement.type}-${uuidv4()}`;
-        const newNode = {
-          ...clipboardElement,
-          id: newNodeId,
-          position: {
-            x: clipboardElement.position.x + 20,
-            y: clipboardElement.position.y + 20,
-          },
-        } as Node;
-        setNodes([...nodes, newNode]);
-        await createNode(newNode);
-      } else if ('source' in clipboardElement && 'target' in clipboardElement) {
-        console.warn('Skipping single-edge paste because source/target nodes were not copied.');
-      }
+      await handleSinglePaste(clipboardElement);
     }
   };
+  
+  const handleMultiplePaste = async (clipboardElements: (Node | Edge)[]) => {
+    const { clipboardNodes, clipboardEdges } = separateNodesAndEdges(clipboardElements);
+    const idMap = generateNewNodeIds(clipboardNodes);
+  
+    const newNodes = clipboardNodes.map(node => createNewNode(node, idMap));
+    setNodes([...nodes, ...newNodes]);
+    await uploadNodes(newNodes);
 
+    const newEdges = createNewEdges(clipboardEdges, idMap);
+    if (newEdges.length > 0) {
+      setEdges([...edges, ...newEdges]);
+      await uploadEdges(newEdges);
+    }
+  };
+  
+  const handleSinglePaste = async (clipboardElement: Node | Edge) => {
+    if (isNode(clipboardElement)) {
+      const newNode = createNewNode(clipboardElement);
+      setNodes([...nodes, newNode]);
+      await createNode(newNode);
+    } else {
+      console.warn('Skipping single-edge paste because source/target nodes were not copied.');
+    }
+  };
+  
+  const separateNodesAndEdges = (elements: (Node | Edge)[]) => {
+    return {
+      clipboardNodes: elements.filter(isNode) as Node[],
+      clipboardEdges: elements.filter(isEdge) as Edge[],
+    };
+  };
+  
+  const generateNewNodeIds = (nodes: Node[]) => {
+    return nodes.reduce((map, node) => {
+      map[node.id] = `${node.type}-${uuidv4()}`;
+      return map;
+    }, {} as Record<string, string>);
+  };
+  
+  const createNewNode = (node: Node, idMap?: Record<string, string>) => {
+    const newId = idMap ? idMap[node.id] : `${node.type}-${uuidv4()}`;
+    return {
+      ...node,
+      id: newId,
+      position: { x: node.position.x + 20, y: node.position.y + 20 },
+    };
+  };
+  
+  const createNewEdges = (edges: Edge[], idMap: Record<string, string>) => {
+    return edges
+      .filter(edge => idMap[edge.source] && idMap[edge.target])
+      .map(edge => ({
+        ...edge,
+        id: `edge-${uuidv4()}`,
+        source: idMap[edge.source],
+        target: idMap[edge.target],
+      }));
+  };
+  
   const handleTriggerDelete = useCallback(() => {
     if (!selectedElement) return;
     if (confirmDeletion) {
@@ -112,32 +134,21 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const handleConfirmDelete = async () => {
     if (!selectedElement) return;
-    if (Array.isArray(selectedElement)) {
-      let updatedEdges = edges;
-      let updatedNodes = nodes;
-      for (const element of selectedElement) {
-        if ('source' in element) {
-          await deleteEdge(element.id as string);
-          updatedEdges = updatedEdges.filter(e => e.id !== element.id);
-        } else {
-          await deleteNode(element.id);
-          updatedNodes = updatedNodes.filter(n => n.id !== element.id);
-        }
-      }
-      setEdges(updatedEdges);
-      setNodes(updatedNodes);
-    } else {
-      if ('source' in selectedElement) {
-        await deleteEdge(selectedElement.id as string);
-        setEdges(edges.filter(e => e.id !== selectedElement.id));
-      } else {
-        await deleteNode(selectedElement.id);
-        setNodes(nodes.filter(n => n.id !== selectedElement.id));
-      }
-    }
+  
+    const isMultiple = Array.isArray(selectedElement);
+    const elementsToDelete = isMultiple ? selectedElement : [selectedElement];
+  
+    const updatedEdges = edges.filter(e => !elementsToDelete.some(el => el.id === e.id && 'source' in el));
+    const updatedNodes = nodes.filter(n => !elementsToDelete.some(el => el.id === n.id && !('source' in el)));
+  
+    await Promise.all(elementsToDelete.map(el => ('source' in el ? deleteEdge(el.id) : deleteNode(el.id))));
+  
+    setEdges(updatedEdges);
+    setNodes(updatedNodes);
     setShowDeleteDialog(false);
     setSelectedElement(null);
   };
+  
 
   return (
     <>
