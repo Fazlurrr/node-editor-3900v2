@@ -217,7 +217,7 @@ const NodesPanel: React.FC = () => {
         dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
         [scrollbar-width:thin] 
         [scrollbar-color:lightGray_transparent]">
-        <div className="pb-2 pl-4 mt-14 mb-2 border-b border-[#9facbc]" onClick={toggleElements}>
+        <div className="pb-2 pl-4 mt-20 pt-2 mb-2 border-b border-[#9facbc]" onClick={toggleElements}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg text-black dark:text-white font-semibold">Elements</h2>
             {collapseElements ? <ChevronUp className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" /> :
