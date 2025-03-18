@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import type { ResizeParams } from 'reactflow';
-import { useStore, NodeResizer } from 'reactflow';
+import { NodeResizer } from 'reactflow';
 import Handles from './Handles';
 import type { CustomNodeProps } from '@/lib/types';
 import { capitalizeFirstLetter } from '@/lib/utils';
@@ -14,7 +14,6 @@ const Block = (props: CustomNodeProps) => {
   const [tempName, setTempName] = useState(props.data.customName || props.data.label || '');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const resizeNodeRef = useRef<HTMLDivElement>(null);
-  const connectionStartHandle = useStore((store) => store.connectionStartHandle);
   const { mode } = useMode();
 
   // Keep dimensions in state for final value (used on mount or after resize ends)
@@ -138,7 +137,7 @@ const Block = (props: CustomNodeProps) => {
         </div>
       )}
 
-      <div style={{ visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden' }}>
+      <div style={{ visibility: mode === 'relation' ? 'visible' : 'hidden' }}>
         <Handles nodeId={props.data.label} />
       </div>
     </figure>
