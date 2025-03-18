@@ -208,7 +208,7 @@ const NodesPanel: React.FC = () => {
     }
   
     return (
-      <div className="h-full w-56 text-white border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 left-0 z-10
+      <div className="h-full w-56 text-white border-t border-r border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 left-0 z-10
         overflow-y-auto
         [&::-webkit-scrollbar]:w-1
         [&::-webkit-scrollbar-track]:bg-white

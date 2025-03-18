@@ -43,7 +43,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) =>
   return (
     <MiniMapProvider>
       <div
-        className="h-full w-56 border border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 right-0 z-10 
+        className="h-full w-56 border-t border-l border-[#9facbc] bg-white dark:bg-navbar-dark fixed top-0 right-0 z-10 
         flex flex-col"
       >
         <div className="pb-2 pl-4 mt-20 pt-2 mb-2 border-b border-[#9facbc]">
