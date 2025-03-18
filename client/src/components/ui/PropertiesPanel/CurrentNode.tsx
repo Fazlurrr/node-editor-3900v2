@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
 import { Input } from '../input';
 import { Button } from '../button';
 import { buttonVariants } from '@/lib/config.ts';
