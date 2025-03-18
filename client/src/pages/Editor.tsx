@@ -146,12 +146,13 @@ const Editor = () => {
     const { x, y } = node.positionAbsolute ?? node.position;
     const width = node.width ?? 150;
     const height = node.height ?? 150;
+    const padding = 22; // Padding for easier selection
 
     const inside = 
-      point.x >= x && 
-      point.x <= x + width && 
-      point.y >= y && 
-      point.y <= y + height;
+      point.x >= x - padding && 
+      point.x <= x + width + padding && 
+      point.y >= y - padding && 
+      point.y <= y + height + padding;
 
       return inside;
   };
