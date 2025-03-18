@@ -7,11 +7,11 @@ const Toolbar = () => {
 
     const iconStyle = 'w-5 h-5 ml-1.5 mt-1.5';
     const iconContainerStyle = 'w-8 h-full hover:text-black dark:hover:text-white mr-2';
-    const activeIconContainerStyle = 'bg-gray-300';
+    const activeIconContainerStyle = 'bg-gray-200 dark:bg-gray-700';
     const dividerStyle = 'w-0.5 h-5 bg-[#B7C0CD] ml-2 mr-4';
 
     return (
-        <div className="fixed top-12 bg-white h-8 w-screen z-20 border-b border-[#9facbc] text-[#61656E] dark:text-white dark:bg-navbar-dark">
+        <div className="fixed top-12 bg-white h-8 w-screen z-20 border-b border-[#9facbc] text-[#61656E] dark:text-gray-300 dark:bg-navbar-dark">
             <div className='flex items-center h-full px-4 pl-5'>
                 <div 
                     title="Move (V)" 
