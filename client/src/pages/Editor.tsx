@@ -166,42 +166,55 @@ const Editor = () => {
     const parentWidth = blockNode.width ?? 110;
     const parentHeight = blockNode.height ?? 66;
   
-    // Calculate relative position
-    const relativeX = node.position.x;
-    const relativeY = node.position.y;
-  
-    // Calculate distances to edges
+    // Calculate the position of the terminal
+    const terminalLeft = node.position.x;
+    const terminalTop = node.position.y;
+    
+    // Calculate the center position (for determining closest edge)
+    const terminalCenterX = terminalLeft + childWidth / 2;
+    const terminalCenterY = terminalTop + childHeight / 2;
+    
+    // Calculate distances to each edge from the terminal's center
     const distances = [
-      { edge: "left", distance: Math.abs(relativeX + childWidth) },
-      { edge: "right", distance: Math.abs(relativeX - parentWidth) },
-      { edge: "top", distance: Math.abs(relativeY + childHeight) },
-      { edge: "bottom", distance: Math.abs(relativeY - parentHeight) },
+      { edge: "left", distance: Math.abs(terminalCenterX) },
+      { edge: "right", distance: Math.abs(terminalCenterX - parentWidth) },
+      { edge: "top", distance: Math.abs(terminalCenterY) },
+      { edge: "bottom", distance: Math.abs(terminalCenterY - parentHeight) },
     ];
   
+    // Find the closest edge
     const closestEdge = distances.reduce((prev, curr) =>
       curr.distance < prev.distance ? curr : prev
     );
   
-    let newX = relativeX;
-    let newY = relativeY;
+    let newX = node.position.x;
+    let newY = node.position.y;
   
-    // Snap to closest edge
+    // Snap to closest edge, making the terminal touch the block border exactly
     switch (closestEdge.edge) {
       case "left":
+        // Position terminal so its right edge touches the left edge of the block
         newX = -childWidth;
-        newY = Math.max(-childHeight, Math.min(relativeY, parentHeight));
+        // Keep Y position but ensure it stays within parent bounds
+        newY = Math.max(0, Math.min(newY, parentHeight - childHeight));
         break;
       case "right":
+        // Position terminal so its left edge touches the right edge of the block
         newX = parentWidth;
-        newY = Math.max(-childHeight, Math.min(relativeY, parentHeight));
+        // Keep Y position but ensure it stays within parent bounds
+        newY = Math.max(0, Math.min(newY, parentHeight - childHeight));
         break;
       case "top":
+        // Position terminal so its bottom edge touches the top edge of the block
         newY = -childHeight;
-        newX = Math.max(-childWidth, Math.min(relativeX, parentWidth));
+        // Preserve X position but ensure it stays within parent bounds
+        newX = Math.max(0, Math.min(newX, parentWidth - childWidth));
         break;
       case "bottom":
+        // Position terminal so its top edge touches the bottom edge of the block
         newY = parentHeight;
-        newX = Math.max(-childWidth, Math.min(relativeX, parentWidth));
+        // Preserve X position but ensure it stays within parent bounds
+        newX = Math.max(0, Math.min(newX, parentWidth - childWidth));
         break;
     }
   
@@ -325,7 +338,7 @@ const Editor = () => {
     const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
   
     if (!data) return;
-
+  
     const offsetX = 199 / currentZoom;
     const offsetY = 25 / currentZoom;
   
@@ -333,7 +346,7 @@ const Editor = () => {
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top,
     });
-
+  
     const adjustedPosition = {
       x: position.x + offsetX,
       y: position.y - offsetY
@@ -347,11 +360,12 @@ const Editor = () => {
       if (blockNode) {
         // Calculate position relative to the block
         const relativePosition = {
-          x: position.x - blockNode.position.x,
-          y: position.y - blockNode.position.y
+          x: adjustedPosition.x - blockNode.position.x,
+          y: adjustedPosition.y - blockNode.position.y
         };
   
-        // Create temporary node for position calculation
+  
+        // Create temporary node for position calculation with correct position
         const tempNode = {
           id: 'temp',
           type: 'terminal',
@@ -380,10 +394,7 @@ const Editor = () => {
       }
     }
     
-    addNode(data.aspect, data.nodeType, {
-      x: position.x + offsetX,
-      y: position.y - offsetY
-    });
+    addNode(data.aspect, data.nodeType, adjustedPosition);
   };
 
   const handleNodeClick = (_: React.MouseEvent, node: Node) => {
