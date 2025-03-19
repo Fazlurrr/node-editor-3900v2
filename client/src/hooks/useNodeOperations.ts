@@ -225,9 +225,107 @@ export const useNodeOperations = (
         addNode(data.aspect, data.nodeType, position);
       };
 
+      const handleTerminalDetach = useCallback((nodeId: string) => {
+          const currentNodes = useStore.getState().nodes;
+          const terminalNode = currentNodes.find(n => n.id === nodeId);
+          const { setNodes } = useStore.getState();
+          
+          if (!terminalNode || terminalNode.type !== 'terminal') return;
+          
+          // Get the parent block
+          const parentId = terminalNode.parentId;
+          const parentBlock = currentNodes.find(n => n.id === parentId);
+          
+          if (!parentBlock) return;
+          
+          // Create updated versions of the nodes
+          const updatedParent = {
+            ...parentBlock,
+            data: {
+              ...parentBlock.data,
+              terminals: parentBlock.data.terminals.filter((t) => t.id !== nodeId)
+            }
+          };
+          
+          // Calculate absolute position
+          const absolutePosition = {
+            x: parentBlock.position.x + terminalNode.position.x,
+            y: parentBlock.position.y + terminalNode.position.y
+          };
+          
+          // Determine which side of the block the terminal is on and move it farther away
+          // to avoid immediate re-snapping (using the snap grid value of 11)
+          const terminalWidth = terminalNode.width || 22; // Default width if not specified
+          const terminalHeight = terminalNode.height || 22; // Default height if not specified
+          const blockWidth = parentBlock.width || 110; // Default width if not specified
+          const blockHeight = parentBlock.height || 66; // Default height if not specified
+          
+          // Check terminal position relative to block
+          const relX = terminalNode.position.x;
+          const relY = terminalNode.position.y;
+          const moveDistance = 11;
+          
+            // Enhanced logic for corners
+            const isOnLeft = relX <= 0;
+            const isOnRight = relX + terminalWidth >= blockWidth;
+            const isOnTop = relY <= 0;
+            const isOnBottom = relY + terminalHeight >= blockHeight;
+
+            // Check if terminal is at a corner
+            const isTopLeft = isOnTop && isOnLeft;
+            const isTopRight = isOnTop && isOnRight;
+            const isBottomLeft = isOnBottom && isOnLeft;
+            const isBottomRight = isOnBottom && isOnRight;
+
+            // Handle corners
+            if (isTopLeft) {
+            absolutePosition.x -= moveDistance;
+            absolutePosition.y -= moveDistance;
+            } else if (isTopRight) {
+            absolutePosition.x += moveDistance;
+            absolutePosition.y -= moveDistance;
+            } else if (isBottomLeft) {
+            absolutePosition.x -= moveDistance;
+            absolutePosition.y += moveDistance;
+            } else if (isBottomRight) {
+            absolutePosition.x += moveDistance;
+            absolutePosition.y += moveDistance;
+            }
+            // Handle edges
+            else if (isOnLeft) {
+            absolutePosition.x -= moveDistance;
+            } else if (isOnRight) {
+            absolutePosition.x += moveDistance;
+            } else if (isOnTop) {
+            absolutePosition.y -= moveDistance;
+            } else if (isOnBottom) {
+            absolutePosition.y += moveDistance;
+            }
+          
+          const updatedTerminal = {
+            ...terminalNode,
+            position: absolutePosition,
+            parentId: undefined, // Remove parentId relationship
+            data: {
+              ...terminalNode.data,
+              parent: 'void',
+              // Remove terminalOf if it exists
+              ...(terminalNode.data.terminalOf ? { terminalOf: undefined } : {})
+            }
+          };
+          
+          // Update the nodes
+          const otherNodes = currentNodes.filter(n => n.id !== nodeId && n.id !== parentId);
+          setNodes([...otherNodes, updatedParent, updatedTerminal]);
+      
+          updateNode(updatedParent.id);
+          updateNode(updatedTerminal.id);
+        }, []);
+
       return {
         onNodeDrag,
         onNodeDragStop,
-        handleDrop
+        handleDrop,
+        handleTerminalDetach
       }
 };
