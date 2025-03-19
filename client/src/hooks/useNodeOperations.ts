@@ -179,7 +179,7 @@ export const useNodeOperations = (
         }
       };
 
-      const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+      const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         
         if (!reactFlowWrapper.current || !reactFlowInstance) return;
@@ -216,7 +216,12 @@ export const useNodeOperations = (
               data
             }, blockNode);
             
-            addTerminalToBlock(blockNode.id, snappedPosition, data.aspect);
+            const newTerminal = await addTerminalToBlock(blockNode.id, snappedPosition, data.aspect);
+            
+            if (newTerminal) {
+              await updateNode(newTerminal.id);
+            }
+            
             return;
           }
         }
@@ -243,7 +248,7 @@ export const useNodeOperations = (
             ...parentBlock,
             data: {
               ...parentBlock.data,
-              terminals: parentBlock.data.terminals.filter((t) => t.id !== nodeId)
+              terminals: parentBlock.data.terminals.filter((t: { id: string; }) => t.id !== nodeId)
             }
           };
           
