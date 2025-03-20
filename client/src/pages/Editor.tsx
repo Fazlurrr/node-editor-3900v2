@@ -151,16 +151,20 @@ const Editor = () => {
 
   const onLoad = (instance: ReactFlowInstance) => setReactFlowInstance(instance);
 
-  const handleNodeClick = (_: React.MouseEvent, node: Node) => {
-    setSelectedElement(node);
+  const handleNodeClick = (e: React.MouseEvent, node: Node) => {
+    if (!e.ctrlKey && !e.shiftKey) {
+      setSelectedElement(node);
+    }
   };
   
-
-  const handleEdgeClick = (_: React.MouseEvent, edge: Edge) => {
-    setSelectedElement(edge);
+  const handleEdgeClick = (e: React.MouseEvent, edge: Edge) => {
+    if (!e.ctrlKey && !e.shiftKey) {
+      setSelectedElement(edge);
+    }
   };
 
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
+
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -197,6 +201,21 @@ const Editor = () => {
             event.dataTransfer.dropEffect = 'move';
           }}
           onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
+          onSelectionChange={(selection) => {
+            if (!selection) {
+              setSelectedElement(null);
+              return;
+            }
+            const { nodes: selNodes = [], edges: selEdges = [] } = selection;
+            const combined: (Node | Edge)[] = [...selNodes, ...selEdges];
+            if (combined.length === 0) {
+              setSelectedElement(null);
+            } else if (combined.length === 1) {
+              setSelectedElement(combined[0]);
+            } else {
+              setSelectedElement(combined);
+            }
+          }}
         >
           {isGridVisible && (
             <Background

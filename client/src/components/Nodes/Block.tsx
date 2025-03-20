@@ -18,7 +18,6 @@ const Block = (props: CustomNodeProps) => {
   const { mode } = useMode();
   const { onResize: onTerminalResize, onResizeEnd: onTerminalResizeEnd } = useTerminalResizeHandling();
 
-  // Keep dimensions in state for final value (used on mount or after resize ends)
   const [dimensions, setDimensions] = useState({
     width: props.data.width || 110,
     height: props.data.height || 66,
