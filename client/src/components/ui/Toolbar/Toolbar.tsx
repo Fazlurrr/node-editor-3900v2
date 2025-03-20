@@ -2,10 +2,12 @@ import { Move, Scaling, Workflow, Clipboard, ClipboardPaste,
     Scissors, Trash2, Undo2, Redo2, ZoomIn, ZoomOut, Fullscreen, Lock} from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
+import { useReactFlow } from 'reactflow';
 
 const Toolbar = () => {
     const { mode, setMode } = useMode();
     const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
+    const { zoomIn, zoomOut, fitView } = useReactFlow();
 
     const iconStyle = 'w-5 h-5 ml-1.5 mt-1.5';
     const iconContainerStyle = 'w-8 h-full hover:text-black dark:hover:text-white mr-1';
@@ -65,13 +67,19 @@ const Toolbar = () => {
                     <Redo2 className={iconStyle} />
                 </div>
                 <div className={dividerStyle}></div>
-                <div title="Zoom In (+)" className={iconContainerStyle}>
+                <div title="Zoom In (+)" className={iconContainerStyle}
+                    onClick={() => zoomIn({ duration: 100 })}
+                >
                     <ZoomIn className={iconStyle} />
                 </div>
-                <div title="Zoom Out (-)" className={iconContainerStyle}>
+                <div title="Zoom Out (-)" className={iconContainerStyle}
+                    onClick={() => zoomOut({ duration: 100 })}
+                >
                     <ZoomOut className={iconStyle} />
                 </div>
-                <div title="Fit View (Ctrl+F)" className={iconContainerStyle}>
+                <div title="Fit View (Ctrl+F)" className={iconContainerStyle}
+                    onClick={() => fitView({ duration: 300, padding: 0.3 })}
+                >
                     <Fullscreen className={iconStyle} />
                 </div>
                 <div title="Lock Movement (Ctrl+L)" className={iconContainerStyle}>
