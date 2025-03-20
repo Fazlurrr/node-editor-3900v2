@@ -1,4 +1,4 @@
-import ReactFlow, { Controls, MiniMap } from 'reactflow';
+import ReactFlow, { MiniMap } from 'reactflow';
 import styled from 'styled-components';
 
 export const ReactFlowStyled = styled(ReactFlow)`
