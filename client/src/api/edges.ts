@@ -166,8 +166,6 @@ export const deleteEdge = async (
       return null;
     }
 
-    toast.success('Edge deleted successfully!');
-
     const edges = await fetchEdges();
 
     if (edges) {
@@ -226,8 +224,6 @@ export const updateEdge = async (
       return null;
     }
 
-    toast.success('Relation type updated successfully!');
-    
     const updatedEdge = await response.json();
 
     if (updatedEdge) {

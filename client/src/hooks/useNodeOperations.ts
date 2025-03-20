@@ -5,14 +5,13 @@ import { updateNode } from '@/api/nodes';
 import { isPointInsideNode, getSnappedPosition } from "@/lib/utils/nodes";
 import { shallow } from 'zustand/shallow';
 import { storeSelector, useStore} from '@/hooks';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 export const useNodeOperations = (
     reactFlowWrapper: React.RefObject<HTMLDivElement>,
     reactFlowInstance: ReactFlowInstance | null,
     initialPositions: React.MutableRefObject<Record<string, { x: number; y: number }>>
 ) => {
-    const [currentZoom ] = useState(1);
     const { nodes } =
         useStore(storeSelector, shallow);
     const onNodeDrag = useCallback(
@@ -180,70 +179,158 @@ export const useNodeOperations = (
         }
       };
 
-      const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+      const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
-      
+        
         if (!reactFlowWrapper.current || !reactFlowInstance) return;
-      
-        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+        
         const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-      
+        
         if (!data) return;
-      
-        const offsetX = 199 / currentZoom;
-        const offsetY = 25 / currentZoom;
-      
+        
+        // Let ReactFlow handle the basic positioning
         const position = reactFlowInstance.screenToFlowPosition({
-          x: event.clientX - reactFlowBounds.left,
-          y: event.clientY - reactFlowBounds.top,
+          x: event.clientX,
+          y: event.clientY
         });
-      
-        const adjustedPosition = {
-          x: position.x + offsetX,
-          y: position.y - offsetY
-        };
-      
+        
         if (data.nodeType === "terminal") {
           const blockNode = nodes.find(
-            (node) => isPointInsideNode(adjustedPosition, node) && node.type === "block"
+            (node) => isPointInsideNode(position, node) && node.type === "block"
           );
           
           if (blockNode) {
             // Calculate position relative to the block
             const relativePosition = {
-              x: adjustedPosition.x - blockNode.position.x,
-              y: adjustedPosition.y - blockNode.position.y
+              x: position.x - blockNode.position.x,
+              y: position.y - blockNode.position.y
             };
-      
-      
-            // Create temporary node for position calculation with correct position
-            const tempNode = {
+            
+            // Use your existing function for terminal positioning
+            const snappedPosition = getSnappedPosition({
               id: 'temp',
               type: 'terminal',
               position: relativePosition,
               width: 22,
               height: 22,
               data
-            };
-      
-            // Get snapped position relative to block
-            const snappedPosition = getSnappedPosition(tempNode, blockNode);
+            }, blockNode);
             
-            addTerminalToBlock(
-              blockNode.id, 
-              snappedPosition,  // For React Flow rendering
-              data.aspect
-            );
+            const newTerminal = await addTerminalToBlock(blockNode.id, snappedPosition, data.aspect);
+            
+            if (newTerminal) {
+              await updateNode(newTerminal.id);
+            }
+            
             return;
           }
         }
         
-        addNode(data.aspect, data.nodeType, adjustedPosition);
+        // Let grid snapping be handled by ReactFlow's props
+        addNode(data.aspect, data.nodeType, position);
       };
+
+      const handleTerminalDetach = useCallback((nodeId: string) => {
+          const currentNodes = useStore.getState().nodes;
+          const terminalNode = currentNodes.find(n => n.id === nodeId);
+          const { setNodes } = useStore.getState();
+          
+          if (!terminalNode || terminalNode.type !== 'terminal') return;
+          
+          // Get the parent block
+          const parentId = terminalNode.parentId;
+          const parentBlock = currentNodes.find(n => n.id === parentId);
+          
+          if (!parentBlock) return;
+          
+          // Create updated versions of the nodes
+          const updatedParent = {
+            ...parentBlock,
+            data: {
+              ...parentBlock.data,
+              terminals: parentBlock.data.terminals.filter((t: { id: string; }) => t.id !== nodeId)
+            }
+          };
+          
+          // Calculate absolute position
+          const absolutePosition = {
+            x: parentBlock.position.x + terminalNode.position.x,
+            y: parentBlock.position.y + terminalNode.position.y
+          };
+          
+          // Determine which side of the block the terminal is on and move it farther away
+          // to avoid immediate re-snapping (using the snap grid value of 11)
+          const terminalWidth = terminalNode.width || 22; // Default width if not specified
+          const terminalHeight = terminalNode.height || 22; // Default height if not specified
+          const blockWidth = parentBlock.width || 110; // Default width if not specified
+          const blockHeight = parentBlock.height || 66; // Default height if not specified
+          
+          // Check terminal position relative to block
+          const relX = terminalNode.position.x;
+          const relY = terminalNode.position.y;
+          const moveDistance = 11;
+          
+            // Enhanced logic for corners
+            const isOnLeft = relX <= 0;
+            const isOnRight = relX + terminalWidth >= blockWidth;
+            const isOnTop = relY <= 0;
+            const isOnBottom = relY + terminalHeight >= blockHeight;
+
+            // Check if terminal is at a corner
+            const isTopLeft = isOnTop && isOnLeft;
+            const isTopRight = isOnTop && isOnRight;
+            const isBottomLeft = isOnBottom && isOnLeft;
+            const isBottomRight = isOnBottom && isOnRight;
+
+            // Handle corners
+            if (isTopLeft) {
+            absolutePosition.x -= moveDistance;
+            absolutePosition.y -= moveDistance;
+            } else if (isTopRight) {
+            absolutePosition.x += moveDistance;
+            absolutePosition.y -= moveDistance;
+            } else if (isBottomLeft) {
+            absolutePosition.x -= moveDistance;
+            absolutePosition.y += moveDistance;
+            } else if (isBottomRight) {
+            absolutePosition.x += moveDistance;
+            absolutePosition.y += moveDistance;
+            }
+            // Handle edges
+            else if (isOnLeft) {
+            absolutePosition.x -= moveDistance;
+            } else if (isOnRight) {
+            absolutePosition.x += moveDistance;
+            } else if (isOnTop) {
+            absolutePosition.y -= moveDistance;
+            } else if (isOnBottom) {
+            absolutePosition.y += moveDistance;
+            }
+          
+          const updatedTerminal = {
+            ...terminalNode,
+            position: absolutePosition,
+            parentId: undefined, // Remove parentId relationship
+            data: {
+              ...terminalNode.data,
+              parent: 'void',
+              // Remove terminalOf if it exists
+              ...(terminalNode.data.terminalOf ? { terminalOf: undefined } : {})
+            }
+          };
+          
+          // Update the nodes
+          const otherNodes = currentNodes.filter(n => n.id !== nodeId && n.id !== parentId);
+          setNodes([...otherNodes, updatedParent, updatedTerminal]);
+      
+          updateNode(updatedParent.id);
+          updateNode(updatedTerminal.id);
+        }, []);
 
       return {
         onNodeDrag,
         onNodeDragStop,
-        handleDrop
+        handleDrop,
+        handleTerminalDetach
       }
 };

@@ -184,7 +184,7 @@ const NodesPanel: React.FC = () => {
   
     document.body.appendChild(dragPreview);
   
-    event.dataTransfer.setDragImage(dragPreview, 25, 25);
+    event.dataTransfer.setDragImage(dragPreview, 0, 0);
   
     setTimeout(() => document.body.removeChild(dragPreview), 0);
   

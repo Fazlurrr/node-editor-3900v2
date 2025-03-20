@@ -51,6 +51,7 @@ const Editor = () => {
     onNodeDrag, 
     onNodeDragStop, 
     handleDrop,
+    handleTerminalDetach,
   } = useNodeOperations(reactFlowWrapper, reactFlowInstance, initialPositions);
   const [, setCurrentZoom] = useState<number>(1);
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
@@ -160,7 +161,7 @@ const Editor = () => {
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <div ref={reactFlowWrapper} className='mx-56 h-full'>
+      <div ref={reactFlowWrapper} className='mx-56 mt-20 h-full'>
         <ReactFlowStyled
           nodes={nodes}
           edges={edges}
@@ -229,7 +230,10 @@ const Editor = () => {
             y={canvasMenu.y}
             onMoveToFront={() => moveNodeToFront(canvasMenu.nodeId)}
             onMoveToBack={() => moveNodeToBack(canvasMenu.nodeId)}
+            onTerminalDetach={() => handleTerminalDetach(canvasMenu.nodeId)}
             onClose={() => setCanvasMenu(null)}
+            nodeType={nodes.find((n) => n.id === canvasMenu.nodeId)?.type}
+            hasParent={!!nodes.find((n) => n.id === canvasMenu.nodeId)?.parentId}
           />
         )}
       </div>

@@ -692,4 +692,4 @@ export const getSnappedPosition = (node: Node, blockNode: Node) => {
   }
   
   return { x: newX, y: newY };
-};  
+};
