@@ -88,7 +88,7 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
                 >
                     <Fullscreen className={iconStyle} />
                 </div>
-                <div title="Lock Movement (Ctrl+L)" className={`${iconContainerStyle} ${isLocked ? activeIconContainerStyle : ''}`}
+                <div title="Lock Movement (L)" className={`${iconContainerStyle} ${isLocked ? activeIconContainerStyle : ''}`}
                     onClick={onLockToggle}>
                     {isLocked ? <Lock className={iconStyle} /> : <Unlock className={iconStyle} />}
                 </div>

@@ -112,7 +112,7 @@ export const useKeyboardShortcuts = (
   );
 
   useHotkeys(
-    'ctrl+l, command+l',
+    'l',
     () => {
       onLockToggle();
     },
