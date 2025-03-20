@@ -24,7 +24,6 @@ import {
   Specialization,
 } from '@/components/Edges';
 import {
-  ControlsStyled,
   ReactFlowStyled,
   darkTheme,
   lightTheme,
@@ -58,6 +57,11 @@ const Editor = () => {
     useStore(storeSelector, shallow);
   const { selectedElement, setSelectedElement, handleTriggerDelete, handlePaste } = useClipboard();
   const { theme } = useTheme();
+  const [lockState, setLockState] = useState<boolean>(false);
+
+  useEffect(() => {
+    setLockState(lockState);
+  }, [lockState]);
 
   const handleRightClick = useCallback(
     ({ x, y, nodeId }: { x: number; y: number; nodeId: string }) => {
@@ -156,12 +160,15 @@ const Editor = () => {
     setSelectedElement(edge);
   };
 
-  useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);
+  useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <div ref={reactFlowWrapper} className='mx-56 mt-20 h-full'>
+      <div ref={reactFlowWrapper} className='mx-56 mt-20 h-[calc(100vh-5rem)]'>
         <ReactFlowStyled
+          nodesDraggable={!lockState}
+          nodesConnectable={!lockState}
+          elementsSelectable={!lockState}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
@@ -191,14 +198,6 @@ const Editor = () => {
           }}
           onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
         >
-          <ControlsStyled
-            style={{
-              position: 'absolute',
-              top: '95%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-            }}
-          />
           {isGridVisible && (
             <Background
               color={theme === 'dark' ? '#2f3237' : '#eee'}
@@ -221,7 +220,7 @@ const Editor = () => {
           />
         )}
       </div>
-      <Toolbar />
+      <Toolbar isLocked={lockState} onLockToggle={() => setLockState(!lockState)} />
       <NodesPanel />
       <PropertiesPanel selectedElement={selectedElement} />
     </ThemeProvider>
