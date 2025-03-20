@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
 import { Input } from '../input';
 import { Button } from '../button';
 import { buttonVariants } from '@/lib/config.ts';
@@ -99,7 +98,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       if (updated) {
         currentNode.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
-        toast.success('Attribute added successfully');
         form.reset();
         setIsAttributesVisible(false);
       }
@@ -124,7 +122,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       if (updated) {
         currentNode.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
-        toast.success('Attribute updated');
         form.reset();
         setEditingIndex(null);
         setIsAttributesVisible(false);
@@ -138,7 +135,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     const updated = await updateNode(currentNode.id, { customAttributes: updatedAttributes });
     if (updated) {
       currentNode.data.customAttributes = updatedAttributes;
-      toast.success('Attribute deleted');
     }
   };
 
@@ -176,7 +172,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     const updated = await updateNode(currentNode.id, { aspect: newAspect });
     if (updated) {
       currentNode.data.aspect = newAspect;
-      toast.success('Aspect updated successfully');
     }
   };
 

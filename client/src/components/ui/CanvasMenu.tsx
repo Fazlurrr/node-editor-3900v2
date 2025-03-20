@@ -7,9 +7,12 @@ interface CanvasMenuProps {
     onMoveToFront: () => void;
     onMoveToBack: () => void;
     onClose: () => void;
+    onTerminalDetach: () => void;
+    nodeType?: string;
+    hasParent?: boolean;
 }
 
-const CanvasMenu: React.FC<CanvasMenuProps> = ({ x, y, onMoveToFront, onMoveToBack, onClose }) => {
+const CanvasMenu: React.FC<CanvasMenuProps> = ({ x, y, onMoveToFront, onMoveToBack, onClose, onTerminalDetach, nodeType, hasParent }) => {
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -43,6 +46,11 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({ x, y, onMoveToFront, onMoveToBa
                 >
                     Move to Back
                 </li>
+                {nodeType === 'terminal' && hasParent && (
+                    <li className="p-2 hover:bg-gray-100 cursor-pointer" onClick={() => { onTerminalDetach(); onClose(); }}>
+                        Detach terminal
+                    </li>
+                )}
             </ul>
         </div>
     );
