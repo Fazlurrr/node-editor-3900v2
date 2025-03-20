@@ -9,29 +9,6 @@ export const MiniMapStyled = styled(MiniMap)`
   background-color: ${props => props.theme.bg};
 `;
 
-export const ControlsStyled = styled(Controls)`
-  position: absolute;
-  top: 95%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  button {
-    background-color: ${props => props.theme.controlsBg};
-    color: ${props => props.theme.controlsColor};
-    border: 1px solid ${props => props.theme.controlsBorder};
-
-    &:hover {
-      background-color: ${props => props.theme.controlsBgHover};
-    }
-
-    path {
-      fill: currentColor;
-    }
-  }
-`;
-
 export const lightTheme = {
   bg: '#fff',
   primary: '#ff0072',

@@ -24,7 +24,6 @@ import {
   Specialization,
 } from '@/components/Edges';
 import {
-  ControlsStyled,
   ReactFlowStyled,
   darkTheme,
   lightTheme,
@@ -199,14 +198,6 @@ const Editor = () => {
           }}
           onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
         >
-          <ControlsStyled
-            style={{
-              position: 'absolute',
-              top: '95%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-            }}
-          />
           {isGridVisible && (
             <Background
               color={theme === 'dark' ? '#2f3237' : '#eee'}
