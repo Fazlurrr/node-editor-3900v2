@@ -84,7 +84,7 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
                     <ZoomOut className={iconStyle} />
                 </div>
                 <div title="Fit View (Ctrl+F)" className={iconContainerStyle}
-                    onClick={() => fitView({ duration: 300, padding: 0.3 })}
+                    onClick={() => fitView({ duration: 300, padding: 0.1 })}
                 >
                     <Fullscreen className={iconStyle} />
                 </div>
