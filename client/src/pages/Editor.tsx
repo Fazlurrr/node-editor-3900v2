@@ -160,7 +160,7 @@ const Editor = () => {
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <div ref={reactFlowWrapper} className='mx-56 mt-20 h-full'>
+      <div ref={reactFlowWrapper} className='mx-56 mt-20 h-[calc(100vh-5rem)]'>
         <ReactFlowStyled
           nodes={nodes}
           edges={edges}
