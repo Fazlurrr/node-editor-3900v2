@@ -22,7 +22,7 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
 
     return (
         <div className="fixed top-12 bg-white h-8 w-screen z-20 border-b border-[#9facbc] text-[#61656E] dark:text-gray-300 dark:bg-navbar-dark">
-            <div className='flex items-center h-full px-4 pl-5'>
+            <div className='flex items-center h-full px-4 pl-8'>
                 <div 
                     title="Move (V)" 
                     onClick={() => setMode('move')} 
