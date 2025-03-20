@@ -1,10 +1,16 @@
 import { Move, Scaling, Workflow, Clipboard, ClipboardPaste,
-    Scissors, Trash2, Undo2, Redo2, ZoomIn, ZoomOut, Fullscreen, Lock} from 'lucide-react';
+    Scissors, Trash2, Undo2, Redo2, ZoomIn, ZoomOut, Fullscreen, Lock, Unlock} from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
 import { useReactFlow } from 'reactflow';
 
-const Toolbar = () => {
+interface ToolbarProps {
+    isLocked: boolean;
+    onLockToggle: () => void;
+}
+
+
+const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
     const { mode, setMode } = useMode();
     const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
     const { zoomIn, zoomOut, fitView } = useReactFlow();
@@ -82,8 +88,9 @@ const Toolbar = () => {
                 >
                     <Fullscreen className={iconStyle} />
                 </div>
-                <div title="Lock Movement (Ctrl+L)" className={iconContainerStyle}>
-                    <Lock className={iconStyle} />
+                <div title="Lock Movement (Ctrl+L)" className={`${iconContainerStyle} ${isLocked ? activeIconContainerStyle : ''}`}
+                    onClick={onLockToggle}>
+                    {isLocked ? <Lock className={iconStyle} /> : <Unlock className={iconStyle} />}
                 </div>
             </div>
         </div>
