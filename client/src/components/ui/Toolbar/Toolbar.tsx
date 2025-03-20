@@ -73,7 +73,7 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
                     <Redo2 className={iconStyle} />
                 </div>
                 <div className={dividerStyle}></div>
-                <div title="Zoom In (+)" className={iconContainerStyle}
+                <div title="Zoom In (.)" className={iconContainerStyle}
                     onClick={() => zoomIn({ duration: 100 })}
                 >
                     <ZoomIn className={iconStyle} />
@@ -83,7 +83,7 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
                 >
                     <ZoomOut className={iconStyle} />
                 </div>
-                <div title="Fit View (Ctrl+F)" className={iconContainerStyle}
+                <div title="Fit View (F)" className={iconContainerStyle}
                     onClick={() => fitView({ duration: 300, padding: 0.1 })}
                 >
                     <Fullscreen className={iconStyle} />

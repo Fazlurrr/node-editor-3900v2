@@ -4,6 +4,7 @@ import { Node, Edge } from 'reactflow';
 import { useMode } from '@/hooks/useMode';
 import { useGridContext } from '@/components/ui/toggleGrid';
 import { useMiniMapContext } from '@/components/ui/toggleMiniMap';
+import { useReactFlow } from 'reactflow';
 
 export const useKeyboardShortcuts = (
   selectedElement: Node | Edge | null,
@@ -15,6 +16,7 @@ export const useKeyboardShortcuts = (
   const { mode, setMode } = useMode();
   const { isGridVisible, setGridVisible } = useGridContext();
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
+  const { zoomIn, zoomOut, fitView } = useReactFlow();
 
   useHotkeys(
     'delete, backspace',
@@ -86,6 +88,27 @@ export const useKeyboardShortcuts = (
       setMode(mode === 'relation' ? 'move' : 'relation');
     },
     [mode]
+  );
+
+  useHotkeys(
+    '.',
+    () => {
+      zoomIn({ duration: 100 });
+    }
+  );
+
+  useHotkeys(
+    '-',
+    () => {
+      zoomOut({ duration: 100 });
+    }
+  );
+
+  useHotkeys(
+    'f',
+    () => {
+      fitView({ duration: 300, padding: 0.1 });
+    }
   );
 
   useHotkeys(
