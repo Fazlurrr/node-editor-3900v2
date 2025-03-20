@@ -166,7 +166,6 @@ export const updateNode = async (
     };
   } else {
     // If no newNodeData is provided, this is a position update
-    // For terminals with parents, we're already using relative positions
     updatedNodeData.data = {
       ...updatedNodeData.data,
       updatedAt: Date.now()
@@ -215,14 +214,11 @@ export const updateNode = async (
       
       const newNodes = nodes.map(node => {
         if (node.id === updatedNode.id) {
-          // For terminal nodes with parents, ensure parentId is maintained
-          if (node.type === 'terminal' && node.parentId) {
-            return {
-              ...updatedNode,
-              parentId: node.parentId // Maintain the parent relationship
-            };
-          }
-          return updatedNode;
+          return {
+            ...updatedNode,
+            selected: node.selected,
+            ...(node.type === 'terminal' && node.parentId ? { parentId: node.parentId } : {})
+          };
         }
         return node;
       });
@@ -238,6 +234,7 @@ export const updateNode = async (
     stopLoading();
   }
 };
+
 
 export const deleteNode = async (
   nodeToDeleteId: string
