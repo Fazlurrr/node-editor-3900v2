@@ -9,6 +9,7 @@ export const useKeyboardShortcuts = (
   selectedElement: Node | Edge | null,
   onTriggerDelete: () => void,
   onPaste: (clipboardElement: Node | Edge) => void,
+  onLockToggle: () => void
 ) => {
   const { copy, cut, paste } = useClipboard();
   const { mode, setMode } = useMode();
@@ -85,6 +86,15 @@ export const useKeyboardShortcuts = (
       setMode(mode === 'relation' ? 'move' : 'relation');
     },
     [mode]
+  );
+
+  useHotkeys(
+    'ctrl+l, command+l',
+    () => {
+      onLockToggle();
+    },
+    { enableOnFormTags: false, preventDefault: true },
+    [onLockToggle]
   );
 
   useHotkeys(

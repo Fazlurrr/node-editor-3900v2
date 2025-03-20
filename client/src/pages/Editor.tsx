@@ -160,7 +160,7 @@ const Editor = () => {
     setSelectedElement(edge);
   };
 
-  useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste);
+  useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
