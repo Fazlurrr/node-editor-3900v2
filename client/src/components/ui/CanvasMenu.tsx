@@ -14,6 +14,7 @@ interface CanvasMenuProps {
 
 const CanvasMenu: React.FC<CanvasMenuProps> = ({ x, y, onMoveToFront, onMoveToBack, onClose, onTerminalDetach, nodeType, hasParent }) => {
     const menuRef = useRef<HTMLDivElement>(null);
+    const liStyle = "p-2 hover:bg-gray-100 dark:bg-[#232528] dark:hover:bg-gray-700 cursor-pointer";    
 
     useEffect(() => {
         menuRef.current?.focus();
@@ -23,13 +24,13 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({ x, y, onMoveToFront, onMoveToBa
         <div
             ref={menuRef}
             tabIndex={0}
-            className={cn("absolute bg-white border shadow-lg rounded z-50")}
+            className={cn("absolute  border shadow-lg rounded z-50")}
             style={{ top: y, left: x, width: "150px" }}
             onBlur={onClose}
         >
             <ul>
                 <li
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    className={liStyle}
                     onClick={() => {
                         onMoveToFront();
                         onClose();
@@ -38,7 +39,7 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({ x, y, onMoveToFront, onMoveToBa
                     Move to Front
                 </li>
                 <li
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    className={liStyle}
                     onClick={() => {
                         onMoveToBack();
                         onClose();
@@ -47,7 +48,7 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({ x, y, onMoveToFront, onMoveToBa
                     Move to Back
                 </li>
                 {nodeType === 'terminal' && hasParent && (
-                    <li className="p-2 hover:bg-gray-100 cursor-pointer" onClick={() => { onTerminalDetach(); onClose(); }}>
+                    <li className={liStyle} onClick={() => { onTerminalDetach(); onClose(); }}>
                         Detach terminal
                     </li>
                 )}
