@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { Button } from '../button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../select';
 import { deleteEdge, updateEdge } from '@/api/edges';
 import { updateNodeConnectionData } from '@/lib/utils/nodes';
 import { EdgeType } from '@/lib/types';
 import { useStore } from '@/hooks';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
-import { buttonVariants } from '@/lib/config';
 import { Trash2 } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useSettings } from '@/hooks/useSettings';
