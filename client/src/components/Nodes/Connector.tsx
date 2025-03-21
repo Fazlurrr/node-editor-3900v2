@@ -9,9 +9,11 @@ import {
 import { Asterisk } from 'lucide-react';
 import { useStore } from 'reactflow';
 import { selectionColor } from '@/lib/config';
+import { useMode } from '@/hooks/useMode';
 
 const Connector = (props: CustomNodeProps) => {
   const connectionStartHandle = useStore((store) => store.connectionStartHandle);
+  const { mode } = useMode();
 
   // Check for custom attributes
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
@@ -43,7 +45,7 @@ const Connector = (props: CustomNodeProps) => {
               </div>
             )}
 
-            <div style={{ visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden' }}>
+            <div style={{ visibility: mode === 'relation' ? 'visible' : 'hidden' }}>
               <Handles nodeId={props.data.label} />
             </div>
           </figure>
