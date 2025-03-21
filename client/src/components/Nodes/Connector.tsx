@@ -7,12 +7,10 @@ import {
   TooltipTrigger,
 } from '../ui/tooltip';
 import { Asterisk } from 'lucide-react';
-import { useStore } from 'reactflow';
 import { selectionColor } from '@/lib/config';
 import { useMode } from '@/hooks/useMode';
 
 const Connector = (props: CustomNodeProps) => {
-  const connectionStartHandle = useStore((store) => store.connectionStartHandle);
   const { mode } = useMode();
 
   // Check for custom attributes
