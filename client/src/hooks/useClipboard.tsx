@@ -170,8 +170,8 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
           open={showDeleteDialog}
           elementType={
             selectedElement && !Array.isArray(selectedElement) && 'source' in selectedElement
-              ? 'element'
-              : 'relation'
+              ? 'relation'
+              : 'element'
           }
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteDialog(false)}

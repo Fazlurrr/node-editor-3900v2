@@ -4,7 +4,7 @@ import { NodeResizer } from 'reactflow';
 import Handles from './Handles';
 import type { CustomNodeProps } from '@/lib/types';
 import { capitalizeFirstLetter } from '@/lib/utils';
-import { Asterisk } from 'lucide-react'; 
+import { Asterisk } from 'lucide-react';
 import { updateNode } from '@/api/nodes';
 import { selectionColor } from '@/lib/config';
 import { useMode } from '@/hooks/useMode';
@@ -13,7 +13,7 @@ import { useTerminalResizeHandling } from '@/lib/utils/nodes';
 const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(props.data.customName || props.data.label || '');
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resizeNodeRef = useRef<HTMLDivElement>(null);
   const { mode } = useMode();
   const { onResize: onTerminalResize, onResizeEnd: onTerminalResizeEnd } = useTerminalResizeHandling();
@@ -51,11 +51,13 @@ const Block = (props: CustomNodeProps) => {
     }
   };
 
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isEditing]);
+  // REMEMBER: Maybe delete later
+  // useEffect(() => {
+  //   if (isEditing && inputRef.current) {
+  //     //inputRef.current.select();
+  //     //inputRef.current.focus();
+  //   }
+  // }, [isEditing]);
 
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
@@ -86,16 +88,17 @@ const Block = (props: CustomNodeProps) => {
     <figure
       id={props.data.label}
       className="relative"
-      onDoubleClick={(e) => {
+      onDoubleClick={(e: React.MouseEvent) => {
+        e.preventDefault();
         e.stopPropagation();
         setIsEditing(true);
       }}
       onContextMenu={(e) => {
         e.preventDefault();
-        props.onRightClick?.({ 
-          x: e.clientX, 
-          y: e.clientY, 
-          nodeId: props.id 
+        props.onRightClick?.({
+          x: e.clientX,
+          y: e.clientY,
+          nodeId: props.id
         });
       }}
     >
@@ -119,21 +122,23 @@ const Block = (props: CustomNodeProps) => {
       >
         <header className="flex items-center justify-center h-full w-full">
           {isEditing ? (
-            <input
-              ref={inputRef}
-              className="w-full h-full bg-transparent text-center focus:outline-none text-black"
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onBlur={handleSubmit}
-              onKeyDown={handleKeyDown}
-            />
-          ) : (
-            <p className="text-center text-black">
-              {props.data.customName === ''
-                ? capitalizeFirstLetter(props.data.label)
-                : props.data.customName}
-            </p>
-          )}
+              <div className="flex items-center justify-center h-full w-full">
+                <textarea
+                  ref={inputRef}
+                  className="w-full h-full bg-transparent text-center resize-none"
+                  value={tempName}
+                  onChange={(e) => { setTempName(e.target.value)}}
+                  onBlur={handleSubmit}
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+            ) : (
+              <p className="text-center text-black overflow-hidden">
+                {props.data.customName === ''
+                  ? capitalizeFirstLetter(props.data.label)
+                  : props.data.customName}
+              </p>
+            )}
         </header>
       </div>
 
