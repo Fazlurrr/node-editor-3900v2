@@ -26,69 +26,69 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
                 <div 
                     title="Move (V)" 
                     onClick={() => setMode('move')} 
-                    className={`${iconContainerStyle} ${mode === 'move' ? activeIconContainerStyle : ''}`}
+                    className={`${iconContainerStyle} ${mode === 'move' ? activeIconContainerStyle : ''} cursor-pointer`}
                 >
                     <Move className={iconStyle} />
                 </div>
                 <div 
                     title="Transform (T)" 
                     onClick={() => setMode('transform')} 
-                    className={`${iconContainerStyle} ${mode === 'transform' ? activeIconContainerStyle : ''}`}
+                    className={`${iconContainerStyle} ${mode === 'transform' ? activeIconContainerStyle : ''} cursor-pointer`}
                 >
                     <Scaling className={iconStyle} />
                 </div>
                 <div 
                     title="Relation (R)" 
                     onClick={() => setMode('relation')} 
-                    className={`${iconContainerStyle} ${mode === 'relation' ? activeIconContainerStyle : ''}`}
+                    className={`${iconContainerStyle} ${mode === 'relation' ? activeIconContainerStyle : ''} cursor-pointer`}
                 >
                     <Workflow className={iconStyle} />
                 </div>
                 <div className={dividerStyle}></div>
-                <div title="Copy (Ctrl+C)" className={iconContainerStyle}
+                <div title="Copy (Ctrl+C)" className={`${iconContainerStyle} cursor-pointer`}
                     onClick={() => { if (selectedElement) copy(selectedElement); }}
                 >
                     <Clipboard className={iconStyle} />
                 </div>
-                <div title="Paste (Ctrl+V)" className={iconContainerStyle}
+                <div title="Paste (Ctrl+V)" className={`${iconContainerStyle} cursor-pointer`}
                     onClick={() => paste(handlePaste)}
                 >
                     <ClipboardPaste className={iconStyle} />
                 </div>
-                <div title="Cut (Ctrl+X)" className={iconContainerStyle}
+                <div title="Cut (Ctrl+X)" className={`${iconContainerStyle} cursor-pointer`}
                     onClick={() => { if (selectedElement) cut(selectedElement, handleTriggerDelete); }}
                 >
                     <Scissors className={iconStyle} />
                 </div>
-                <div title="Delete (Backspace)" className={iconContainerStyle} 
+                <div title="Delete (Backspace)" className={`${iconContainerStyle} cursor-pointer`} 
                     onClick={() => { if (selectedElement) handleTriggerDelete(); }}
                 >
                     <Trash2 className={iconStyle} />
                 </div>
                 <div className={dividerStyle}></div>
-                <div title="Undo (Ctrl+Z)" className={iconContainerStyle}>
+                <div title="Undo (Ctrl+Z)" className={`${iconContainerStyle} cursor-pointer`}>
                     <Undo2 className={iconStyle} />
                 </div>
-                <div title="Redo (Ctrl+Shift+Z)" className={iconContainerStyle}>
+                <div title="Redo (Ctrl+Shift+Z)" className={`${iconContainerStyle} cursor-pointer`}>
                     <Redo2 className={iconStyle} />
                 </div>
                 <div className={dividerStyle}></div>
-                <div title="Zoom In (.)" className={iconContainerStyle}
+                <div title="Zoom In (.)" className={`${iconContainerStyle} cursor-pointer`}
                     onClick={() => zoomIn({ duration: 100 })}
                 >
                     <ZoomIn className={iconStyle} />
                 </div>
-                <div title="Zoom Out (-)" className={iconContainerStyle}
+                <div title="Zoom Out (-)" className={`${iconContainerStyle} cursor-pointer`}
                     onClick={() => zoomOut({ duration: 100 })}
                 >
                     <ZoomOut className={iconStyle} />
                 </div>
-                <div title="Fit View (F)" className={iconContainerStyle}
+                <div title="Fit View (F)" className={`${iconContainerStyle} cursor-pointer`}
                     onClick={() => fitView({ duration: 300, padding: 0.1 })}
                 >
                     <Fullscreen className={iconStyle} />
                 </div>
-                <div title="Lock Movement (L)" className={`${iconContainerStyle} ${isLocked ? activeIconContainerStyle : ''}`}
+                <div title="Lock Movement (L)" className={`${iconContainerStyle} ${isLocked ? activeIconContainerStyle : ''} cursor-pointer`}
                     onClick={onLockToggle}>
                     {isLocked ? <Lock className={iconStyle} /> : <Unlock className={iconStyle} />}
                 </div>

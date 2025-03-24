@@ -38,7 +38,7 @@ const CurrentMultipleElements: React.FC<CurrentMultipleElementsProps> = ({ selec
           {blocks.length > 0 && (
             <div className="mb-2">
               <h5 className="font-semibold">Blocks:</h5>
-              <ul className="list-disc list-inside">
+              <ul className="list-disc list-outside ml-4">
                 {blocks.map((node) => (
                   <li key={node.id}>{getElementLabel(node)}</li>
                 ))}
@@ -48,7 +48,7 @@ const CurrentMultipleElements: React.FC<CurrentMultipleElementsProps> = ({ selec
           {connectors.length > 0 && (
             <div className="mb-2">
               <h5 className="font-semibold">Connectors:</h5>
-              <ul className="list-disc list-inside">
+              <ul className="list-disc list-outside ml-4">
                 {connectors.map((node) => (
                   <li key={node.id}>{getElementLabel(node)}</li>
                 ))}
@@ -58,7 +58,7 @@ const CurrentMultipleElements: React.FC<CurrentMultipleElementsProps> = ({ selec
           {terminals.length > 0 && (
             <div>
               <h5 className="font-semibold">Terminals:</h5>
-              <ul className="list-disc list-inside">
+              <ul className="list-disc list-outside ml-4">
                 {terminals.map((node) => (
                   <li key={node.id}>{getElementLabel(node)}</li>
                 ))}
@@ -71,7 +71,7 @@ const CurrentMultipleElements: React.FC<CurrentMultipleElementsProps> = ({ selec
       {sortedEdges.length > 0 && (
         <div>
           <h4 className="font-semibold">Edges:</h4>
-          <ul className="list-disc list-inside">
+          <ul className="list-disc list-outside ml-4">
             {sortedEdges.map((edge) => (
               <li key={edge.id}>{getElementLabel(edge)}</li>
             ))}

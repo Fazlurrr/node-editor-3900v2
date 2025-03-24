@@ -44,13 +44,11 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const cut = (element: Node | Edge | (Node | Edge)[], onDelete: () => void) => {
     copy(element);
     onDelete(); 
-    toast.success('Cut to clipboard');
   };
 
   const paste = async (onPaste?: (clipboardElement: Node | Edge | (Node | Edge)[]) => void) => {
     if (clipboardRef.current && onPaste) {
       await onPaste(clipboardRef.current);
-      toast.success('Pasted from clipboard');
     }
   };
 
