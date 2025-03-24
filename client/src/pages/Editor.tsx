@@ -7,6 +7,7 @@ import {
   EdgeTypes,
   NodeTypes,
   SelectionMode,
+  useOnSelectionChange,
   ReactFlowInstance
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
@@ -166,6 +167,25 @@ const Editor = () => {
   };
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
 
+  const onSelectionChangeHandler = useCallback(({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
+    const combined = [...nodes, ...edges];
+    if (combined.length === 0) {
+      console.log('Selection is empty.');
+      setSelectedElement(null);
+    } else if (combined.length === 1) {
+      console.log('Single element selected:', combined[0]);
+      setSelectedElement(combined[0]);
+    } else {
+      console.log('Multiple elements selected:', combined);
+      setSelectedElement(combined);
+    }
+  }, [setSelectedElement]); 
+
+  useOnSelectionChange({
+    onChange: onSelectionChangeHandler,
+  });
+
+
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -203,23 +223,8 @@ const Editor = () => {
           onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
             event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
-          }}
+            }}
           onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
-          onSelectionChange={(selection) => {
-            if (!selection) {
-              setSelectedElement(null);
-              return;
-            }
-            const { nodes: selNodes = [], edges: selEdges = [] } = selection;
-            const combined: (Node | Edge)[] = [...selNodes, ...selEdges];
-            if (combined.length === 0) {
-              setSelectedElement(null);
-            } else if (combined.length === 1) {
-              setSelectedElement(combined[0]);
-            } else {
-              setSelectedElement(combined);
-            }
-          }}
         >
           {isGridVisible && (
             <Background
