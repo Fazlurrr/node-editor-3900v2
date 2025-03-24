@@ -1,7 +1,15 @@
-import React, { createContext, useContext, useRef, useState, ReactNode, useCallback, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  ReactNode,
+  useCallback,
+  useEffect,
+} from 'react';
 import { Node, Edge } from 'reactflow';
-import { createNode, uploadNodes, deleteNode } from '@/api/nodes';
-import { uploadEdges, deleteEdge } from '@/api/edges';
+import { createNode, uploadNodes, deleteNode, deleteNodes } from '@/api/nodes';
+import { uploadEdges, deleteEdge, deleteEdges } from '@/api/edges';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/hooks/useStore';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
@@ -121,13 +129,13 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       position: { x: node.position.x + 20, y: node.position.y + 20 },
       data: {
         ...node.data,
-        label: node.data.customName && node.data.customName.trim() !== ''
-                ? node.data.customName
-                : node.data.label,
+        label:
+          node.data.customName && node.data.customName.trim() !== ''
+            ? node.data.customName
+            : node.data.label,
       },
     };
   };
-  
 
   const createNewEdges = (edges: Edge[], idMap: Record<string, string>) => {
     return edges
@@ -140,6 +148,32 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       }));
   };
 
+  const handleConfirmDelete = async () => {
+    if (!selectedElement) return;
+
+    if (Array.isArray(selectedElement)) {
+      const nodesDeletion = deleteNodes(); 
+      const edgesDeletion = deleteEdges(); 
+
+      await Promise.all([nodesDeletion, edgesDeletion]);
+
+      setNodes([]);
+      setEdges([]);
+    } else {
+      if ('source' in selectedElement) {
+        // It is an edge.
+        await deleteEdge(selectedElement.id);
+        setEdges(edges.filter((e) => e.id !== selectedElement.id));
+      } else {
+        // It is a node.
+        await deleteNode(selectedElement.id);
+        setNodes(nodes.filter((n) => n.id !== selectedElement.id));
+      }
+    }
+    setShowDeleteDialog(false);
+    setSelectedElement(null);
+  };
+
   const handleTriggerDelete = useCallback(() => {
     if (!selectedElement) return;
     if (confirmDeletion) {
@@ -148,23 +182,6 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       handleConfirmDelete();
     }
   }, [selectedElement, confirmDeletion]);
-
-  const handleConfirmDelete = async () => {
-    if (!selectedElement) return;
-
-    const isMultiple = Array.isArray(selectedElement);
-    const elementsToDelete = isMultiple ? selectedElement : [selectedElement];
-
-    const updatedEdges = edges.filter(e => !elementsToDelete.some(el => el.id === e.id && 'source' in el));
-    const updatedNodes = nodes.filter(n => !elementsToDelete.some(el => el.id === n.id && !('source' in el)));
-
-    await Promise.all(elementsToDelete.map(el => ('source' in el ? deleteEdge(el.id) : deleteNode(el.id))));
-
-    setEdges(updatedEdges);
-    setNodes(updatedNodes);
-    setShowDeleteDialog(false);
-    setSelectedElement(null);
-  };
 
   return (
     <>
