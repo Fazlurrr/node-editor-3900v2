@@ -49,6 +49,23 @@ namespace server.DAL
           context.Users.Add(newUser);
         }
 
+        // Add usertest users
+        for (int i = 1; i <= 20; i++)
+        {
+          salt = PasswordHasher.GenerateSalt();
+          hashedPassword = PasswordHasher.HashPassword($"testuser{i}", salt);
+
+          User testUser = new()
+          {
+            Username = $"testuser{i}",
+            Password = hashedPassword,
+            Salt = Convert.ToBase64String(salt),
+            Role = UserRole.User
+          };
+
+          context.Users.Add(testUser);
+        }
+
       context.SaveChanges();
       }
 
