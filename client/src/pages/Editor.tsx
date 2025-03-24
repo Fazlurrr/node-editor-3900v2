@@ -6,6 +6,7 @@ import {
   BackgroundVariant,
   EdgeTypes,
   NodeTypes,
+  SelectionMode,
   ReactFlowInstance
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
@@ -58,6 +59,7 @@ const Editor = () => {
   const { selectedElement, setSelectedElement, handleTriggerDelete, handlePaste } = useClipboard();
   const { theme } = useTheme();
   const [lockState, setLockState] = useState<boolean>(false);
+  const panOnDrag = [1, 2];
 
   useEffect(() => {
     setLockState(lockState);
@@ -162,7 +164,6 @@ const Editor = () => {
       setSelectedElement(edge);
     }
   };
-
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
 
 
@@ -175,6 +176,9 @@ const Editor = () => {
           elementsSelectable={!lockState}
           nodes={nodes}
           edges={edges}
+          selectionOnDrag
+          selectionMode={SelectionMode.Partial}
+          panOnDrag={panOnDrag}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
