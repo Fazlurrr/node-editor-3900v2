@@ -8,6 +8,9 @@ import { updateNode } from '@/api/nodes';
 import { selectionColor } from '@/lib/config';
 import { useMode } from '@/hooks/useMode';
 import { useTerminalResizeHandling } from '@/lib/utils/nodes';
+import { useStore } from '@/hooks/useStore';
+import { Node as RFNode } from 'reactflow';
+
 
 const Block = (props: CustomNodeProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -16,6 +19,7 @@ const Block = (props: CustomNodeProps) => {
   const resizeNodeRef = useRef<HTMLDivElement>(null);
   const { mode } = useMode();
   const { onResize: onTerminalResize, onResizeEnd: onTerminalResizeEnd } = useTerminalResizeHandling();
+  const setNodes = useStore((state) => state.setNodes);
 
   const [dimensions, setDimensions] = useState({
     width: props.data.width || 110,
@@ -34,12 +38,20 @@ const Block = (props: CustomNodeProps) => {
   }, [props.data.customName, props.data.label]);
 
   const handleSubmit = () => {
-    if (tempName.trim() !== props.data.customName) {
-      updateNode(props.id, { customName: tempName.trim() });
+    const updatedName = tempName.trim();
+    if (updatedName !== props.data.customName) {
+      const currentNodes = useStore.getState().nodes as RFNode[];
+      const updatedNodes = currentNodes.map((node: RFNode) =>
+        node.id === props.id 
+          ? { ...node, data: { ...node.data, customName: updatedName } }
+          : node
+      );
+      setNodes(updatedNodes);
+      updateNode(props.id, { customName: updatedName });
     }
     setIsEditing(false);
   };
-
+  
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
