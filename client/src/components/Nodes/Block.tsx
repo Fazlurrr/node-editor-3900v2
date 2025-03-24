@@ -128,7 +128,7 @@ const Block = (props: CustomNodeProps) => {
             {isEditing ? (
             <textarea
               ref={inputRef}
-              className="w-auto bg-transparent text-center resize-none focus:outline-none overflow-x-hidden break-words"
+              className="w-auto bg-transparent text-center resize-none focus:outline-none overflow-x-hidden break-words text-black"
               value={tempName}
               onChange={(e) => setTempName(e.target.value)}
               onBlur={handleSubmit}
