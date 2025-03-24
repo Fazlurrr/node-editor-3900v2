@@ -24,7 +24,7 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({
   hasParent,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const liStyle = "p-2 hover:bg-gray-100 dark:bg-[#232528] dark:hover:bg-gray-700 cursor-pointer";    
+  const liStyle = "p-2 bg-white hover:bg-gray-100 dark:bg-[#232528] dark:hover:bg-gray-700 cursor-pointer";    
   const { selectedElement, copy, cut, handleTriggerDelete } = useClipboard();
 
   useEffect(() => {
