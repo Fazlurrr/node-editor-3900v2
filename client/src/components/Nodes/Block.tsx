@@ -122,7 +122,7 @@ const Block = (props: CustomNodeProps) => {
       >
         <header className="flex items-center justify-center h-full w-full">
           {isEditing ? (
-              <div className="flex items-center justify-center h-full w-full">
+              <div className="flex items-center justify-center h-full w-full text-black">
                 <textarea
                   ref={inputRef}
                   className="w-full h-full bg-transparent text-center resize-none"
