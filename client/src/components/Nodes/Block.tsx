@@ -3,7 +3,6 @@ import type { ResizeParams } from 'reactflow';
 import { NodeResizer } from 'reactflow';
 import Handles from './Handles';
 import type { CustomNodeProps } from '@/lib/types';
-import { capitalizeFirstLetter } from '@/lib/utils';
 import { Asterisk } from 'lucide-react';
 import { updateNode } from '@/api/nodes';
 import { selectionColor } from '@/lib/config';
@@ -142,7 +141,7 @@ const Block = (props: CustomNodeProps) => {
         ) : (
           <p className="text-center text-black overflow-hidden break-words">
             {props.data.customName === ''
-              ? capitalizeFirstLetter(props.data.label)
+              ? (props.data.label)
               : props.data.customName}
           </p>
         )}

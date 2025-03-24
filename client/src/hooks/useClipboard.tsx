@@ -119,8 +119,15 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       ...node,
       id: newId,
       position: { x: node.position.x + 20, y: node.position.y + 20 },
+      data: {
+        ...node.data,
+        label: node.data.customName && node.data.customName.trim() !== ''
+                ? node.data.customName
+                : node.data.label,
+      },
     };
   };
+  
 
   const createNewEdges = (edges: Edge[], idMap: Record<string, string>) => {
     return edges
