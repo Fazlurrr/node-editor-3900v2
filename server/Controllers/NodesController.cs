@@ -427,5 +427,36 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
         }
     }
 
+    [HttpDelete("delete-by-ids")]
+    public async Task<IActionResult> DeleteNodesBulk([FromBody] List<string> nodeIds)
+    {
+        if (nodeIds == null || !nodeIds.Any())
+        {
+            return BadRequest("No node IDs provided.");
+        }
 
+        try
+        {
+            var nodesToDelete = await _db.Nodes.Where(n => nodeIds.Contains(n.Id)).ToListAsync();
+            if (nodesToDelete == null || !nodesToDelete.Any())
+            {
+                return NotFound("No nodes found for the provided IDs.");
+            }
+
+            _db.Nodes.RemoveRange(nodesToDelete);
+            await _db.SaveChangesAsync();
+
+            return Ok("Selected nodes have been deleted.");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[NodesController]: Bulk deletion failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to delete nodes due to a database error.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[NodesController]: Bulk deletion failed: {Error}", e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
+        }
+    }
 }

@@ -331,3 +331,44 @@ export const deleteNodes = async (): Promise<boolean> => {
     stopLoading();
   }
 };
+
+export const deleteMultipleNodes = async (nodeIds: string[]): Promise<boolean> => {
+  const { setNodes } = useStore.getState();
+  const { token, logout } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/nodes/delete-by-ids`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(nodeIds),
+      }
+    );
+
+    if (response.status === 401) {
+      logout();
+      toast.error('Unauthorized');
+      return false;
+    }
+    if (!response.ok) {
+      toast.error(`Error deleting nodes - Status: ${response.status}`);
+      return false;
+    }
+
+    const currentNodes = useStore.getState().nodes;
+    setNodes(currentNodes.filter((node) => !nodeIds.includes(node.id)));
+    return true;
+  } catch (error) {
+    toast.error(`Error deleting nodes: ${(error as Error).message}`);
+    throw error;
+  } finally {
+    stopLoading();
+  }
+};
+
