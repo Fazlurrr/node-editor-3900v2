@@ -194,4 +194,38 @@ public class EdgesController(DB db, ILogger<EdgesController> logger) : Controlle
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
+
+    [HttpDelete("delete-by-ids")]
+    public async Task<IActionResult> DeleteEdgesBulk([FromBody] List<string> edgeIds)
+    {
+        if (edgeIds == null || !edgeIds.Any())
+        {
+            return BadRequest("No edge IDs provided.");
+        }
+
+        try
+        {
+            var edgesToDelete = await _db.Edges.Where(e => edgeIds.Contains(e.Id)).ToListAsync();
+            if (edgesToDelete == null || !edgesToDelete.Any())
+            {
+                return NotFound("No edges found for the provided IDs.");
+            }
+
+            _db.Edges.RemoveRange(edgesToDelete);
+            await _db.SaveChangesAsync();
+
+            return Ok("Selected edges have been deleted.");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[EdgesController]: Bulk deletion failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to delete edges due to a database error.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[EdgesController]: Bulk deletion failed: {Error}", e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
+        }
+    }
+
 }

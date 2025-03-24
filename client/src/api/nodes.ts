@@ -30,16 +30,31 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
 
   const nodes = await response.json();
 
-  // Process nodes to restore parent-child relationships
   const processedNodes = nodes.map((node: Node) => {
+    let updatedNode = node;
+    // For terminal nodes, restore the parent relationship
     if (node.type === 'terminal' && node.data.terminalOf) {
-      // Restore the parent relationship for terminals
-      return {
+      updatedNode = {
         ...node,
-        parentId: node.data.terminalOf,  // This is all ReactFlow needs to establish the relationship
+        parentId: node.data.terminalOf,
       };
     }
-    return node;
+    // For block nodes, copy top-level width/height to data if available
+    if (
+      node.type === 'block' &&
+      node.width !== undefined &&
+      node.height !== undefined
+    ) {
+      updatedNode = {
+        ...updatedNode,
+        data: {
+          ...updatedNode.data,
+          width: node.width,
+          height: node.height,
+        },
+      };
+    }
+    return updatedNode;
   });
 
   return processedNodes;
@@ -125,7 +140,14 @@ export const createNode = async (node: Node): Promise<Node | null> => {
       if (createdNode.type === 'terminal' && createdNode.data.terminalOf) {
         createdNode.parentId = createdNode.data.terminalOf;
       }
-      
+    
+      createdNode.data = {
+        ...createdNode.data,
+        width: createdNode.width,
+        height: createdNode.height,
+        customAttributes: createdNode.data.customAttributes ?? [],
+      };
+    
       setNodes([...nodes, createdNode]);
     }
 
@@ -331,3 +353,44 @@ export const deleteNodes = async (): Promise<boolean> => {
     stopLoading();
   }
 };
+
+export const deleteMultipleNodes = async (nodeIds: string[]): Promise<boolean> => {
+  const { setNodes } = useStore.getState();
+  const { token, logout } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/nodes/delete-by-ids`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(nodeIds),
+      }
+    );
+
+    if (response.status === 401) {
+      logout();
+      toast.error('Unauthorized');
+      return false;
+    }
+    if (!response.ok) {
+      toast.error(`Error deleting nodes - Status: ${response.status}`);
+      return false;
+    }
+
+    const currentNodes = useStore.getState().nodes;
+    setNodes(currentNodes.filter((node) => !nodeIds.includes(node.id)));
+    return true;
+  } catch (error) {
+    toast.error(`Error deleting nodes: ${(error as Error).message}`);
+    throw error;
+  } finally {
+    stopLoading();
+  }
+};
+

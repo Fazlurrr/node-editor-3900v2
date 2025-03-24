@@ -284,3 +284,44 @@ export const deleteEdges = async (): Promise<boolean> => {
     stopLoading();
   }
 };
+
+export const deleteMultipleEdges = async (edgeIds: string[]): Promise<boolean> => {
+  const { setEdges } = useStore.getState();
+  const { token, logout } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/edges/delete-by-ids`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(edgeIds),
+      }
+    );
+
+    if (response.status === 401) {
+      logout();
+      toast.error('Unauthorized');
+      return false;
+    }
+    if (!response.ok) {
+      toast.error(`Error deleting edges - Status: ${response.status}`);
+      return false;
+    }
+
+    const currentEdges = useStore.getState().edges;
+    setEdges(currentEdges.filter((edge) => !edgeIds.includes(edge.id)));
+    return true;
+  } catch (error) {
+    toast.error(`Error deleting edges: ${(error as Error).message}`);
+    throw error;
+  } finally {
+    stopLoading();
+  }
+};
+
