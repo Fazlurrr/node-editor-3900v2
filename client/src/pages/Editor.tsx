@@ -168,6 +168,7 @@ const Editor = () => {
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
 
   const onSelectionChangeHandler = useCallback(({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
+    console.log('onSelectionChange fired with:', { nodes, edges });
     const combined = [...nodes, ...edges];
     if (combined.length === 0) {
       console.log('Selection is empty.');
