@@ -6,6 +6,8 @@ import {
   BackgroundVariant,
   EdgeTypes,
   NodeTypes,
+  SelectionMode,
+  useOnSelectionChange,
   ReactFlowInstance
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
@@ -58,6 +60,7 @@ const Editor = () => {
   const { selectedElement, setSelectedElement, handleTriggerDelete, handlePaste } = useClipboard();
   const { theme } = useTheme();
   const [lockState, setLockState] = useState<boolean>(false);
+  const panOnDrag = [1, 2];
 
   useEffect(() => {
     setLockState(lockState);
@@ -162,9 +165,26 @@ const Editor = () => {
       setSelectedElement(edge);
     }
   };
-
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
 
+  const onSelectionChangeHandler = useCallback(({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
+    console.log('onSelectionChange fired with:', { nodes, edges });
+    const combined = [...nodes, ...edges];
+    if (combined.length === 0) {
+      console.log('Selection is empty.');
+      setSelectedElement(null);
+    } else if (combined.length === 1) {
+      console.log('Single element selected:', combined[0]);
+      setSelectedElement(combined[0]);
+    } else {
+      console.log('Multiple elements selected:', combined);
+      setSelectedElement(combined);
+    }
+  }, [setSelectedElement]); 
+
+  useOnSelectionChange({
+    onChange: onSelectionChangeHandler,
+  });
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -175,6 +195,9 @@ const Editor = () => {
           elementsSelectable={!lockState}
           nodes={nodes}
           edges={edges}
+          selectionOnDrag
+          selectionMode={SelectionMode.Partial}
+          panOnDrag={panOnDrag}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
@@ -199,23 +222,8 @@ const Editor = () => {
           onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
             event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
-          }}
+            }}
           onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
-          onSelectionChange={(selection) => {
-            if (!selection) {
-              setSelectedElement(null);
-              return;
-            }
-            const { nodes: selNodes = [], edges: selEdges = [] } = selection;
-            const combined: (Node | Edge)[] = [...selNodes, ...selEdges];
-            if (combined.length === 0) {
-              setSelectedElement(null);
-            } else if (combined.length === 1) {
-              setSelectedElement(combined[0]);
-            } else {
-              setSelectedElement(combined);
-            }
-          }}
         >
           {isGridVisible && (
             <Background

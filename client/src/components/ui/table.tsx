@@ -1,15 +1,15 @@
 import * as React from 'react';
-
 import { cn } from '@/lib/utils';
+import useTheme from '@/hooks/useTheme';
 
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
+  <div className="relative w-full overflow-auto max-h-[480px]">
     <table
       ref={ref}
-      className={cn('w-full caption-bottom text-sm', className)}
+      className={cn('w-full caption-bottom text-sm ', className)}
       {...props}
     />
   </div>
@@ -69,16 +69,22 @@ TableRow.displayName = 'TableRow';
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
   React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <th
-    ref={ref}
-    className={cn(
-      'h-12 px-4 text-center align-middel font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, ...props }, ref) => {
+  const { theme } = useTheme();
+  const bgClass = theme === 'dark' ? 'bg-navbar-dark' : 'bg-white';
+
+  return (
+    <th
+      ref={ref}
+      className={cn(
+        'sticky top-0 z-10 h-12 px-4 text-center align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 shadow-[0_1px_0_0_rgba(156,163,175,1)]',
+        bgClass,
+        className
+      )}
+      {...props}
+    />
+  );
+});
 TableHead.displayName = 'TableHead';
 
 const TableCell = React.forwardRef<

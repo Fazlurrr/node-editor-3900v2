@@ -118,16 +118,16 @@ export default function DataTable<TData, TValue>({
         </DropdownMenu>
       </div>
       <div
-            className="mb-4 border border-[#9facbc] max-h-[485px]
-            overflow-y-auto
-            [&::-webkit-scrollbar]:w-1
-            [&::-webkit-scrollbar-track]:bg-white
-            [&::-webkit-scrollbar-thumb]:bg-gray-200
-            dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
-            [scrollbar-width:thin] 
-            [scrollbar-color:lightGray_transparent]"
-          >
+        className="mb-4 border border-[#9facbc] max-h-[485px]
+        overflow-y-auto
+        [&::-webkit-scrollbar]:w-1
+        [&::-webkit-scrollbar-track]:bg-white
+        [&::-webkit-scrollbar-thumb]:bg-gray-200
+        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+        [scrollbar-width:thin] 
+        [scrollbar-color:lightGray_transparent]"
+      >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
