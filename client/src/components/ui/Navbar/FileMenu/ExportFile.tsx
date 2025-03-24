@@ -54,6 +54,7 @@ const ExportFile: React.FC<ExportFileProps> = ({close}) => {
                     <MenuItem value="imf">.imf</MenuItem>
                     <MenuItem value="rdf">.rdf</MenuItem>
                     <MenuItem value="png">.png</MenuItem>
+                    <MenuItem value="svg">.svg</MenuItem>
                 </TextField>
             </div>
           
@@ -64,8 +65,8 @@ const ExportFile: React.FC<ExportFileProps> = ({close}) => {
             >
                 Cancel
             </Button>
-            {fileType === 'png' ? (
-              <DownloadImage fileName={fileName} />
+            {fileType === 'png' || fileType === 'svg' ? (
+              <DownloadImage fileName={fileName} fileType={fileType} />
             ) : (
               <Button
               className={`w-1/4 ${buttonVariants.confirm}`}

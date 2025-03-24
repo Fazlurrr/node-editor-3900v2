@@ -1,14 +1,15 @@
 import { useReactFlow, getNodesBounds, getViewportForBounds } from 'reactflow';
-import { toPng } from 'html-to-image';
+import { toPng, toSvg } from 'html-to-image';
 import { useTheme } from '@/hooks';
 import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
 
 interface DownloadImageProps {
     fileName: string;
+    fileType?: 'png' | 'svg';
 }
 
-const Download = (dataUrl: string, fileName: string) => {
+const Download = (dataUrl: string, fileName: string ) => {
     const a = document.createElement('a');
 
     a.setAttribute('download', fileName);
@@ -16,7 +17,7 @@ const Download = (dataUrl: string, fileName: string) => {
     a.click();
 };
 
-const DownloadImage = ({ fileName }: DownloadImageProps) => {
+const DownloadImage = ({ fileName, fileType }: DownloadImageProps) => {
     const { getNodes } = useReactFlow();
     const { theme } = useTheme();
 
@@ -38,9 +39,20 @@ const DownloadImage = ({ fileName }: DownloadImageProps) => {
         );
 
         const element = document.querySelector('.react-flow__viewport');
-        if (element instanceof HTMLElement) {
+        if (element instanceof HTMLElement && fileType === 'png') {
             toPng(element, {
                 backgroundColor: theme === 'dark' ? '#232528' : '#ffffff',
+                width: imageWidth,
+                height: imageHeight,
+                style: {
+                    width: `${imageWidth}px`,
+                    height: `${imageHeight}px`,
+                    transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+                },
+            }).then((dataUrl) => Download(dataUrl, fileName));
+        }
+        else if (element instanceof HTMLElement && fileType === 'svg') {
+            toSvg(element, {
                 width: imageWidth,
                 height: imageHeight,
                 style: {

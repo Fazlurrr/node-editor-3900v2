@@ -7,11 +7,11 @@ import {
   TooltipContent,
 } from '../ui/tooltip';
 import { Asterisk } from 'lucide-react'; 
-import { useStore } from 'reactflow';
 import { selectionColor } from '@/lib/config';
+import { useMode } from '@/hooks/useMode';
 
 const Terminal = (props: CustomNodeProps) => {
-  const connectionStartHandle = useStore((store) => store.connectionStartHandle);
+  const { mode } = useMode();
 
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
@@ -44,9 +44,7 @@ const Terminal = (props: CustomNodeProps) => {
       )}
 
       <div
-        style={{ 
-          visibility: props.selected || connectionStartHandle ? 'visible' : 'hidden',
-        }}
+        style={{ visibility: mode === 'relation' ? 'visible' : 'hidden' }}
       >
         <Handles nodeId={props.data.label} />
       </div>
