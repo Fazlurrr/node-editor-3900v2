@@ -51,13 +51,18 @@ const Block = (props: CustomNodeProps) => {
     }
   };
 
-  // REMEMBER: Maybe delete later
-  // useEffect(() => {
-  //   if (isEditing && inputRef.current) {
-  //     //inputRef.current.select();
-  //     //inputRef.current.focus();
-  //   }
-  // }, [isEditing]);
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.style.height = 'auto'; 
+      inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    }
+  }, [tempName, isEditing]);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing]);
 
   const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
   const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
@@ -88,8 +93,7 @@ const Block = (props: CustomNodeProps) => {
     <figure
       id={props.data.label}
       className="relative"
-      onDoubleClick={(e: React.MouseEvent) => {
-        e.preventDefault();
+      onDoubleClick={(e) => {
         e.stopPropagation();
         setIsEditing(true);
       }}
@@ -98,7 +102,7 @@ const Block = (props: CustomNodeProps) => {
         props.onRightClick?.({
           x: e.clientX,
           y: e.clientY,
-          nodeId: props.id
+          nodeId: props.id,
         });
       }}
     >
@@ -121,23 +125,21 @@ const Block = (props: CustomNodeProps) => {
         className={`border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
       >
         <header className="flex items-center justify-center h-full w-full">
-          {isEditing ? (
-              <div className="flex items-center justify-center h-full w-full">
-                <textarea
-                  ref={inputRef}
-                  className="w-full h-full bg-transparent text-center resize-none"
-                  value={tempName}
-                  onChange={(e) => { setTempName(e.target.value)}}
-                  onBlur={handleSubmit}
-                  onKeyDown={handleKeyDown}
-                />
-              </div>
+            {isEditing ? (
+            <textarea
+              ref={inputRef}
+              className="w-auto bg-transparent text-center resize-none focus:outline-none overflow-x-hidden break-words"
+              value={tempName}
+              onChange={(e) => setTempName(e.target.value)}
+              onBlur={handleSubmit}
+              onKeyDown={handleKeyDown}
+            />
             ) : (
-              <p className="text-center text-black overflow-hidden">
-                {props.data.customName === ''
-                  ? capitalizeFirstLetter(props.data.label)
-                  : props.data.customName}
-              </p>
+            <p className="text-center text-black overflow-hidden break-words">
+              {props.data.customName === ''
+              ? capitalizeFirstLetter(props.data.label)
+              : props.data.customName}
+            </p>
             )}
         </header>
       </div>
