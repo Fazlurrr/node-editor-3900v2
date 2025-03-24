@@ -30,16 +30,31 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
 
   const nodes = await response.json();
 
-  // Process nodes to restore parent-child relationships
   const processedNodes = nodes.map((node: Node) => {
+    let updatedNode = node;
+    // For terminal nodes, restore the parent relationship
     if (node.type === 'terminal' && node.data.terminalOf) {
-      // Restore the parent relationship for terminals
-      return {
+      updatedNode = {
         ...node,
-        parentId: node.data.terminalOf,  // This is all ReactFlow needs to establish the relationship
+        parentId: node.data.terminalOf,
       };
     }
-    return node;
+    // For block nodes, copy top-level width/height to data if available
+    if (
+      node.type === 'block' &&
+      node.width !== undefined &&
+      node.height !== undefined
+    ) {
+      updatedNode = {
+        ...updatedNode,
+        data: {
+          ...updatedNode.data,
+          width: node.width,
+          height: node.height,
+        },
+      };
+    }
+    return updatedNode;
   });
 
   return processedNodes;
@@ -125,7 +140,14 @@ export const createNode = async (node: Node): Promise<Node | null> => {
       if (createdNode.type === 'terminal' && createdNode.data.terminalOf) {
         createdNode.parentId = createdNode.data.terminalOf;
       }
-      
+    
+      createdNode.data = {
+        ...createdNode.data,
+        width: createdNode.width,
+        height: createdNode.height,
+        customAttributes: createdNode.data.customAttributes ?? [],
+      };
+    
       setNodes([...nodes, createdNode]);
     }
 

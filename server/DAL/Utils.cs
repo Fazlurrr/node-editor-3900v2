@@ -19,7 +19,8 @@ public class Utils
     };
   }
 
-  public static Node CreateNode(string type, string id, Position position, string aspect, string label, string createdBy, string customName, string childrenString, string directPartsString, string directPartOf, string terminalsString, string terminalOf, string transfersTo, string transferedBy, string fulfillsString, string fulfilledByString, string connectedToString, string connectedByString, string customAttributesString)
+  public static Node CreateNode(string type, string id, Position position, string aspect, string label, string createdBy, string customName, string childrenString, string directPartsString, string directPartOf, string terminalsString, string terminalOf, string transfersTo, string transferedBy, string fulfillsString, string fulfilledByString, string connectedToString, string connectedByString, string customAttributesString, int width,
+    int height)
   {
     AspectType parsedAspect = (AspectType)Enum.Parse(typeof(AspectType), aspect, ignoreCase: true);
     NodeData data = new() { Label = label, Aspect = parsedAspect, CustomName = customName };
@@ -199,11 +200,52 @@ public class Utils
 
     return type.ToLower() switch
     {
-      "block" => new Block(id, position, new BlockData() { Label = data.Label, Aspect = data.Aspect, CreatedBy = createdBy, CustomName = data.CustomName, Children = children, DirectParts = directParts, DirectPartOf = directPartOf.Replace("\"", ""), Terminals = terminals, FulfilledBy = fulfilledBy, Fulfills = fulfills, ConnectedTo = connectedTo, ConnectedBy = connectedBy, CustomAttributes = customAttributes }),
-      "connector" => new Connector(id, position, new ConnectorData() { Label = data.Label, Aspect = data.Aspect, CreatedBy = createdBy, CustomName = data.CustomName, DirectParts = directParts, DirectPartOf = directPartOf.Replace("\"", ""), ConnectedTo = connectedTo, ConnectedBy = connectedBy, CustomAttributes = customAttributes }),
-      "terminal" => new Terminal(id, position, new TerminalData() { Label = data.Label, Aspect = data.Aspect, CreatedBy = createdBy, CustomName = data.CustomName, TerminalOf = terminalOf.Replace("\"", ""), TransfersTo = transfersTo.Replace("\"", ""), TransferedBy = transferedBy.Replace("\"", ""), ConnectedTo = connectedTo, ConnectedBy = connectedBy, CustomAttributes = customAttributes }),
+      "block" => new Block(id, position, new BlockData {
+          Label = data.Label,
+          Aspect = data.Aspect,
+          CreatedBy = createdBy,
+          CustomName = data.CustomName,
+          Children = children,
+          DirectParts = directParts,
+          DirectPartOf = directPartOf.Replace("\"", ""),
+          Terminals = terminals,
+          FulfilledBy = fulfilledBy,
+          Fulfills = fulfills,
+          ConnectedTo = connectedTo,
+          ConnectedBy = connectedBy,
+          CustomAttributes = customAttributes
+        })
+        {
+          Width = width,
+          Height = height
+        },
+
+      "connector" => new Connector(id, position, new ConnectorData {
+          Label = data.Label,
+          Aspect = data.Aspect,
+          CreatedBy = createdBy,
+          CustomName = data.CustomName,
+          DirectParts = directParts,
+          DirectPartOf = directPartOf.Replace("\"", ""),
+          ConnectedTo = connectedTo,
+          ConnectedBy = connectedBy,
+          CustomAttributes = customAttributes
+        }),
+      "terminal" => new Terminal(id, position, new TerminalData {
+          Label = data.Label,
+          Aspect = data.Aspect,
+          CreatedBy = createdBy,
+          CustomName = data.CustomName,
+          TerminalOf = terminalOf.Replace("\"", ""),
+          TransfersTo = transfersTo.Replace("\"", ""),
+          TransferedBy = transferedBy.Replace("\"", ""),
+          ConnectedTo = connectedTo,
+          ConnectedBy = connectedBy,
+          CustomAttributes = customAttributes
+        }),
       _ => throw new ArgumentException($"Unsupported node type: {type}"),
     };
+
   }
 
 }

@@ -8,7 +8,7 @@ import React, {
   useEffect,
 } from 'react';
 import { Node, Edge } from 'reactflow';
-import { createNode, uploadNodes, deleteNode, deleteMultipleNodes } from '@/api/nodes';
+import { createNode, uploadNodes, updateNode, deleteNode, deleteMultipleNodes, fetchNodes } from '@/api/nodes';
 import { uploadEdges, deleteEdge, deleteMultipleEdges } from '@/api/edges';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/hooks/useStore';
@@ -85,11 +85,9 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const handleMultiplePaste = async (clipboardElements: (Node | Edge)[]) => {
     const { clipboardNodes, clipboardEdges } = separateNodesAndEdges(clipboardElements);
     const idMap = generateNewNodeIds(clipboardNodes);
-
     const newNodes = clipboardNodes.map(node => createNewNode(node, idMap));
     setNodes([...nodes, ...newNodes]);
     await uploadNodes(newNodes);
-
     const newEdges = createNewEdges(clipboardEdges, idMap);
     if (newEdges.length > 0) {
       setEdges([...edges, ...newEdges]);
@@ -102,6 +100,9 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       const newNode = createNewNode(clipboardElement);
       setNodes([...nodes, newNode]);
       await createNode(newNode);
+      if (newNode.data.customAttributes && newNode.data.customAttributes.length > 0) {
+        await updateNode(newNode.id, { customAttributes: newNode.data.customAttributes });
+      }
     } else {
       console.warn('Skipping single-edge paste because source/target nodes were not copied.');
     }
@@ -126,13 +127,16 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     return {
       ...node,
       id: newId,
-      position: { x: node.position.x + 20, y: node.position.y + 20 },
+      position: {
+        x: node.position.x + 20,
+        y: node.position.y + 20,
+      },
+      width: node.width ?? 110,
+      height: node.height ?? 66,
       data: {
         ...node.data,
-        label:
-          node.data.customName && node.data.customName.trim() !== ''
-            ? node.data.customName
-            : node.data.label,
+        label: node.data.customName?.trim() ? node.data.customName : node.data.label,
+        customAttributes: node.data.customAttributes ?? [],
       },
     };
   };
@@ -158,17 +162,13 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       const selectedEdges = selectedElement.filter(
         (el) => "source" in el
       ) as Edge[];
-  
       const nodeIds = selectedNodes.map((node) => node.id);
       const edgeIds = selectedEdges.map((edge) => edge.id);
-  
       const nodesDeletionPromise =
         nodeIds.length > 0 ? deleteMultipleNodes(nodeIds) : Promise.resolve(true);
       const edgesDeletionPromise =
         edgeIds.length > 0 ? deleteMultipleEdges(edgeIds) : Promise.resolve(true);
-  
       await Promise.all([nodesDeletionPromise, edgesDeletionPromise]);
-  
       const currentNodes = useStore.getState().nodes;
       const currentEdges = useStore.getState().edges;
       setNodes(currentNodes.filter((n) => !nodeIds.includes(n.id)));
@@ -185,7 +185,6 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     setShowDeleteDialog(false);
     setSelectedElement(null);
   };
-  
 
   const handleTriggerDelete = useCallback(() => {
     if (!selectedElement) return;

@@ -113,6 +113,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
     [HttpPost("upload")]
     public async Task<IActionResult> UploadNodes([FromBody] JsonElement data)
     {
+        
         if (data.ValueKind == JsonValueKind.Undefined)
         {
             return BadRequest("Node data is missing.");
@@ -120,6 +121,8 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
 
         try
         {
+            var createdNodes = new List<Node>();
+
             foreach (var node in data.EnumerateArray())
             {
                 if (!node.TryGetProperty("data", out JsonElement dataElement))
@@ -137,6 +140,9 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                     X = node.GetProperty("position").TryGetProperty("x", out var xPosProp) ? xPosProp.GetDouble() : 0,
                     Y = node.GetProperty("position").TryGetProperty("y", out var yPosProp) ? yPosProp.GetDouble() : 0
                 };
+                var width = node.TryGetProperty("width", out var widthProp) ? widthProp.GetInt32() : 110;
+                var height = node.TryGetProperty("height", out var heightProp) ? heightProp.GetInt32() : 66;
+
 
                 var customName = node.GetProperty("data").GetProperty("customName").GetString() ?? "";
                 var customAttributes = node.GetProperty("data").TryGetProperty("customAttributes", out var customAttributesProp) ? customAttributesProp.GetRawText() : "";
@@ -159,9 +165,32 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                     return BadRequest("Node data is missing required fields.");
                 }
 
-                Node newNode = Utils.CreateNode(type, id, position, aspect, label, createdBy, customName, children, directParts, directPartOf, terminals, terminalOf, transfersTo, transferedBy, fulfills, fulfilledBy, connectedTo, connectedBy, customAttributes);
+                Node newNode = Utils.CreateNode(
+                    type,
+                    id,
+                    position,
+                    aspect,
+                    label,
+                    createdBy,
+                    customName,
+                    children,
+                    directParts,
+                    directPartOf,
+                    terminals,
+                    terminalOf,
+                    transfersTo,
+                    transferedBy,
+                    fulfills,
+                    fulfilledBy,
+                    connectedTo,
+                    connectedBy,
+                    customAttributes,
+                    width,
+                    height
+                );
 
                 await _db.Nodes.AddAsync(newNode);
+                createdNodes.Add(newNode);            
             }
 
             await _db.SaveChangesAsync();
@@ -207,7 +236,35 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                 return BadRequest("Node data is missing required fields.");
             }
 
-            Node node = Utils.CreateNode(type, id, position, aspect, label, createdBy);
+            var customName = data.GetProperty("data").TryGetProperty("customName", out var cn) ? cn.GetString() ?? "" : "";
+            var customAttributes = data.GetProperty("data").TryGetProperty("customAttributes", out var ca) ? ca.GetRawText() : "[]";
+            var width = data.TryGetProperty("width", out var widthProp) ? widthProp.GetInt32() : 110;
+            var height = data.TryGetProperty("height", out var heightProp) ? heightProp.GetInt32() : 66;
+
+
+            Node node = Utils.CreateNode(
+                type,
+                id,
+                position,
+                aspect,
+                label,
+                createdBy,
+                customName,
+                "", // children
+                "", // directParts
+                "", // directPartOf
+                "", // terminals
+                "", // terminalOf
+                "", // transfersTo
+                "", // transferedBy
+                "", // fulfills
+                "", // fulfilledBy
+                "", // connectedTo
+                "", // connectedBy
+                customAttributes,
+                width,
+                height
+            );
 
             await _db.Nodes.AddAsync(node);
             await _db.SaveChangesAsync();
