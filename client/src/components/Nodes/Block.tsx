@@ -93,9 +93,13 @@ const Block = (props: CustomNodeProps) => {
     <figure
       id={props.data.label}
       className="relative"
-      onDoubleClick={(e) => {
-        e.stopPropagation();
+      onDoubleClick={() => {
         setIsEditing(true);
+      }}
+      onMouseDownCapture={(e) => {
+        if (isEditing) {
+          e.stopPropagation();
+        }
       }}
       onContextMenu={(e) => {
         e.preventDefault();
@@ -125,22 +129,23 @@ const Block = (props: CustomNodeProps) => {
         className={`border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
       >
         <header className="flex items-center justify-center h-full w-full">
-            {isEditing ? (
-            <textarea
-              ref={inputRef}
-              className="w-auto bg-transparent text-center resize-none focus:outline-none overflow-x-hidden break-words text-black"
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onBlur={handleSubmit}
-              onKeyDown={handleKeyDown}
-            />
-            ) : (
-            <p className="text-center text-black overflow-hidden break-words">
-              {props.data.customName === ''
+        {isEditing ? (
+          <textarea
+            ref={inputRef}
+            onMouseDown={(e) => e.stopPropagation()} 
+            className="w-auto bg-transparent text-center resize-none focus:outline-none overflow-x-hidden break-words"
+            value={tempName}
+            onChange={(e) => setTempName(e.target.value)}
+            onBlur={handleSubmit}
+            onKeyDown={handleKeyDown}
+          />
+        ) : (
+          <p className="text-center text-black overflow-hidden break-words">
+            {props.data.customName === ''
               ? capitalizeFirstLetter(props.data.label)
               : props.data.customName}
-            </p>
-            )}
+          </p>
+        )}
         </header>
       </div>
 
