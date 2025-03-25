@@ -8,7 +8,7 @@ import React, {
   useEffect,
 } from 'react';
 import { Node, Edge } from 'reactflow';
-import { createNode, uploadNodes, updateNode, deleteNode, deleteMultipleNodes, fetchNodes } from '@/api/nodes';
+import { createNode, uploadNodes, updateNode, deleteNode, deleteMultipleNodes } from '@/api/nodes';
 import { uploadEdges, deleteEdge, deleteMultipleEdges } from '@/api/edges';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/hooks/useStore';
