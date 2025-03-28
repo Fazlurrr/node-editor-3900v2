@@ -50,7 +50,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
                                         <h2 className="text-lg font-semibold mb-2">Creating relations</h2>
-                                        <p className='mb-4'>Begin by selecting your relation type in the left sidebar. Then select an element, and drag from its handles to another elements handles.</p>
+                                        <p className='mb-4'>Enter selection mode from the toolbar or by selecting a relation type in the left sidebar. Then click and drag between the connection handles on the elements you want to connect.</p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
                                         <img src="/tutorial-images/tutorial-3.png" alt="Tutorial 3" className="w-full"/>
