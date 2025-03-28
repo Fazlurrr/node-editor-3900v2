@@ -27,6 +27,8 @@ import { toast } from 'react-toastify';
 import { Check } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
+import { useEffect } from 'react';
+import { useFirstVisit } from '@/hooks/useLocalStorage';
 import AdvancedSettingsModal from './_components/AdvancedSettings';
 
 const Navbar = () => {
@@ -42,7 +44,17 @@ const Navbar = () => {
   const [ modalPage, setModalPage ] = React.useState('');
   const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
   const { setMode } = useMode();
+  const { firstVisit, setFirstVisit } = useFirstVisit();
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = React.useState(false);
+
+  // Opens tutorial on first visit
+  useEffect(() => {
+    if (firstVisit && currentPage === AppPage.Editor) {
+      toggleHelpMenu();
+      setHelpMenuPage('Tutorial');
+      setFirstVisit(false);
+    }
+  }, [firstVisit, setFirstVisit, currentPage]);
 
   // used for debugging
   const toggleGrid = () => {
