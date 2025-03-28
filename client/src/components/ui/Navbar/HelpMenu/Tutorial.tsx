@@ -62,7 +62,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
                                         <h2 className="text-lg font-semibold mb-2">Attaching Terminals</h2>
-                                        <p className='mb-4'>Enter selection mode from the toolbar or by selecting a relation type in the left sidebar. Then click and drag between the connection handles on the elements you want to connect.</p>
+                                        <p className='mb-4'>To attach a terminal to a block, drag it from the left sidebar and drop it onto the block.</p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
                                         <img src="/tutorial-images/tutorial-terminal.png" alt="Tutorial Terminal" className="w-full"/>
@@ -120,14 +120,14 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                     <ChevronLeft />
                 </Button>
                 <div className="w-14 p-2 font-semibold text-center">
-                    {pageNumber}/5
+                    {pageNumber}/6
                 </div>
-                {pageNumber < 5 ? (
+                {pageNumber < 6 ? (
                     <Button 
                         className={`${buttonVariants.confirm} px-2`} 
                         variant="outline" 
                         onClick={() => setPageNumber(pageNumber + 1)} 
-                        disabled={pageNumber >= 5}
+                        disabled={pageNumber >= 6}
                     >
                         <ChevronRight />
                     </Button>
