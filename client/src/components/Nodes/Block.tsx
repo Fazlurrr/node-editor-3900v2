@@ -72,6 +72,7 @@ const Block = (props: CustomNodeProps) => {
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
+      inputRef.current.select();
     }
   }, [isEditing]);
 
@@ -143,8 +144,9 @@ const Block = (props: CustomNodeProps) => {
         {isEditing ? (
           <textarea
             ref={inputRef}
+            rows={1}
             onMouseDown={(e) => e.stopPropagation()} 
-            className="w-auto bg-transparent text-center resize-none focus:outline-none overflow-x-hidden break-words"
+            className="w-auto h-auto bg-transparent text-center text-black resize-none focus:outline-none overflow-x-hidden break-words"
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
             onBlur={handleSubmit}
