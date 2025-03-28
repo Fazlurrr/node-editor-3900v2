@@ -20,7 +20,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                     <div className='mb-4 w-1/2'>
                                         <h2 className="text-lg font-semibold mb-2">Welcome to IMF Editor</h2>
                                         <p>
-                                            IMF Editor is a tool for designing within the
+                                            IMF Editor is a tool for modelling within the
                                             <a className="text-blue-500 hover:underline cursor-pointer" onClick={() => window.open('https://sirius-labs.no/imf/')} title="sirius-labs.no/imf"> Information Modelling Framework (IMF).</a>
                                             <br/>
                                             The editor allows you to create and edit elements, and connect them with relations.
