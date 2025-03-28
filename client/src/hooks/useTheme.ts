@@ -9,7 +9,7 @@ type ThemeData = {
 const useTheme = create<ThemeData>()(
   persist(
     set => ({
-      theme: 'dark',
+      theme: 'light',
       toggleTheme: (theme: 'dark' | 'light') => set({ theme: theme }),
     }),
     {
