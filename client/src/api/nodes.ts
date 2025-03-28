@@ -1,7 +1,6 @@
 import { toast } from 'react-toastify';
-import { getConnectedEdges, type Node } from 'reactflow';
+import { type Node } from 'reactflow';
 import { type UpdateNode } from '@/lib/types';
-import { deleteEdge } from './edges';
 import { useLoading, useSession, useStore } from '@/hooks';
 
 export const fetchNodes = async (): Promise<Node[] | null> => {
@@ -258,12 +257,14 @@ export const updateNode = async (
 };
 
 
-export const deleteNode = async (
-  nodeToDeleteId: string
-): Promise<string | null> => {
-  const { nodes, setNodes, edges } = useStore.getState();
+export const deleteNode = async (nodeToDeleteId: string): Promise<string | null> => {
+  //eslint-disable-next-line no-console
+  console.log(`===== STARTING deleteNode for ${nodeToDeleteId} =====`);
+  
+  const { nodes, setNodes } = useStore.getState();
   const { token, logout } = useSession.getState();
-
+  const { startLoading, stopLoading } = useLoading.getState();
+  
   const nodeToDelete = nodes.find(node => node.id === nodeToDeleteId);
 
   if (!nodeToDelete?.id) {
@@ -271,47 +272,125 @@ export const deleteNode = async (
     return null;
   }
 
-  const { startLoading, stopLoading } = useLoading.getState();
   startLoading();
 
-  const connectedEdges = getConnectedEdges([nodeToDelete], edges);
-  for (const edge of connectedEdges) {
-    await deleteEdge(edge.id as string, nodeToDeleteId);
-  }
-
   try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.id}`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    // Handle block nodes with terminals
+    if (nodeToDelete.type === 'block' && nodeToDelete.data?.terminals) {
+      const terminalIds = nodeToDelete.data.terminals.map((t: { id: string }) => t.id);
+      
+      // Create new terminal nodes with absolute positions and no parent references
+      const updatedNodes = nodes.map(node => {
+        if (terminalIds.includes(node.id)) {
+          // Calculate absolute position
+          const absolutePosition = {
+            x: nodeToDelete.position.x + node.position.x,
+            y: nodeToDelete.position.y + node.position.y
+          };
+          
+          // Create a new terminal with absolute position and no parent reference
+          const result = {
+            ...node,
+            position: absolutePosition,
+            data: { ...node.data }
+          };
+          
+          // Remove parent references completely
+          delete result.parentId;
+          delete result.data.terminalOf;
+          
+          return result;
+        }
+        return node;
+      });
+      
+      // Filter out the node to delete
+      const nodesWithoutDeleted = updatedNodes.filter(n => n.id !== nodeToDeleteId);
+      
+      // Update React state BEFORE making backend calls
+      // This ensures ReactFlow's rendering is consistent
+      setNodes(nodesWithoutDeleted);
+      
+      // Update terminals in the backend
+      for (const terminalId of terminalIds) {
+        const terminal = nodesWithoutDeleted.find(n => n.id === terminalId);
+        if (terminal) {
+          try {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(terminal),
+            });
+          } catch (error) {
+            //eslint-disable-next-line no-console
+            console.warn(`Warning: Error updating terminal ${terminalId}:`, error);
+          }
+        }
       }
-    );
-
-    if (response.status === 401) {
-      logout();
-      toast.error('Unauthorized');
-      return null;
+      
+      // Delete the node from API
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      if (response.status === 401) {
+        logout();
+        toast.error('Unauthorized');
+        return null;
+      }
+      
+      if (!response.ok) {
+        const status = response.status;
+        toast.error(`Error deleting node - Status: ${status}`);
+        return null;
+      }
+    } else {
+      // For non-block nodes, just update state and call the API
+      setNodes(nodes.filter(n => n.id !== nodeToDeleteId));
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      if (response.status === 401) {
+        logout();
+        toast.error('Unauthorized');
+        return null;
+      }
+      
+      if (!response.ok) {
+        const status = response.status;
+        toast.error(`Error deleting node - Status: ${status}`);
+        return null;
+      }
     }
-
-    if (!response.ok) {
-      const status = response.status;
-      toast.error(`Error deleting node - Status: ${status}`);
-      return null;
-    }
-
+    
+    //eslint-disable-next-line no-console
+    console.log(`Node deleted successfully`);
+    
     return nodeToDelete.id;
   } catch (error) {
+    //eslint-disable-next-line no-console
+    console.error(`Error in deleteNode:`, error);
     toast.error(`Error deleting node: ${(error as Error).message}`);
     throw error;
   } finally {
     stopLoading();
-    const nodes = await fetchNodes();
-    if (nodes) {
-      setNodes(nodes);
-    }
   }
 };
 

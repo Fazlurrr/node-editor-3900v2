@@ -176,10 +176,8 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     } else {
       if ("source" in selectedElement) {
         await deleteEdge(selectedElement.id);
-        setEdges(edges.filter((e) => e.id !== selectedElement.id));
       } else {
         await deleteNode(selectedElement.id);
-        setNodes(nodes.filter((n) => n.id !== selectedElement.id));
       }
     }
     setShowDeleteDialog(false);
