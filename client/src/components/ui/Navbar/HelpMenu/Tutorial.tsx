@@ -27,7 +27,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                         </p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
-                                        <img src="/tutorial-images/tutorial-1.png" alt="Tutorial 1" className="w-full"/>
+                                        <img src="/tutorial-images/tutorial-welcome.png" alt="Tutorial Welcome" className="w-full"/>
                                     </div>
                                 </div>
                             );
@@ -41,7 +41,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                         </p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
-                                        <img src="/tutorial-images/tutorial-2.png" alt="Tutorial 2" className="w-full"/>
+                                        <img src="/tutorial-images/tutorial-elements.png" alt="Tutorial Elements" className="w-full"/>
                                     </div>
                                 </div>
                             );
@@ -53,7 +53,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                         <p className='mb-4'>Enter selection mode from the toolbar or by selecting a relation type in the left sidebar. Then click and drag between the connection handles on the elements you want to connect.</p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
-                                        <img src="/tutorial-images/tutorial-3.png" alt="Tutorial 3" className="w-full"/>
+                                        <img src="/tutorial-images/tutorial-relations.png" alt="Tutorial Relations" className="w-full"/>
                                     </div>
                                 </div>
                             );
@@ -61,7 +61,19 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
-                                        <h2 className="text-lg font-semibold mb-2">Element properties</h2>
+                                        <h2 className="text-lg font-semibold mb-2">Attaching Terminals</h2>
+                                        <p className='mb-4'>Enter selection mode from the toolbar or by selecting a relation type in the left sidebar. Then click and drag between the connection handles on the elements you want to connect.</p>
+                                    </div>
+                                    <div className="w-1/2 border-2 border-black">
+                                        <img src="/tutorial-images/tutorial-terminal.png" alt="Tutorial Terminal" className="w-full"/>
+                                    </div>
+                                </div>
+                            );
+                        case 5:
+                            return (
+                                <div className="flex flex-row items-center gap-4">
+                                    <div className='mb-4 w-1/2'>
+                                        <h2 className="text-lg font-semibold mb-2">Element Properties</h2>
                                         <p className='mb-4'>
                                             To view an element or relations properties, simply click on them and they will appear in the right sidebar.
                                             <br/><br/>
@@ -69,11 +81,11 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                         </p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
-                                        <img src="/tutorial-images/tutorial-4.png" alt="Tutorial 4" className="w-full"/>
+                                        <img src="/tutorial-images/tutorial-properties.png" alt="Tutorial Properties" className="w-full"/>
                                     </div>
                                 </div>
                             );
-                        case 5:
+                        case 6:
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
@@ -87,7 +99,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                         </p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
-                                        <img src="/tutorial-images/tutorial-5.png" alt="Tutorial 5" className="w-full"/>
+                                        <img src="/tutorial-images/tutorial-attributes.png" alt="Tutorial Attributes" className="w-full"/>
                                     </div>
                                 </div>
                             );
