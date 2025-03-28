@@ -45,7 +45,25 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                     </div>
                                 </div>
                             );
+                        
                         case 3:
+                            return (
+                                <div className="flex flex-row items-center gap-4">
+                                    <div className='mb-4 w-1/2'>
+                                        <h2 className="text-lg font-semibold mb-2">Toolbar</h2>
+                                        <p className='mb-4'>
+                                            The Toolbar is located at the top of the page, and features functionality for changing modes, clipboard, undo/redo and canvas controls.
+                                            <br/><br/>
+                                            You can also access these functions using keyboard shortcuts, which are shown when you hover over the buttons.
+                                        </p>
+                                    </div>
+                                    <div className="w-1/2 border-2 border-black">
+                                        <img src="/tutorial-images/tutorial-toolbar.png" alt="Tutorial Toolbar" className="w-full"/>
+                                    </div>
+                                </div>
+                            );
+
+                        case 4:
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
@@ -57,7 +75,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                     </div>
                                 </div>
                             );
-                        case 4:
+                        case 5:
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
@@ -69,7 +87,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                     </div>
                                 </div>
                             );
-                        case 5:
+                        case 6:
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
@@ -85,7 +103,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                                     </div>
                                 </div>
                             );
-                        case 6:
+                        case 7:
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
@@ -120,14 +138,14 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                     <ChevronLeft />
                 </Button>
                 <div className="w-14 p-2 font-semibold text-center">
-                    {pageNumber}/6
+                    {pageNumber}/7
                 </div>
-                {pageNumber < 6 ? (
+                {pageNumber < 7 ? (
                     <Button 
                         className={`${buttonVariants.confirm} px-2`} 
                         variant="outline" 
                         onClick={() => setPageNumber(pageNumber + 1)} 
-                        disabled={pageNumber >= 6}
+                        disabled={pageNumber >= 7}
                     >
                         <ChevronRight />
                     </Button>
