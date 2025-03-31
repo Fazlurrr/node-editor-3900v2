@@ -31,6 +31,9 @@ const ClipboardContext = createContext<ClipboardContextType | undefined>(undefin
 export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const isNode = (element: Node | Edge): element is Node => 'data' in element && !('source' in element);
   const isEdge = (element: Node | Edge): element is Edge => 'source' in element && 'target' in element;
+  const isBlock = (node: Node): boolean => node.type === 'block';
+  const isTerminal = (node: Node): boolean => node.type === 'terminal';
+  
   const [selectedElement, setSelectedElement] = useState<Node | Edge | (Node | Edge)[] | null>(null);
   const clipboardRef = useRef<any>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -57,7 +60,39 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [nodes, edges, selectedElement]);
 
   const copy = (element: Node | Edge | (Node | Edge)[]) => {
-    clipboardRef.current = JSON.parse(JSON.stringify(element));
+    let elementsToCopy: (Node | Edge)[] = Array.isArray(element) ? [...element] : [element];
+    
+    // Get all blocks in the selection
+    const blocks = elementsToCopy.filter(el => isNode(el) && isBlock(el)) as Node[];
+    
+    // If there are blocks, ensure all their terminals are included (without duplicates)
+    if (blocks.length > 0) {
+      // Get IDs of all terminals already selected
+      const selectedTerminalIds = new Set(
+        elementsToCopy
+          .filter(el => isNode(el) && isTerminal(el))
+          .map(term => (term as Node).id)
+      );
+      
+      // Find all terminal IDs that should be included from block references
+      const blockTerminalIds = new Set(
+        blocks.flatMap(block => block.data.terminals?.map((t: any) => t.id) || [])
+      );
+      
+      // Find terminals to add (that are referenced by blocks but not already selected)
+      const terminalsToAdd = nodes.filter(
+        node => isTerminal(node) && 
+               blockTerminalIds.has(node.id) && 
+               !selectedTerminalIds.has(node.id)
+      );
+      
+      // Add missing terminals to the selection
+      if (terminalsToAdd.length > 0) {
+        elementsToCopy = [...elementsToCopy, ...terminalsToAdd];
+      }
+    }
+    
+    clipboardRef.current = JSON.parse(JSON.stringify(elementsToCopy));
     toast.success('Copied to clipboard');
   };
 
@@ -68,31 +103,128 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const paste = async (onPaste?: (clipboardElement: Node | Edge | (Node | Edge)[]) => void) => {
     if (clipboardRef.current && onPaste) {
-      await onPaste(clipboardRef.current);
+      const result = await onPaste(clipboardRef.current);
+      toast.success('Pasted from clipboard');
+      return result;
     }
   };
 
-  const handlePaste = async (clipboardElement: Node | Edge | (Node | Edge)[]) => {
-    if (!clipboardElement) return;
+  // Modified handlePaste function that only selects blocks after pasting
+const handlePaste = async (clipboardElement: Node | Edge | (Node | Edge)[]) => {
+  if (!clipboardElement) return;
 
-    if (Array.isArray(clipboardElement)) {
-      await handleMultiplePaste(clipboardElement);
-    } else {
-      await handleSinglePaste(clipboardElement);
+  if (Array.isArray(clipboardElement)) {
+    const newElements = await handleMultiplePaste(clipboardElement);
+    // Only select block nodes after pasting, not terminals or edges
+    if (newElements && newElements.length > 0) {
+      const currentNodes = useStore.getState().nodes;
+      const currentEdges = useStore.getState().edges;
+      
+      // Filter for only the block nodes from new elements
+      const pastedBlocks = newElements.filter(el => 
+        isNode(el) && isBlock(el as Node)
+      ) as Node[];
+      
+      // Set only blocks as selected in the context
+      if (pastedBlocks.length > 0) {
+        setSelectedElement(pastedBlocks);
+        
+        // Get IDs of pasted blocks only
+        const pastedBlockIds = pastedBlocks.map(node => node.id);
+        
+        // Update nodes with selected state (only blocks are selected)
+        const updatedNodes = currentNodes.map(node => ({
+          ...node,
+          selected: pastedBlockIds.includes(node.id)
+        }));
+        
+        // No edges should be selected
+        const updatedEdges = currentEdges.map(edge => ({
+          ...edge,
+          selected: false
+        }));
+        
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
+      }
     }
-  };
+  } else {
+    const newElement = await handleSinglePaste(clipboardElement);
+    // For single paste, keep existing behavior
+    if (newElement) {
+      setSelectedElement(newElement);
+      
+      if (isNode(newElement)) {
+        const currentNodes = useStore.getState().nodes;
+        const updatedNodes = currentNodes.map(node => ({
+          ...node,
+          selected: node.id === newElement.id
+        }));
+        setNodes(updatedNodes);
+      } else if (isEdge(newElement)) {
+        const currentEdges = useStore.getState().edges;
+        const updatedEdges = currentEdges.map(edge => ({
+          ...edge,
+          selected: edge.id === newElement.id
+        }));
+        setEdges(updatedEdges);
+      }
+    }
+  }
+};
 
   const handleMultiplePaste = async (clipboardElements: (Node | Edge)[]) => {
     const { clipboardNodes, clipboardEdges } = separateNodesAndEdges(clipboardElements);
+    
+    // Analyze block-terminal relationships in the clipboard
+    const blocks = clipboardNodes.filter(node => isBlock(node));
+    
+    // Generate new IDs for all nodes
     const idMap = generateNewNodeIds(clipboardNodes);
-    const newNodes = clipboardNodes.map(node => createNewNode(node, idMap));
+    
+    // Calculate offsets for blocks to apply to their terminals
+    const blockOffsets: Record<string, {x: number, y: number}> = {};
+    blocks.forEach(block => {
+      blockOffsets[block.id] = { x: 22, y: 22 }; // Standard offset
+    });
+    
+    // Create new nodes with proper positions and relationships
+    const newNodes = clipboardNodes.map(node => {
+      const newNode = createNewNode(node, idMap, blockOffsets);
+      
+      // Update terminal relationships if this is a terminal
+      if (isTerminal(node) && node.data.terminalOf) {
+        const newBlockId = idMap[node.data.terminalOf];
+        if (newBlockId) {
+          newNode.data.terminalOf = newBlockId;
+        }
+      }
+      
+      // Update block's terminals array if this is a block
+      if (isBlock(node) && node.data.terminals && node.data.terminals.length > 0) {
+        newNode.data.terminals = node.data.terminals.map((terminal: any) => ({
+          id: idMap[terminal.id] || terminal.id // Use new ID if available, fallback to original
+        })).filter((t: { id: any; }) => !!t.id); // Filter out any null/undefined IDs
+      }
+      
+      return newNode;
+    });
+    
+    // Update the nodes in the UI
     setNodes([...nodes, ...newNodes]);
+    
+    // Upload the new nodes to the server
     await uploadNodes(newNodes);
+    
+    // Create and upload new edges
     const newEdges = createNewEdges(clipboardEdges, idMap);
     if (newEdges.length > 0) {
       setEdges([...edges, ...newEdges]);
       await uploadEdges(newEdges);
     }
+    
+    // Return all newly created elements for selection
+    return [...newNodes, ...newEdges];
   };
 
   const handleSinglePaste = async (clipboardElement: Node | Edge) => {
@@ -103,8 +235,10 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (newNode.data.customAttributes && newNode.data.customAttributes.length > 0) {
         await updateNode(newNode.id, { customAttributes: newNode.data.customAttributes });
       }
+      return newNode;
     } else {
       console.warn('Skipping single-edge paste because source/target nodes were not copied.');
+      return null;
     }
   };
 
@@ -122,15 +256,38 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     }, {} as Record<string, string>);
   };
 
-  const createNewNode = (node: Node, idMap?: Record<string, string>) => {
+  const createNewNode = (node: Node, idMap?: Record<string, string>, blockOffsets?: Record<string, {x: number, y: number}>) => {
     const newId = idMap ? idMap[node.id] : `${node.type}-${uuidv4()}`;
+    
+    // Calculate the appropriate position for the node
+    let position;
+    
+    if (isTerminal(node) && node.data.terminalOf) {
+      // For terminals: keep exact relative position to parent block
+      if (blockOffsets && blockOffsets[node.data.terminalOf]) {
+        position = {
+          x: node.position.x, // Keep exact x position relative to parent
+          y: node.position.y  // Keep exact y position relative to parent
+        };
+      } else {
+        // Parent block not in selection, apply standard offset
+        position = {
+          x: node.position.x + 22,
+          y: node.position.y + 22
+        };
+      }
+    } else {
+      // For blocks and other nodes, apply the standard offset
+      position = {
+        x: node.position.x + 22,
+        y: node.position.y + 22
+      };
+    }
+    
     return {
       ...node,
       id: newId,
-      position: {
-        x: node.position.x + 20,
-        y: node.position.y + 20,
-      },
+      position,
       width: node.width ?? 110,
       height: node.height ?? 66,
       data: {
