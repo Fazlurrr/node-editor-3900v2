@@ -1,8 +1,6 @@
-import { storeSelector, useConnection, useStore } from '@/hooks';
+import { useConnection } from '@/hooks';
 import { EdgeType, NodeRelation } from '@/lib/types';
 import { addEdge } from '@/lib/utils/edges';
-import { shallow } from 'zustand/shallow';
-import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 import { useMode } from '@/hooks/useMode';
 
@@ -17,8 +15,6 @@ const RelationsMenu: React.FC = () => {
     endConnection,
   } = useConnection();
 
-  const { nodes } = useStore(storeSelector, shallow);
-
   useEffect(() => {
     setEdgeType(EdgeType.Connected);
   }, [setEdgeType]);
@@ -27,22 +23,6 @@ const RelationsMenu: React.FC = () => {
     const newNodeRelations: NodeRelation[] = [];
 
     if (edgeType === EdgeType.Part) {
-      const sourceNode = nodes.find(node => node.id === params!.source);
-
-      if (
-        sourceNode?.data?.directPartOf &&
-        sourceNode?.data?.directPartOf !== ''
-      ) {
-        const partOfNode = nodes.find(
-          node => node.id === sourceNode?.data?.directPartOf
-        );
-
-        toast.error(
-          `${sourceNode.data.customName === '' ? sourceNode.data.label : sourceNode.data.customName} is already part of ${partOfNode?.data?.customName === '' ? sourceNode?.data?.label : partOfNode?.data?.customName}`
-        );
-        endConnection();
-        return;
-      }
 
       newNodeRelations.push({
         nodeId: params!.target as string,

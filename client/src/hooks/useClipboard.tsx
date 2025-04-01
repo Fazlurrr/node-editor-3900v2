@@ -110,68 +110,77 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   // Modified handlePaste function that only selects blocks after pasting
-const handlePaste = async (clipboardElement: Node | Edge | (Node | Edge)[]) => {
-  if (!clipboardElement) return;
-
-  if (Array.isArray(clipboardElement)) {
-    const newElements = await handleMultiplePaste(clipboardElement);
-    // Only select block nodes after pasting, not terminals or edges
-    if (newElements && newElements.length > 0) {
-      const currentNodes = useStore.getState().nodes;
-      const currentEdges = useStore.getState().edges;
-      
-      // Filter for only the block nodes from new elements
-      const pastedBlocks = newElements.filter(el => 
-        isNode(el) && isBlock(el as Node)
-      ) as Node[];
-      
-      // Set only blocks as selected in the context
-      if (pastedBlocks.length > 0) {
-        setSelectedElement(pastedBlocks);
-        
-        // Get IDs of pasted blocks only
-        const pastedBlockIds = pastedBlocks.map(node => node.id);
-        
-        // Update nodes with selected state (only blocks are selected)
-        const updatedNodes = currentNodes.map(node => ({
-          ...node,
-          selected: pastedBlockIds.includes(node.id)
-        }));
-        
-        // No edges should be selected
-        const updatedEdges = currentEdges.map(edge => ({
-          ...edge,
-          selected: false
-        }));
-        
-        setNodes(updatedNodes);
-        setEdges(updatedEdges);
-      }
-    }
-  } else {
-    const newElement = await handleSinglePaste(clipboardElement);
-    // For single paste, keep existing behavior
-    if (newElement) {
-      setSelectedElement(newElement);
-      
-      if (isNode(newElement)) {
+  const handlePaste = async (clipboardElement: Node | Edge | (Node | Edge)[]) => {
+    if (!clipboardElement) return;
+  
+    if (Array.isArray(clipboardElement)) {
+      const newElements = await handleMultiplePaste(clipboardElement);
+      // Only select block nodes after pasting, not terminals or edges
+      if (newElements && newElements.length > 0) {
         const currentNodes = useStore.getState().nodes;
-        const updatedNodes = currentNodes.map(node => ({
-          ...node,
-          selected: node.id === newElement.id
-        }));
-        setNodes(updatedNodes);
-      } else if (isEdge(newElement)) {
         const currentEdges = useStore.getState().edges;
-        const updatedEdges = currentEdges.map(edge => ({
-          ...edge,
-          selected: edge.id === newElement.id
-        }));
-        setEdges(updatedEdges);
+        
+        // To ensure proper typing through the whole operation:
+        // 1. Explicitly cast the result of handleMultiplePaste
+        const typedElements = newElements as Array<Node | Edge>;
+        
+        // 2. Use a type guard to filter for block nodes
+        const pastedBlocks = typedElements.filter((el): el is Node => {
+          // First check if it's a Node
+          if (!isNode(el)) return false;
+          // Then check if it's a block
+          return isBlock(el);
+        });
+        
+        // Set only blocks as selected in the context
+        if (pastedBlocks.length > 0) {
+          setSelectedElement(pastedBlocks);
+          
+          // Now TypeScript knows these are Nodes with id properties
+          const pastedBlockIds = pastedBlocks.map(node => node.id);
+          
+          // Update nodes with selected state (only blocks are selected)
+          const updatedNodes = currentNodes.map(node => ({
+            ...node,
+            selected: pastedBlockIds.includes(node.id)
+          }));
+          
+          // No edges should be selected
+          const updatedEdges = currentEdges.map(edge => ({
+            ...edge,
+            selected: false
+          }));
+          
+          setNodes(updatedNodes);
+          setEdges(updatedEdges);
+        }
+      }
+    } else {
+      const newElement = await handleSinglePaste(clipboardElement);
+      // For single paste, keep existing behavior
+      if (newElement) {
+        // Explicitly type the result of handleSinglePaste
+        const typedElement = newElement as Node | Edge;
+        setSelectedElement(typedElement);
+        
+        if (isNode(typedElement)) {
+          const currentNodes = useStore.getState().nodes;
+          const updatedNodes = currentNodes.map(node => ({
+            ...node,
+            selected: node.id === typedElement.id
+          }));
+          setNodes(updatedNodes);
+        } else if (isEdge(typedElement)) {
+          const currentEdges = useStore.getState().edges;
+          const updatedEdges = currentEdges.map(edge => ({
+            ...edge,
+            selected: edge.id === typedElement.id
+          }));
+          setEdges(updatedEdges);
+        }
       }
     }
-  }
-};
+  };
 
   const handleMultiplePaste = async (clipboardElements: (Node | Edge)[]) => {
     const { clipboardNodes, clipboardEdges } = separateNodesAndEdges(clipboardElements);
