@@ -41,6 +41,7 @@ import { useGridContext } from '@/components/ui/toggleGrid';
 import { useClipboard } from '@/hooks/useClipboard';
 import CanvasMenu from '@/components/ui/CanvasMenu';
 import { useNodeOperations } from '@/hooks/useNodeOperations';
+import useConnection from '@/hooks/useConnection';
 
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -61,6 +62,7 @@ const Editor = () => {
   const { theme } = useTheme();
   const [lockState, setLockState] = useState<boolean>(false);
   const panOnDrag = [1, 2];
+  const { startDraggingRelation, endDraggingRelation } = useConnection();
 
   useEffect(() => {
     setLockState(lockState);
@@ -200,6 +202,8 @@ const Editor = () => {
           panOnDrag={panOnDrag}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          onConnectStart={startDraggingRelation}
+          onConnectEnd={endDraggingRelation}
           onConnect={onConnect}
           nodeTypes={nodeTypes as unknown as NodeTypes}
           edgeTypes={edgeTypes as unknown as EdgeTypes}
