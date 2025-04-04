@@ -54,6 +54,8 @@ const Editor = () => {
     onNodeDragStop, 
     handleDrop,
     handleTerminalDetach,
+    handleSelectionDragStart,
+    handleSelectionDragStop,
   } = useNodeOperations(reactFlowWrapper, reactFlowInstance, initialPositions);
   const [, setCurrentZoom] = useState<number>(1);
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
@@ -179,22 +181,7 @@ const Editor = () => {
     onChange: onSelectionChangeHandler,
   });
 
-  const handleSelectionDragStart = useCallback((_event: React.MouseEvent, draggedNodes: Node[]) => {
-    draggedNodes.forEach((node) => {
-      if (!initialPositions.current[node.id]) {
-        initialPositions.current[node.id] = {
-          x: node.position.x,
-          y: node.position.y,
-        };
-      }
-    });
-  }, []);
-
-  const handleSelectionDragStop = useCallback(async (event: React.MouseEvent, draggedNodes: Node[]) => {
-    for (const node of draggedNodes) {
-      await onNodeDragStop(event, node);
-    }
-  }, [onNodeDragStop]);
+  
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
