@@ -156,17 +156,8 @@ const Editor = () => {
 
   const onLoad = (instance: ReactFlowInstance) => setReactFlowInstance(instance);
 
-  const handleNodeClick = (e: React.MouseEvent, node: Node) => {
-    if (!e.ctrlKey && !e.shiftKey) {
-      setSelectedElement(node);
-    }
-  };
   
-  const handleEdgeClick = (e: React.MouseEvent, edge: Edge) => {
-    if (!e.ctrlKey && !e.shiftKey) {
-      setSelectedElement(edge);
-    }
-  };
+
   useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
 
   const onSelectionChangeHandler = useCallback(({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
@@ -187,6 +178,23 @@ const Editor = () => {
   useOnSelectionChange({
     onChange: onSelectionChangeHandler,
   });
+
+  const handleSelectionDragStart = useCallback((_event: React.MouseEvent, draggedNodes: Node[]) => {
+    draggedNodes.forEach((node) => {
+      if (!initialPositions.current[node.id]) {
+        initialPositions.current[node.id] = {
+          x: node.position.x,
+          y: node.position.y,
+        };
+      }
+    });
+  }, []);
+
+  const handleSelectionDragStop = useCallback(async (event: React.MouseEvent, draggedNodes: Node[]) => {
+    for (const node of draggedNodes) {
+      await onNodeDragStop(event, node);
+    }
+  }, [onNodeDragStop]);
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -213,11 +221,11 @@ const Editor = () => {
               y: node.position.y,
             };
           }}
-          deleteKeyCode={null}
           onNodeDragStop={onNodeDragStop}
+          onSelectionDragStart={handleSelectionDragStart}
+          onSelectionDragStop={handleSelectionDragStop}
           onNodeDrag={onNodeDrag}
-          onNodeClick={handleNodeClick}
-          onEdgeClick={handleEdgeClick}
+          deleteKeyCode={null}
           onPaneClick={() => setSelectedElement(null)}
           onInit={onLoad}
           snapToGrid={true}
@@ -226,7 +234,7 @@ const Editor = () => {
           onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
             event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
-            }}
+          }}
           onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
         >
           {isGridVisible && (
