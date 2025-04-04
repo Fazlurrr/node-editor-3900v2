@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { Role, User } from '@/lib/types';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -9,7 +8,7 @@ import {
 } from '../../dropdown-menu';
 import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal, X } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -21,14 +20,6 @@ import {
 import { deleteUser, updatePassword, updateUserRole } from '@/api/auth';
 import { queryClient } from '@/main';
 import { cn } from '@/lib/utils';
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,16 +33,13 @@ import {
 import { useState } from 'react';
 import { updatePasswordAdmin } from '@/lib/schemas';
 import { TextField } from '@mui/material';
+import { useTheme } from '@/hooks';
 
 const UserActions = ({ username, id }: { username: string; id: string }) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
   return (
-    <Dialog
-      open={dialogOpen}
-      onOpenChange={e => {
-        if (!e) setDialogOpen(false);
-      }}
-    >
+    <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -76,15 +64,16 @@ const UserActions = ({ username, id }: { username: string; id: string }) => {
           >
             Delete user
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <DialogTrigger onClick={() => setDialogOpen(true)}>
-              Update password
-            </DialogTrigger>
+          <DropdownMenuItem onClick={() => setDialogOpen(true)}>
+            Update password
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <UpdatePasswordAdmin id={id} setDialogOpen={setDialogOpen} />
-    </Dialog>
+
+      {dialogOpen && (
+        <UpdatePasswordAdmin id={id} setDialogOpen={setDialogOpen} />
+      )}
+    </>
   );
 };
 
@@ -102,6 +91,7 @@ const UpdatePasswordAdmin = ({
       repeatPassword: '',
     },
   });
+  const { theme } = useTheme();
 
   const handleSubmit = async (values: z.infer<typeof updatePasswordAdmin>) => {
     const success = await updatePassword(id, values.password);
@@ -113,75 +103,84 @@ const UpdatePasswordAdmin = ({
   };
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Set new password for user</DialogTitle>
-      </DialogHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
+    <>
+      <div 
+        className={`${theme === 'dark' ? 'bg-black' : 'bg-white'} bg-opacity-50 fixed inset-0 z-40`}
+        onClick={() => setDialogOpen(false)}
+      />
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/5 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
+        <div className='flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc] font-bold'>
+              Update password
+            <span className="cursor-pointer" title='Close'>
+              <X size={18} />
+            </span>
+        </div>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 px-8 pb-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
               <FormItem>
                 <FormControl>
                 <TextField
-                {...field}
-                type="password"
-                label="New password"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
-                            dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
-                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
-                            dark:[&_.MuiInputBase-input]:text-[#9facbc]
-                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
-                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
-                            dark:[&_.MuiInputLabel-root]:text-white
-                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
-                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                  {...field}
+                  type="password"
+                  label="New password"
+                  variant="outlined"
+                  margin="normal"
+                  fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                      dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                      dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                      dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                      dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                      dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                      dark:[&_.MuiInputLabel-root]:text-white
+                      dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                      dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
                 />
                 </FormControl>
                 <FormMessage className="text-xs text-red-600" />
               </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="repeatPassword"
-            render={({ field }) => (
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="repeatPassword"
+              render={({ field }) => (
               <FormItem>
                 <FormControl>
                 <TextField
-                {...field}
-                type="password"
-                label="Repeat password"
-                variant="outlined"
-                fullWidth
-                className=" dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
-                            dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
-                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
-                            dark:[&_.MuiInputBase-input]:text-[#9facbc]
-                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
-                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
-                            dark:[&_.MuiInputLabel-root]:text-white
-                            dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
-                            dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                  {...field}
+                  type="password"
+                  label="Repeat password"
+                  variant="outlined"
+                  fullWidth
+                  className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                      dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                      dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                      dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                      dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                      dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                      dark:[&_.MuiInputLabel-root]:text-white
+                      dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                      dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
                 />
                 </FormControl>
                 <FormMessage className="text-xs text-red-600" />
               </FormItem>
-            )}
-          />
-          <div className="mt-6 flex justify-center">
-            <Button className={buttonVariants.confirm} onClick={ form.handleSubmit(handleSubmit)}>
-                      Update password
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </DialogContent>
+              )}
+            />
+            <div className="mt-6 flex justify-center">
+              <Button className={buttonVariants.confirm} type="submit">
+              Update password
+              </Button>
+            </div>
+            </form>
+        </Form>
+      </div>
+    </>
   );
 };
 
