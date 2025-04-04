@@ -15,6 +15,7 @@ import { useStore } from '@/hooks/useStore';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'react-toastify';
+import { set } from 'zod';
 
 interface ClipboardContextType {
   selectedElement: Node | Edge | (Node | Edge)[] | null;
@@ -38,6 +39,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const clipboardRef = useRef<any>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { confirmDeletion } = useSettings();
+  const [offset, setOffset] = useState(22); // Initial offset value
 
   const { nodes, setNodes, edges, setEdges } = useStore((state) => ({
     nodes: state.nodes,
@@ -61,6 +63,8 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const copy = (element: Node | Edge | (Node | Edge)[]) => {
     let elementsToCopy: (Node | Edge)[] = Array.isArray(element) ? [...element] : [element];
+
+    setOffset(20); // Reset offset for new copy
     
     // Get all blocks in the selection
     const blocks = elementsToCopy.filter(el => isNode(el) && isBlock(el)) as Node[];
@@ -93,6 +97,8 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
     
     clipboardRef.current = JSON.parse(JSON.stringify(elementsToCopy));
+    clipboardRef.current = JSON.parse(JSON.stringify(element));
+    setOffset(22);
     toast.success('Copied to clipboard');
   };
 
@@ -104,7 +110,6 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const paste = async (onPaste?: (clipboardElement: Node | Edge | (Node | Edge)[]) => void) => {
     if (clipboardRef.current && onPaste) {
       const result = await onPaste(clipboardRef.current);
-      toast.success('Pasted from clipboard');
       return result;
     }
   };
@@ -179,6 +184,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
           setEdges(updatedEdges);
         }
       }
+      setOffset((prevOffset) => prevOffset + 22);
     }
   };
 
@@ -231,6 +237,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       setEdges([...edges, ...newEdges]);
       await uploadEdges(newEdges);
     }
+    setSelectedElement(newNodes);
     
     // Return all newly created elements for selection
     return [...newNodes, ...newEdges];
@@ -241,6 +248,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       const newNode = createNewNode(clipboardElement);
       setNodes([...nodes, newNode]);
       await createNode(newNode);
+
       if (newNode.data.customAttributes && newNode.data.customAttributes.length > 0) {
         await updateNode(newNode.id, { customAttributes: newNode.data.customAttributes });
       }
@@ -296,9 +304,10 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     return {
       ...node,
       id: newId,
-      position,
-      width: node.width ?? 110,
-      height: node.height ?? 66,
+      position: {
+        x: node.position.x + offset,
+        y: node.position.y + offset,
+      },
       data: {
         ...node.data,
         label: node.data.customName?.trim() ? node.data.customName : node.data.label,
