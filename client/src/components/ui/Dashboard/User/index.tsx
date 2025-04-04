@@ -7,15 +7,14 @@ import { buttonVariants } from '@/lib/config.ts';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { TextField } from '@mui/material';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { updatePasswordUser } from '@/lib/schemas';
 import { useTheme } from '@/hooks';
@@ -110,25 +109,43 @@ const UpdatePasswordUser = ({
         className={`${theme === 'dark' ? 'bg-black' : 'bg-white'} bg-opacity-50 fixed inset-0 z-40`}
         onClick={() => setDialogOpen(false)}
       />
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/4 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
-        <div className='flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc] font-bold'>
-                Change Password
-              <span className="cursor-pointer" title='Close' onClick={() => setDialogOpen(false)}>
-                <X size={18} />
-              </span>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/4 min-w-[300px] bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
+        <div className='flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc] font-bold dark:text-white'>
+          Change Password
+          <span 
+            className="cursor-pointer" 
+            title='Close' 
+            onClick={() => setDialogOpen(false)}
+          >
+            <X size={18} className="dark:text-[#9facbc] hover:dark:text-white" />
+          </span>
         </div>
         <Form {...form}>
-          <form className='px-4 pb-4' onSubmit={form.handleSubmit(handleSubmit)}>
+          <form className='px-8 pb-4 space-y-4' onSubmit={form.handleSubmit(handleSubmit)}>
             <FormField
               control={form.control}
               name="currentPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Current password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="password" {...field} />
+                    <TextField
+                      {...field}
+                      type="password"
+                      label="Current password"
+                      variant="outlined"
+                      fullWidth
+                      className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                              dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                              dark:[&_.MuiInputLabel-root]:text-white
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                    />
                   </FormControl>
-                  <FormMessage className="text-red-500" />
+                  <FormMessage className="text-xs text-red-600" />
                 </FormItem>
               )}
             />
@@ -137,11 +154,25 @@ const UpdatePasswordUser = ({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="password" {...field} />
+                    <TextField
+                      {...field}
+                      type="password"
+                      label="New password"
+                      variant="outlined"
+                      fullWidth
+                      className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                              dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                              dark:[&_.MuiInputLabel-root]:text-white
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                    />
                   </FormControl>
-                  <FormMessage className="text-red-500" />
+                  <FormMessage className="text-xs text-red-600" />
                 </FormItem>
               )}
             />
@@ -150,16 +181,33 @@ const UpdatePasswordUser = ({
               name="repeatPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Repeat password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="password" {...field} />
+                    <TextField
+                      {...field}
+                      type="password"
+                      label="Repeat password"
+                      variant="outlined"
+                      fullWidth
+                      className="dark:[&_.MuiOutlinedInput-notchedOutline]:border-[#9facbc] 
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-white 
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-white
+                              dark:[&_.MuiInputBase-input]:text-[#9facbc]
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiInputBase-input]:text-white
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputBase-input]:text-white
+                              dark:[&_.MuiInputLabel-root]:text-white
+                              dark:[&_.MuiOutlinedInput-root:hover_.MuiInputLabel-root]:text-white
+                              dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white"
+                    />
                   </FormControl>
-                  <FormMessage className="text-red-500" />
+                  <FormMessage className="text-xs text-red-600" />
                 </FormItem>
               )}
             />
             <div className="mt-6 flex justify-center">
-              <Button className={`w-1/2 ${buttonVariants.confirm}`}>
+              <Button 
+                className={`w-1/2 ${buttonVariants.confirm}`}
+                type="submit"
+              >
                 Update password
               </Button>
             </div>
