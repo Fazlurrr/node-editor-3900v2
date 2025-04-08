@@ -7,7 +7,6 @@ import { Button } from '../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
 import { Edit2, Plus, Minus,  X, Trash2} from 'lucide-react';
-import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode, deleteNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
 import { TextField, MenuItem } from '@mui/material';
@@ -614,12 +613,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           </div>
         )}
       </div>
-      <DeleteConfirmationDialog
-        open={showDeleteDialog}
-        elementType="element"
-        onConfirm={handleDeleteNode}
-        onCancel={() => setShowDeleteDialog(false)}
-      />
     </div>
   );
 };

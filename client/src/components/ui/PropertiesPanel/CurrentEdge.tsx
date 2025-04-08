@@ -4,7 +4,6 @@ import { deleteEdge, updateEdge } from '@/api/edges';
 import { updateNodeConnectionData } from '@/lib/utils/nodes';
 import { EdgeType } from '@/lib/types';
 import { useStore } from '@/hooks';
-import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { Trash2 } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useSettings } from '@/hooks/useSettings';
@@ -115,12 +114,6 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           </SelectContent>
         </Select>
       </div>
-      <DeleteConfirmationDialog
-        open={showDeleteDialog}
-        elementType="relation"
-        onConfirm={handleDeleteEdge}
-        onCancel={() => setShowDeleteDialog(false)}
-      />
   </div>
   );
 };
