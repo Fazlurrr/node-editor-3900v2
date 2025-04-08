@@ -7,12 +7,10 @@ import { Button } from '../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
 import { Edit2, Plus, Minus, X, Trash2 } from 'lucide-react';
-import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode} from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
 import { TextField, MenuItem } from '@mui/material';
 import { useClipboard } from '@/hooks/useClipboard';
-import { useStore } from '@/hooks';
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -37,7 +35,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const { handleTriggerDelete } = useClipboard();
-  const { setNodes } = useStore();
   const form = useForm<z.infer<typeof customAttributeSchema>>({
     resolver: zodResolver(customAttributeSchema),
     defaultValues: {
@@ -153,14 +150,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     setIsAttributesVisible(true);
   };
 
-  const handleDeleteClick = async () => {
-    const currentNodes = useStore.getState().nodes;
-    setNodes(
-      currentNodes.map(n => (n.id === currentNode.id ? { ...n, selected: true } : n))
-    );
-    await handleTriggerDelete();
-  };
-
   const handleAspectChange = async (newAspect: AspectType) => {
     const updated = await updateNode(currentNode.id, { aspect: newAspect });
     if (updated) {
@@ -195,7 +184,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             </span>
           )}
         </div>
-        <button onClick={handleDeleteClick} title="Delete Element">
+        <button onClick={handleTriggerDelete} title="Delete Element">
           <Trash2 size={18} className="mr-2 text-red-700" />
         </button>
       </div>
@@ -640,12 +629,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           ))}
         </div>
       )}
-      <DeleteConfirmationDialog
-        open={showDeleteDialog}
-        elementType="element"
-        onConfirm={handleDeleteClick}
-        onCancel={() => setShowDeleteDialog(false)}
-      />
     </div>
   );
 };

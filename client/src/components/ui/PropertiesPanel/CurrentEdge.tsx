@@ -11,10 +11,9 @@ interface CurrentEdgeProps {
 }
 
 const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
-  const { nodes, setEdges} = useStore();
+  const { nodes } = useStore();
   const sourceNode = nodes.find((node: any) => node.id === currentEdge.source);
   const targetNode = nodes.find((node: any) => node.id === currentEdge.target);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { handleTriggerDelete } = useClipboard();
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
@@ -30,14 +29,6 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
     }
   };
 
-  const handleDeleteClick = async () => {
-    const currentEdges = useStore.getState().edges;
-    setEdges(
-      currentEdges.map(e => (e.id === currentEdge.id ? { ...e, selected: true } : e))
-    );
-    await handleTriggerDelete();
-  };
-
   return (
     <div className="">
       <div className="mb-2 p-4 flex flex-col gap-2 items-start border-b border-[#9facbc]">
@@ -46,7 +37,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           <div className="ml-2 text-black-600">
             {sourceNode ? sourceNode.data.customName || sourceNode.data.label : currentEdge.source}
           </div>
-          <button onClick={handleDeleteClick} title="Delete Relation" className="flex items-center">
+          <button onClick={handleTriggerDelete} title="Delete Relation" className="flex items-center">
             <Trash2 size={18} className="text-red-700" />
           </button>
         </div>
@@ -105,12 +96,6 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           </SelectContent>
         </Select>
       </div>
-      <DeleteConfirmationDialog
-        open={showDeleteDialog}
-        elementType="relation"
-        onConfirm={handleDeleteClick}
-        onCancel={() => setShowDeleteDialog(false)}
-      />
     </div>
   );
 };
