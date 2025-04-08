@@ -160,29 +160,29 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   return (
     <div className="flex flex-col flex-1 h-full">
       <div className="mb-2 p-4 flex gap-2 justify-between items-center border-b border-[#9facbc]">
-        <div className="flex items-start gap-2">
-          {editLabel ? (
-            <Input
-              className="min-w-[100px] w-full break-words overflow-hidden text-overflow-ellipsis"
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onBlur={handleUpdateCustomName}
-              autoFocus
-              onKeyDown={handleKeyDown}
-            />
-          ) : (
-            <span
-              title="Edit Name"
-              onClick={() => {
-                setTempName(currentNode.data.customName || currentNode.data.label || '');
-                setEditLabel(true);
-              }}
-              className="flex-grow cursor-pointer font-bold flex items-center break-all"
-            >
-              {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
-              <Edit2 size={18} className="ml-1" />
-            </span>
-          )}
+        <div className="flex items-center gap-2">
+            {editLabel ? (
+              <Input
+                className="min-w-[100px] w-full"
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                onBlur={handleUpdateCustomName}
+                autoFocus
+                onKeyDown={handleKeyDown}
+              />
+            ) : (
+              <span
+                title="Edit Name"
+                onClick={() => {
+                  setTempName(currentNode.data.customName || currentNode.data.label || '');
+                  setEditLabel(true);
+                }}
+                className="flex-grow cursor-pointer font-bold flex items-center break-all"
+              >
+                {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
+                <Edit2 size={18} className="ml-1 flex-shrink-0" />
+              </span>
+            )}
         </div>
         <button onClick={handleTriggerDelete} title="Delete Element">
           <Trash2 size={18} className="mr-2 text-red-700" />
