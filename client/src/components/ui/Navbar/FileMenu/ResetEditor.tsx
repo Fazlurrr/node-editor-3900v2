@@ -3,12 +3,23 @@ import { buttonVariants } from '@/lib/config.ts';
 import { deleteEdges } from '@/api/edges';
 import { deleteNodes } from '@/api/nodes';
 import { toast } from 'react-toastify';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 interface ResetEditorProps {
     close: () => void;
 }
 
 const ResetEditor: React.FC<ResetEditorProps> = ({close}) => {
+    useHotkeys('esc', () => close());
+    useHotkeys(
+        'enter',
+        () => {
+            reset();
+            close();
+        },
+        { preventDefault: true }
+    );
+
     const reset = async () => {
         const deletedNodes = await deleteNodes();
         const deletedEdges = await deleteEdges();
