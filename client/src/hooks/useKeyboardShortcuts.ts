@@ -1,15 +1,14 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useClipboard } from './useClipboard';
-import { Node, Edge } from 'reactflow';
+import { useStore } from '@/hooks';
 import { useMode } from '@/hooks/useMode';
 import { useGridContext } from '@/components/ui/toggleGrid';
 import { useMiniMapContext } from '@/components/ui/toggleMiniMap';
 import { useReactFlow } from 'reactflow';
 
 export const useKeyboardShortcuts = (
-  selectedElement: Node | Edge | (Node | Edge)[] | null,
   onTriggerDelete: () => void,
-  onPaste: (clipboardElement: Node | Edge | (Node | Edge)[]) => void,
+  onPaste: (clipboardElements: any) => void,
   onLockToggle: () => void
 ) => {
   const { copy, cut, paste } = useClipboard();
@@ -17,6 +16,10 @@ export const useKeyboardShortcuts = (
   const { isGridVisible, setGridVisible } = useGridContext();
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
   const { zoomIn, zoomOut, fitView } = useReactFlow();
+  const selectedNodes = useStore(state => state.nodes.filter(n => n.selected));
+  const selectedEdges = useStore(state => state.edges.filter(e => e.selected));
+  const selectedElements = [...selectedNodes, ...selectedEdges];
+  const hasSelection = selectedElements.length > 0;
 
   useHotkeys(
     'delete, backspace',
@@ -31,39 +34,40 @@ export const useKeyboardShortcuts = (
       ) {
         return;
       }
-      if (selectedElement) {
+      if (hasSelection) {
         onTriggerDelete();
       }
     },
     { enableOnFormTags: false },
-    [selectedElement]
+    [hasSelection]
   );
-  
+
   useHotkeys(
     'ctrl+c, command+c',
     () => {
-      if (selectedElement) {
-        copy(selectedElement);
+      if (hasSelection) {
+        copy(selectedElements);
       }
     },
-    [selectedElement]
+    [hasSelection, selectedElements]
   );
 
   useHotkeys(
     'ctrl+x, command+x',
     () => {
-      if (selectedElement) {
-        cut(selectedElement, onTriggerDelete);
+      if (hasSelection) {
+        cut(selectedElements, onTriggerDelete);
       }
     },
-    [selectedElement]
+    [hasSelection, selectedElements]
   );
 
   useHotkeys(
     'ctrl+v, command+v',
     () => {
       paste(onPaste);
-    }
+    },
+    [onPaste, paste]
   );
 
   useHotkeys(

@@ -1,19 +1,22 @@
 import { Move, Scaling, Workflow, Clipboard, ClipboardPaste,
-    Scissors, Trash2, Undo2, Redo2, ZoomIn, ZoomOut, Fullscreen, Lock, Unlock} from 'lucide-react';
+    Scissors, Trash2, Undo2, Redo2, ZoomIn, ZoomOut, Fullscreen, Lock, Unlock } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
 import { useReactFlow } from 'reactflow';
+import { useStore } from '@/hooks';
 
 interface ToolbarProps {
     isLocked: boolean;
     onLockToggle: () => void;
 }
 
-
 const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
     const { mode, setMode } = useMode();
-    const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
+    const { copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
     const { zoomIn, zoomOut, fitView } = useReactFlow();
+    const selectedNodes = useStore(state => state.nodes.filter(n => n.selected));
+    const selectedEdges = useStore(state => state.edges.filter(e => e.selected));
+    const selectedElements = [...selectedNodes, ...selectedEdges];
 
     const iconStyle = 'w-5 h-5 ml-1.5 mt-1.5';
     const iconContainerStyle = 'w-8 h-full hover:text-black dark:hover:text-white mr-1';
@@ -46,7 +49,7 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
                 </div>
                 <div className={dividerStyle}></div>
                 <div title="Copy (Ctrl+C)" className={`${iconContainerStyle} cursor-pointer`}
-                    onClick={() => { if (selectedElement) copy(selectedElement); }}
+                    onClick={() => { if (selectedElements.length > 0) copy(selectedElements); }}
                 >
                     <Clipboard className={iconStyle} />
                 </div>
@@ -56,12 +59,12 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
                     <ClipboardPaste className={iconStyle} />
                 </div>
                 <div title="Cut (Ctrl+X)" className={`${iconContainerStyle} cursor-pointer`}
-                    onClick={() => { if (selectedElement) cut(selectedElement, handleTriggerDelete); }}
+                    onClick={() => { if (selectedElements.length > 0) cut(selectedElements, handleTriggerDelete); }}
                 >
                     <Scissors className={iconStyle} />
                 </div>
                 <div title="Delete (Backspace)" className={`${iconContainerStyle} cursor-pointer`} 
-                    onClick={() => { if (selectedElement) handleTriggerDelete(); }}
+                    onClick={() => { if (selectedElements.length > 0) handleTriggerDelete(); }}
                 >
                     <Trash2 className={iconStyle} />
                 </div>
@@ -95,6 +98,6 @@ const Toolbar = ({ isLocked, onLockToggle }: ToolbarProps) => {
             </div>
         </div>
     );
-}
+};
 
 export default Toolbar;

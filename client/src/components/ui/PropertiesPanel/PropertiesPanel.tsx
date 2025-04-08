@@ -9,7 +9,7 @@ import { MiniMapProvider, useMiniMapContext } from '../toggleMiniMap';
 import { Info } from 'lucide-react';
 
 interface PropertiesPanelProps {
-  selectedElement: Node | Edge | (Node | Edge)[] | null;
+  selectedElements: (Node | Edge)[];
 }
 
 function isEdgeElement(element: Node | Edge): element is Edge {
@@ -36,17 +36,14 @@ const getAspectColor = (node: any): string => {
   }
 };
 
-const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElement }) => {
-const { isMiniMapVisible } = useMiniMapContext();
-
-const isMultiple = Array.isArray(selectedElement) && selectedElement.length > 1;
-const getSingleElement = (element: Node | Edge | (Node | Edge)[] | null) => {
-  if (!element) return null;
-  if (!Array.isArray(element)) return element;
-  return element.length === 1 ? element[0] : null;
-};
-const singleElement = getSingleElement(selectedElement);
-
+const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElements }) => {
+  const { isMiniMapVisible } = useMiniMapContext();
+  
+  const isMultiple = selectedElements.length > 1;
+  const getSingleElement = () => {
+    return selectedElements.length === 1 ? selectedElements[0] : null;
+  };
+  const singleElement = getSingleElement();
 
   return (
     <MiniMapProvider>
@@ -55,16 +52,16 @@ const singleElement = getSingleElement(selectedElement);
         flex flex-col"
       >
         <div className="pb-2 pl-4 mt-20 pt-2 mb-2 border-b border-[#9facbc]">
-        <h2 className="text-lg font-semibold text-black dark:text-white">Properties</h2>
+          <h2 className="text-lg font-semibold text-black dark:text-white">Properties</h2>
         </div>
         <div className="flex-1 overflow-auto">
-          {selectedElement ? (
+          {selectedElements.length > 0 ? (
             isMultiple ? (
-              <CurrentMultipleElements selectedElements={selectedElement as (Node | Edge)[]} />
-            ) : (singleElement && !Array.isArray(singleElement) && isEdgeElement(singleElement)) ? (
-              <CurrentEdge currentEdge={singleElement} />
-            ) : singleElement ? (
+              <CurrentMultipleElements selectedElements={selectedElements} />
+            ) : (singleElement && !isEdgeElement(singleElement)) ? (
               <CurrentNode currentNode={singleElement} />
+            ) : singleElement && isEdgeElement(singleElement) ? (
+              <CurrentEdge currentEdge={singleElement} />
             ) : null
           ) : (
             <div className="flex items-center justify-center p-4">

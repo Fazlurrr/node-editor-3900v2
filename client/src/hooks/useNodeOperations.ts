@@ -327,10 +327,29 @@ export const useNodeOperations = (
           updateNode(updatedTerminal.id);
         }, []);
 
+        const handleSelectionDragStart = useCallback((_event: React.MouseEvent, draggedNodes: Node[]) => {
+            draggedNodes.forEach((node) => {
+              if (!initialPositions.current[node.id]) {
+                initialPositions.current[node.id] = {
+                  x: node.position.x,
+                  y: node.position.y,
+                };
+              }
+            });
+          }, []);
+        
+          const handleSelectionDragStop = useCallback(async (event: React.MouseEvent, draggedNodes: Node[]) => {
+            for (const node of draggedNodes) {
+              await onNodeDragStop(event, node);
+            }
+          }, [onNodeDragStop]);
+
       return {
         onNodeDrag,
         onNodeDragStop,
         handleDrop,
-        handleTerminalDetach
+        handleTerminalDetach,
+        handleSelectionDragStop,
+        handleSelectionDragStart
       }
 };

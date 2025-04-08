@@ -11,10 +11,11 @@ interface CurrentEdgeProps {
 }
 
 const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
-  const { nodes } = useStore();
+  const { nodes, setEdges} = useStore();
   const sourceNode = nodes.find((node: any) => node.id === currentEdge.source);
   const targetNode = nodes.find((node: any) => node.id === currentEdge.target);
-  const { selectedElement, handleTriggerDelete } = useClipboard(); 
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { handleTriggerDelete } = useClipboard();
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
     const updatedEdge = await updateEdge(currentEdge.id, newEdgeType);
@@ -29,6 +30,13 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
     }
   };
 
+  const handleDeleteClick = async () => {
+    const currentEdges = useStore.getState().edges;
+    setEdges(
+      currentEdges.map(e => (e.id === currentEdge.id ? { ...e, selected: true } : e))
+    );
+    await handleTriggerDelete();
+  };
 
   return (
     <div className="">
@@ -38,7 +46,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           <div className="ml-2 text-black-600">
             {sourceNode ? sourceNode.data.customName || sourceNode.data.label : currentEdge.source}
           </div>
-          <button onClick={() => { if (selectedElement) handleTriggerDelete(); }} title='Delete Relation' className="flex items-center">
+          <button onClick={handleDeleteClick} title="Delete Relation" className="flex items-center">
             <Trash2 size={18} className="text-red-700" />
           </button>
         </div>
@@ -49,7 +57,6 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           </div>
         </div>
       </div>
-
 
       <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
         <strong>Relation Type:</strong>
@@ -98,7 +105,13 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           </SelectContent>
         </Select>
       </div>
-  </div>
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        elementType="relation"
+        onConfirm={handleDeleteClick}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
+    </div>
   );
 };
 
