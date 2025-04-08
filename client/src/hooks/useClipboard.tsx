@@ -282,7 +282,6 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     setEdges(currentEdges.filter(e => !edgeIds.includes(e.id)).map(e => ({ ...e, selected: false })));
   };
   
-  
   const handleTriggerDelete = useCallback(() => {
     const selectedNodes = nodes.filter(n => n.selected);
     const selectedEdges = edges.filter(e => e.selected);

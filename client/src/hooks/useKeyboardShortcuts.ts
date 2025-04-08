@@ -67,7 +67,7 @@ export const useKeyboardShortcuts = (
     () => {
       paste(onPaste);
     },
-    []
+    [onPaste, paste]
   );
 
   useHotkeys(
