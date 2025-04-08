@@ -4,7 +4,7 @@ import { useTheme } from '@/hooks';
 import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { useEffect } from 'react';
-import { on } from 'events';
+
 interface DownloadImageProps {
     fileName: string;
     fileType?: 'png' | 'svg';
