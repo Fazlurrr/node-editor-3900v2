@@ -7,11 +7,10 @@ import { Button } from '../button';
 import { buttonVariants } from '@/lib/config.ts';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
 import { Edit2, Plus, Minus,  X, Trash2} from 'lucide-react';
-import { updateNode, deleteNode } from '@/api/nodes';
+import { updateNode } from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
 import { TextField, MenuItem } from '@mui/material';
 import { useClipboard } from '@/hooks/useClipboard';
-import { useSettings } from '@/hooks/useSettings';
 
 interface CurrentNodeProps {
   currentNode: any;
@@ -34,10 +33,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const [tempName, setTempName] = useState(currentNode.data.customName || currentNode.data.label || '');
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const { setSelectedElement } = useClipboard();
-  const { confirmDeletion } = useSettings();
+  const { selectedElement, handleTriggerDelete } = useClipboard();
+
 
   const form = useForm<z.infer<typeof customAttributeSchema>>({
     resolver: zodResolver(customAttributeSchema),
@@ -154,19 +152,6 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     setIsAttributesVisible(true);
   };
 
-  const handleDeleteClick = async () => {
-    if (!confirmDeletion) {
-      await handleDeleteNode();
-    } else {
-      setShowDeleteDialog(true);
-    }
-  };
-
-  const handleDeleteNode = async () => {
-    await deleteNode(currentNode.id);
-    setSelectedElement(null);
-  };
-
   const handleAspectChange = async (newAspect: AspectType) => {
     const updated = await updateNode(currentNode.id, { aspect: newAspect });
     if (updated) {
@@ -201,7 +186,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
               </span>
             )}
         </div>
-        <button onClick={handleDeleteClick} title='Delete Element'>
+        <button onClick={() => { if (selectedElement) handleTriggerDelete(); }} title='Delete Element'>
           <Trash2 size={18} className="mr-2 text-red-700" />
         </button>
       </div>

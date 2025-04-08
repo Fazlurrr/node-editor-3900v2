@@ -1,12 +1,10 @@
-import { useState } from 'react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../select';
-import { deleteEdge, updateEdge } from '@/api/edges';
+import { updateEdge } from '@/api/edges';
 import { updateNodeConnectionData } from '@/lib/utils/nodes';
 import { EdgeType } from '@/lib/types';
 import { useStore } from '@/hooks';
 import { Trash2 } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
-import { useSettings } from '@/hooks/useSettings';
 
 interface CurrentEdgeProps {
   currentEdge: any;
@@ -16,9 +14,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
   const { nodes } = useStore();
   const sourceNode = nodes.find((node: any) => node.id === currentEdge.source);
   const targetNode = nodes.find((node: any) => node.id === currentEdge.target);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const { setSelectedElement } = useClipboard(); 
-  const { confirmDeletion } = useSettings();
+  const { selectedElement, handleTriggerDelete } = useClipboard(); 
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
     const updatedEdge = await updateEdge(currentEdge.id, newEdgeType);
@@ -33,18 +29,6 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
     }
   };
 
-  const handleDeleteClick = async () => {
-    if (!confirmDeletion) {
-      await handleDeleteEdge();
-    } else {
-      setShowDeleteDialog(true);
-    }
-  };
-
-  const handleDeleteEdge = async () => {
-    await deleteEdge(currentEdge.id);
-    setSelectedElement(null);
-  };
 
   return (
     <div className="">
@@ -54,7 +38,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           <div className="ml-2 text-black-600">
             {sourceNode ? sourceNode.data.customName || sourceNode.data.label : currentEdge.source}
           </div>
-          <button onClick={handleDeleteClick} title='Delete Relation' className="flex items-center">
+          <button onClick={() => { if (selectedElement) handleTriggerDelete(); }} title='Delete Relation' className="flex items-center">
             <Trash2 size={18} className="text-red-700" />
           </button>
         </div>
