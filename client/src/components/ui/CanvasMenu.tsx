@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useClipboard } from '@/hooks/useClipboard';
+import { useStore } from '@/hooks';
 
 interface CanvasMenuProps {
   x: number;
@@ -24,8 +25,11 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({
   hasParent,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const liStyle = "p-2 bg-white hover:bg-gray-100 dark:bg-[#232528] dark:hover:bg-gray-700 cursor-pointer";    
-  const { selectedElement, copy, cut, handleTriggerDelete } = useClipboard();
+  const liStyle = "p-2 bg-white hover:bg-gray-100 dark:bg-[#232528] dark:hover:bg-gray-700 cursor-pointer";
+  const { copy, cut, handleTriggerDelete } = useClipboard();
+  const selectedNodes = useStore(state => state.nodes.filter(n => n.selected));
+  const selectedEdges = useStore(state => state.edges.filter(e => e.selected));
+  const selectedElements = [...selectedNodes, ...selectedEdges];
 
   useEffect(() => {
     menuRef.current?.focus();
@@ -35,7 +39,7 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({
     <div
       ref={menuRef}
       tabIndex={0}
-      className={cn('absolute  border shadow-lg rounded z-50')}
+      className={cn('absolute border shadow-lg rounded z-50')}
       style={{ top: y, left: x, width: '150px' }}
       onBlur={onClose}
     >
@@ -72,7 +76,9 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({
         <li
           className={liStyle}
           onClick={() => {
-            if (selectedElement) copy(selectedElement);
+            if (selectedElements.length > 0) {
+              copy(selectedElements);
+            }
             onClose();
           }}
         >
@@ -81,7 +87,9 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({
         <li
           className={liStyle}
           onClick={() => {
-            if (selectedElement) cut(selectedElement, handleTriggerDelete);
+            if (selectedElements.length > 0) {
+              cut(selectedElements, handleTriggerDelete);
+            }
             onClose();
           }}
         >
@@ -90,7 +98,9 @@ const CanvasMenu: React.FC<CanvasMenuProps> = ({
         <li
           className={cn(liStyle, "text-red-600")}
           onClick={() => {
-            if (selectedElement) handleTriggerDelete();
+            if (selectedElements.length > 0) {
+              handleTriggerDelete();
+            }
             onClose();
           }}
         >

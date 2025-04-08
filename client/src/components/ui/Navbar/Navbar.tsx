@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { NavigationMenu, NavigationMenuLink } from '@/components/ui/navigation-menu';
-import { 
-  Menubar, 
-  MenubarCheckboxItem, 
-  MenubarContent, 
-  MenubarItem, 
-  MenubarMenu, 
-  MenubarSeparator, 
-  MenubarShortcut, 
-  MenubarSub, 
-  MenubarSubContent, 
-  MenubarSubTrigger, 
-  MenubarTrigger 
+import {
+  Menubar,
+  MenubarCheckboxItem,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger
 } from "@/components/ui/menubar";
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
@@ -27,7 +27,7 @@ import { toast } from 'react-toastify';
 import { Check } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useFirstVisit } from '@/hooks/useLocalStorage';
 import AdvancedSettingsModal from './_components/AdvancedSettings';
 
@@ -38,14 +38,17 @@ const Navbar = () => {
   const { isGridVisible, setGridVisible } = useGridContext();
   const [ isFullScreen ] = React.useState(false);
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
-  const [ isHelpMenuVisible, setIsHelpMenuVisible ] = React.useState(false);
-  const [ helpMenuPage, setHelpMenuPage ] = React.useState('');
-  const [ isModalVisible, setIsModalVisible ] = React.useState(false);
-  const [ modalPage, setModalPage ] = React.useState('');
-  const { selectedElement, copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
+  const [ isHelpMenuVisible, setIsHelpMenuVisible ] = useState(false);
+  const [ helpMenuPage, setHelpMenuPage ] = useState('');
+  const [ isModalVisible, setIsModalVisible ] = useState(false);
+  const [ modalPage, setModalPage ] = useState('');
+  const { copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
   const { setMode } = useMode();
   const { firstVisit, setFirstVisit } = useFirstVisit();
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = React.useState(false);
+  const selectedNodes = useStore(state => state.nodes.filter(n => n.selected));
+  const selectedEdges = useStore(state => state.edges.filter(e => e.selected));
+  const selectedElements = [...selectedNodes, ...selectedEdges];
 
   // Opens tutorial on first visit
   useEffect(() => {
@@ -56,12 +59,10 @@ const Navbar = () => {
     }
   }, [firstVisit, setFirstVisit, currentPage]);
 
-  // used for debugging
   const toggleGrid = () => {
     setGridVisible(!isGridVisible);
   };
 
-  // used for debugging
   const toggleMiniMap = () => {
     setMiniMapVisible(!isMiniMapVisible);
   };
@@ -146,23 +147,23 @@ const Navbar = () => {
                   <MenubarItem
                     className="cursor-pointer"
                     onClick={() => {
-                      if (selectedElement) {
+                      if (selectedElements.length > 0) {
                         handleTriggerDelete();
                       }
                     }}
                   >
                     Delete <MenubarShortcut>Backspace</MenubarShortcut>
                   </MenubarItem>
-                  <MenubarSeparator/>
+                  <MenubarSeparator />
                   <MenubarItem
                     className="cursor-pointer"
-                    onClick={() => { if (selectedElement) cut(selectedElement, handleTriggerDelete); }}
+                    onClick={() => { if (selectedElements.length > 0) cut(selectedElements, handleTriggerDelete); }}
                   >
                     Cut <MenubarShortcut>Ctrl+X</MenubarShortcut>
                   </MenubarItem>
                   <MenubarItem
                     className="cursor-pointer"
-                    onClick={() => { if (selectedElement) copy(selectedElement); }}
+                    onClick={() => { if (selectedElements.length > 0) copy(selectedElements); }}
                   >
                     Copy <MenubarShortcut>Ctrl+C</MenubarShortcut>
                   </MenubarItem>
@@ -172,10 +173,13 @@ const Navbar = () => {
                   >
                     Paste <MenubarShortcut>Ctrl+V</MenubarShortcut>
                   </MenubarItem>
-                  <MenubarSeparator/>
-                    <MenubarItem className="cursor-pointer" onClick={() => setMode('transform')}>
+                  <MenubarSeparator />
+                  <MenubarItem
+                    className="cursor-pointer"
+                    onClick={() => setMode('transform')}
+                  >
                     Transform Mode <MenubarShortcut>T</MenubarShortcut>
-                    </MenubarItem>
+                  </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
               <MenubarMenu>

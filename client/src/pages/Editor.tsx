@@ -7,7 +7,6 @@ import {
   EdgeTypes,
   NodeTypes,
   SelectionMode,
-  useOnSelectionChange,
   ReactFlowInstance
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
@@ -60,7 +59,7 @@ const Editor = () => {
   const [, setCurrentZoom] = useState<number>(1);
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
     useStore(storeSelector, shallow);
-  const { selectedElement, setSelectedElement, handleTriggerDelete, handlePaste } = useClipboard();
+  const { handleTriggerDelete, handlePaste } = useClipboard();
   const { theme } = useTheme();
   const [lockState, setLockState] = useState<boolean>(false);
   const panOnDrag = [1, 2];
@@ -78,13 +77,9 @@ const Editor = () => {
         selected: node.id === nodeId,
       }));
       setNodes(updatedNodes);
-      const selectedNode = updatedNodes.find((n) => n.id === nodeId);
-      if (selectedNode) {
-        setSelectedElement(selectedNode);
-      }
       setCanvasMenu({ x, y, nodeId });
     },
-    [setNodes, setSelectedElement]
+    [setNodes]
   );
 
   const nodeTypes = useMemo(
@@ -158,34 +153,17 @@ const Editor = () => {
 
   const onLoad = (instance: ReactFlowInstance) => setReactFlowInstance(instance);
 
-  
+  useKeyboardShortcuts(handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
 
-  useKeyboardShortcuts(selectedElement, handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
-
-  const onSelectionChangeHandler = useCallback(({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
-    console.log('onSelectionChange fired with:', { nodes, edges });
-    const combined = [...nodes, ...edges];
-    if (combined.length === 0) {
-      console.log('Selection is empty.');
-      setSelectedElement(null);
-    } else if (combined.length === 1) {
-      console.log('Single element selected:', combined[0]);
-      setSelectedElement(combined[0]);
-    } else {
-      console.log('Multiple elements selected:', combined);
-      setSelectedElement(combined);
-    }
-  }, [setSelectedElement]); 
-
-  useOnSelectionChange({
-    onChange: onSelectionChangeHandler,
-  });
-
-  
+  const selectedElements = useMemo(() => {
+    const selectedNodes = nodes.filter(n => n.selected);
+    const selectedEdges = edges.filter(e => e.selected);
+    return [...selectedNodes, ...selectedEdges];
+  }, [nodes, edges]);
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <div ref={reactFlowWrapper} className='mx-56 mt-20 h-[calc(100vh-5rem)]'>
+      <div ref={reactFlowWrapper} className="mx-56 mt-20 h-[calc(100vh-5rem)]">
         <ReactFlowStyled
           nodesDraggable={!lockState}
           nodesConnectable={!lockState}
@@ -213,7 +191,10 @@ const Editor = () => {
           onSelectionDragStop={handleSelectionDragStop}
           onNodeDrag={onNodeDrag}
           deleteKeyCode={null}
-          onPaneClick={() => setSelectedElement(null)}
+          onPaneClick={() => {
+            setNodes(nodes.map(n => ({ ...n, selected: false })));
+            setEdges(edges.map(e => ({ ...e, selected: false })));
+          }}
           onInit={onLoad}
           snapToGrid={true}
           snapGrid={[11, 11]}
@@ -248,7 +229,7 @@ const Editor = () => {
       </div>
       <Toolbar isLocked={lockState} onLockToggle={() => setLockState(!lockState)} />
       <NodesPanel />
-      <PropertiesPanel selectedElement={selectedElement} />
+      <PropertiesPanel selectedElements={selectedElements} />
     </ThemeProvider>
   );
 };

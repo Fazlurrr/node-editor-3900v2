@@ -5,7 +5,6 @@ import React, {
   useState,
   ReactNode,
   useCallback,
-  useEffect,
 } from 'react';
 import { Node, Edge } from 'reactflow';
 import { createNode, uploadNodes, updateNode, deleteNode, deleteMultipleNodes } from '@/api/nodes';
@@ -17,12 +16,10 @@ import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'react-toastify';
 
 interface ClipboardContextType {
-  selectedElement: Node | Edge | (Node | Edge)[] | null;
-  setSelectedElement: React.Dispatch<React.SetStateAction<Node | Edge | (Node | Edge)[] | null>>;
-  copy: (element: Node | Edge | (Node | Edge)[]) => void;
-  cut: (element: Node | Edge | (Node | Edge)[], onDelete: () => void) => void;
-  paste: (onPaste?: (clipboardElement: Node | Edge | (Node | Edge)[]) => void) => Promise<void>;
-  handlePaste: (clipboardElement: Node | Edge | (Node | Edge)[]) => Promise<void>;
+  copy: (elements: Node | Edge | (Node | Edge)[]) => void;
+  cut: (elements: Node | Edge | (Node | Edge)[], onDelete: () => void) => void;
+  paste: (onPaste?: (clipboardElements: (Node | Edge)[]) => void) => Promise<void>;
+  handlePaste: (clipboardElements: Node | Edge | (Node | Edge)[]) => Promise<void>;
   handleTriggerDelete: () => void;
 }
 
@@ -34,7 +31,6 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const isBlock = (node: Node): boolean => node.type === 'block';
   const isTerminal = (node: Node): boolean => node.type === 'terminal';
   
-  const [selectedElement, setSelectedElement] = useState<Node | Edge | (Node | Edge)[] | null>(null);
   const clipboardRef = useRef<any>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { confirmDeletion } = useSettings();
@@ -46,105 +42,75 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     setEdges: state.setEdges,
   }));
 
-  useEffect(() => {
-    if (!selectedElement || Array.isArray(selectedElement)) return;
-
-    const fresh =
-      'source' in selectedElement
-        ? edges.find((e) => e.id === selectedElement.id)
-        : nodes.find((n) => n.id === selectedElement.id);
-
-    if (fresh && fresh !== selectedElement) {
-      setSelectedElement(fresh);
-    }
-  }, [nodes, edges, selectedElement]);
-
-  const copy = (element: Node | Edge | (Node | Edge)[]) => {
-    let elementsToCopy: (Node | Edge)[] = Array.isArray(element) ? [...element] : [element];
+  const copy = (elements: Node | Edge | (Node | Edge)[]) => {
+    let elementsToCopy: (Node | Edge)[] = Array.isArray(elements) ? [...elements] : [elements];
     
-    // Get all blocks in the selection
     const blocks = elementsToCopy.filter(el => isNode(el) && isBlock(el)) as Node[];
     
-    // If there are blocks, ensure all their terminals are included (without duplicates)
     if (blocks.length > 0) {
-      // Get IDs of all terminals already selected
       const selectedTerminalIds = new Set(
         elementsToCopy
           .filter(el => isNode(el) && isTerminal(el))
           .map(term => (term as Node).id)
       );
       
-      // Find all terminal IDs that should be included from block references
       const blockTerminalIds = new Set(
         blocks.flatMap(block => block.data.terminals?.map((t: any) => t.id) || [])
       );
       
-      // Find terminals to add (that are referenced by blocks but not already selected)
       const terminalsToAdd = nodes.filter(
         node => isTerminal(node) && 
                blockTerminalIds.has(node.id) && 
                !selectedTerminalIds.has(node.id)
       );
       
-      // Add missing terminals to the selection
       if (terminalsToAdd.length > 0) {
         elementsToCopy = [...elementsToCopy, ...terminalsToAdd];
       }
     }
     
     clipboardRef.current = JSON.parse(JSON.stringify(elementsToCopy));
+    console.log('Copied elements to clipboard:', clipboardRef.current);
     toast.success('Copied to clipboard');
   };
 
-  const cut = (element: Node | Edge | (Node | Edge)[], onDelete: () => void) => {
-    copy(element);
+  const cut = (elements: Node | Edge | (Node | Edge)[], onDelete: () => void) => {
+    copy(elements);
     onDelete();
   };
 
-  const paste = async (onPaste?: (clipboardElement: Node | Edge | (Node | Edge)[]) => void) => {
+  const paste = async (onPaste?: (clipboardElements: (Node | Edge)[]) => void) => {
     if (clipboardRef.current && onPaste) {
-      const result = await onPaste(clipboardRef.current);
-      return result;
+      await onPaste(clipboardRef.current);
     }
   };
 
-  // Modified handlePaste function that only selects blocks after pasting
-  const handlePaste = async (clipboardElement: Node | Edge | (Node | Edge)[]) => {
-    if (!clipboardElement) return;
+  const handlePaste = async (clipboardElements: Node | Edge | (Node | Edge)[]) => {
+    if (!clipboardElements) return;
   
-    if (Array.isArray(clipboardElement)) {
-      const newElements = await handleMultiplePaste(clipboardElement);
-      // Only select block nodes after pasting, not terminals or edges
+    if (Array.isArray(clipboardElements)) {
+      console.log('Handling multiple paste for clipboard elements:', clipboardElements);
+      const newElements = await handleMultiplePaste(clipboardElements);
       if (newElements && newElements.length > 0) {
         const currentNodes = useStore.getState().nodes;
         const currentEdges = useStore.getState().edges;
         
-        // To ensure proper typing through the whole operation:
-        // 1. Explicitly cast the result of handleMultiplePaste
         const typedElements = newElements as Array<Node | Edge>;
         
-        // 2. Use a type guard to filter for block nodes
         const pastedBlocks = typedElements.filter((el): el is Node => {
-          // First check if it's a Node
           if (!isNode(el)) return false;
-          // Then check if it's a block
           return isBlock(el);
         });
         
-        // Set only blocks as selected in the context
         if (pastedBlocks.length > 0) {
-          setSelectedElement(pastedBlocks);
-          
-          // Now TypeScript knows these are Nodes with id properties
           const pastedBlockIds = pastedBlocks.map(node => node.id);
+          console.log('Pasted blocks IDs:', pastedBlockIds);
           
-          // Update nodes with selected state (only blocks are selected)
           const updatedNodes = currentNodes.map(node => ({
             ...node,
             selected: pastedBlockIds.includes(node.id)
           }));
           
-          // No edges should be selected
           const updatedEdges = currentEdges.map(edge => ({
             ...edge,
             selected: false
@@ -155,28 +121,14 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
         }
       }
     } else {
-      const newElement = await handleSinglePaste(clipboardElement);
-      // For single paste, keep existing behavior
-      if (newElement) {
-        // Explicitly type the result of handleSinglePaste
-        const typedElement = newElement as Node | Edge;
-        setSelectedElement(typedElement);
-        
-        if (isNode(typedElement)) {
-          const currentNodes = useStore.getState().nodes;
-          const updatedNodes = currentNodes.map(node => ({
-            ...node,
-            selected: node.id === typedElement.id
-          }));
-          setNodes(updatedNodes);
-        } else if (isEdge(typedElement)) {
-          const currentEdges = useStore.getState().edges;
-          const updatedEdges = currentEdges.map(edge => ({
-            ...edge,
-            selected: edge.id === typedElement.id
-          }));
-          setEdges(updatedEdges);
-        }
+      const newElement = await handleSinglePaste(clipboardElements);
+      if (newElement && isNode(newElement)) {
+        const currentNodes = useStore.getState().nodes;
+        const updatedNodes = currentNodes.map(node => ({
+          ...node,
+          selected: node.id === newElement.id
+        }));
+        setNodes(updatedNodes);
       }
     }
   };
@@ -184,60 +136,60 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const handleMultiplePaste = async (clipboardElements: (Node | Edge)[]) => {
     const { clipboardNodes, clipboardEdges } = separateNodesAndEdges(clipboardElements);
     
-    // Analyze block-terminal relationships in the clipboard
     const blocks = clipboardNodes.filter(node => isBlock(node));
     
-    // Generate new IDs for all nodes
     const idMap = generateNewNodeIds(clipboardNodes);
+    console.log('Generated ID Map:', idMap);
     
-    // Calculate offsets for blocks to apply to their terminals
     const blockOffsets: Record<string, {x: number, y: number}> = {};
     blocks.forEach(block => {
       blockOffsets[block.id] = { x: 22, y: 22 }; // Standard offset
     });
     
-    // Create new nodes with proper positions and relationships
     const newNodes = clipboardNodes.map(node => {
+      console.log(`Creating new node for old ID ${node.id}`);
       const newNode = createNewNode(node, idMap, blockOffsets);
+      console.log(`New node created. Old ID: ${node.id}, New ID: ${newNode.id}`);
       
-      // Update terminal relationships if this is a terminal
       if (isTerminal(node) && node.data.terminalOf) {
         const newBlockId = idMap[node.data.terminalOf];
+        console.log(`Mapping terminal ${node.id}: old parent ${node.data.terminalOf} -> new parent ${newBlockId}`);
         if (newBlockId) {
           newNode.data.terminalOf = newBlockId;
+          newNode.parentId = newBlockId;
         }
       }
       
-      // Update block's terminals array if this is a block
       if (isBlock(node) && node.data.terminals && node.data.terminals.length > 0) {
-        newNode.data.terminals = node.data.terminals.map((terminal: any) => ({
-          id: idMap[terminal.id] || terminal.id // Use new ID if available, fallback to original
-        })).filter((t: { id: any; }) => !!t.id); // Filter out any null/undefined IDs
+        newNode.data.terminals = node.data.terminals.map((terminal: any) => {
+          const mappedId = idMap[terminal.id] || terminal.id;
+          console.log(`Mapping terminal in block ${node.id}: old terminal ID ${terminal.id} -> new terminal ID ${mappedId}`);
+          return { id: mappedId };
+        }).filter((t: { id: any; }) => !!t.id); 
       }
       
       return newNode;
     });
     
-    // Update the nodes in the UI
+    console.log('New Nodes after paste mapping:', newNodes);
     setNodes([...nodes, ...newNodes]);
     
-    // Upload the new nodes to the server
     await uploadNodes(newNodes);
     
-    // Create and upload new edges
     const newEdges = createNewEdges(clipboardEdges, idMap);
+    console.log('New Edges after paste mapping:', newEdges);
     if (newEdges.length > 0) {
       setEdges([...edges, ...newEdges]);
       await uploadEdges(newEdges);
     }
-    
-    // Return all newly created elements for selection
     return [...newNodes, ...newEdges];
   };
 
   const handleSinglePaste = async (clipboardElement: Node | Edge) => {
     if (isNode(clipboardElement)) {
+      console.log(`Handling single paste for node ID: ${clipboardElement.id}`);
       const newNode = createNewNode(clipboardElement);
+      console.log(`Created new node for single paste. Old ID: ${clipboardElement.id}, New ID: ${newNode.id}`);
       setNodes([...nodes, newNode]);
       await createNode(newNode);
       if (newNode.data.customAttributes && newNode.data.customAttributes.length > 0) {
@@ -259,7 +211,9 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const generateNewNodeIds = (nodes: Node[]) => {
     return nodes.reduce((map, node) => {
-      map[node.id] = `${node.type}-${uuidv4()}`;
+      const newId = `${node.type}-${uuidv4()}`;
+      console.log(`Mapping node ID: ${node.id} -> ${newId}`);
+      map[node.id] = newId;
       return map;
     }, {} as Record<string, string>);
   };
@@ -267,25 +221,21 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   const createNewNode = (node: Node, idMap?: Record<string, string>, blockOffsets?: Record<string, {x: number, y: number}>) => {
     const newId = idMap ? idMap[node.id] : `${node.type}-${uuidv4()}`;
     
-    // Calculate the appropriate position for the node
     let position;
     
     if (isTerminal(node) && node.data.terminalOf) {
-      // For terminals: keep exact relative position to parent block
       if (blockOffsets && blockOffsets[node.data.terminalOf]) {
         position = {
-          x: node.position.x, // Keep exact x position relative to parent
-          y: node.position.y  // Keep exact y position relative to parent
+          x: node.position.x,
+          y: node.position.y
         };
       } else {
-        // Parent block not in selection, apply standard offset
         position = {
           x: node.position.x + 22,
           y: node.position.y + 22
         };
       }
     } else {
-      // For blocks and other nodes, apply the standard offset
       position = {
         x: node.position.x + 22,
         y: node.position.y + 22
@@ -318,52 +268,36 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedElement) return;
-
-    if (Array.isArray(selectedElement)) {
-      const selectedNodes = selectedElement.filter(
-        (el) => !("source" in el)
-      ) as Node[];
-      const selectedEdges = selectedElement.filter(
-        (el) => "source" in el
-      ) as Edge[];
-      const nodeIds = selectedNodes.map((node) => node.id);
-      const edgeIds = selectedEdges.map((edge) => edge.id);
-      const nodesDeletionPromise =
-        nodeIds.length > 0 ? deleteMultipleNodes(nodeIds) : Promise.resolve(true);
-      const edgesDeletionPromise =
-        edgeIds.length > 0 ? deleteMultipleEdges(edgeIds) : Promise.resolve(true);
-      await Promise.all([nodesDeletionPromise, edgesDeletionPromise]);
-      const currentNodes = useStore.getState().nodes;
-      const currentEdges = useStore.getState().edges;
-      setNodes(currentNodes.filter((n) => !nodeIds.includes(n.id)));
-      setEdges(currentEdges.filter((e) => !edgeIds.includes(e.id)));
-    } else {
-      if ("source" in selectedElement) {
-        await deleteEdge(selectedElement.id);
-      } else {
-        await deleteNode(selectedElement.id);
-      }
-    }
-    setShowDeleteDialog(false);
-    setSelectedElement(null);
+    const currentNodes = useStore.getState().nodes;
+    const currentEdges = useStore.getState().edges;
+    const selectedNodes = currentNodes.filter(n => n.selected);
+    const selectedEdges = currentEdges.filter(e => e.selected);
+    const nodeIds = selectedNodes.map(node => node.id);
+    const edgeIds = selectedEdges.map(edge => edge.id);
+    if (nodeIds.length > 0) await deleteMultipleNodes(nodeIds);
+    if (edgeIds.length > 0) await deleteMultipleEdges(edgeIds);
+  
+    // Clear selection on remaining nodes and edges:
+    setNodes(currentNodes.filter(n => !nodeIds.includes(n.id)).map(n => ({ ...n, selected: false })));
+    setEdges(currentEdges.filter(e => !edgeIds.includes(e.id)).map(e => ({ ...e, selected: false })));
   };
-
+  
+  
   const handleTriggerDelete = useCallback(() => {
-    if (!selectedElement) return;
+    const selectedNodes = nodes.filter(n => n.selected);
+    const selectedEdges = edges.filter(e => e.selected);
+    if (selectedNodes.length === 0 && selectedEdges.length === 0) return;
     if (confirmDeletion) {
       setShowDeleteDialog(true);
     } else {
       handleConfirmDelete();
     }
-  }, [selectedElement, confirmDeletion]);
+  }, [nodes, edges, confirmDeletion]);
 
   return (
     <>
       <ClipboardContext.Provider
         value={{
-          selectedElement,
-          setSelectedElement,
           copy,
           cut,
           paste,
@@ -377,11 +311,12 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
         <DeleteConfirmationDialog
           open={showDeleteDialog}
           elementType={
-            selectedElement && !Array.isArray(selectedElement) && 'source' in selectedElement
-              ? 'relation'
-              : 'element'
+            nodes.some(n => n.selected) ? 'element' : 'relation'
           }
-          onConfirm={handleConfirmDelete}
+          onConfirm={async () => {
+            await handleConfirmDelete();
+            setShowDeleteDialog(false);
+          }}
           onCancel={() => setShowDeleteDialog(false)}
         />
       )}
