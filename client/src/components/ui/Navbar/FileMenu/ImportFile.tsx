@@ -33,6 +33,10 @@ import { useEffect } from 'react';
         if (event.key === 'Escape') {
           close();
         }
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleSubmit(onSubmit)();
+        }
       };
       document.addEventListener('keydown', handleKeyDown);
       return () => {
