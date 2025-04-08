@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import Credits from './Credits';
 import Tutorial from './Tutorial';
 import { useTheme } from '@/hooks';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 interface HelpMenuProps {
   close: () => void;
@@ -9,6 +10,9 @@ interface HelpMenuProps {
 }
 
 const HelpMenu: React.FC<HelpMenuProps> = ({close, page}) => {
+
+  useHotkeys('esc', () => close());
+  
   const currentPage = page;
   const { theme } = useTheme();
     return(
