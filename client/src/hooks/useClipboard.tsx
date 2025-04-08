@@ -7,8 +7,8 @@ import React, {
   useCallback,
 } from 'react';
 import { Node, Edge } from 'reactflow';
-import { createNode, uploadNodes, updateNode, deleteNode, deleteMultipleNodes } from '@/api/nodes';
-import { uploadEdges, deleteEdge, deleteMultipleEdges } from '@/api/edges';
+import { createNode, uploadNodes, updateNode, deleteMultipleNodes } from '@/api/nodes';
+import { uploadEdges, deleteMultipleEdges } from '@/api/edges';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/hooks/useStore';
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
@@ -26,7 +26,8 @@ interface ClipboardContextType {
 const ClipboardContext = createContext<ClipboardContextType | undefined>(undefined);
 
 export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const isNode = (element: Node | Edge): element is Node => 'data' in element && !('source' in element);
+  const isNode = (element: Node | Edge): element is Node =>
+    'data' in element && !('source' in element) && typeof (element as Node).width === 'number';
   const isEdge = (element: Node | Edge): element is Edge => 'source' in element && 'target' in element;
   const isBlock = (node: Node): boolean => node.type === 'block';
   const isTerminal = (node: Node): boolean => node.type === 'terminal';
@@ -95,30 +96,24 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
         const currentNodes = useStore.getState().nodes;
         const currentEdges = useStore.getState().edges;
         
-        const typedElements = newElements as Array<Node | Edge>;
+        const pastedNodeIds = newElements.filter(isNode).map(node => node.id);
+        const pastedEdgeIds = newElements.filter((el): el is Edge => 'source' in el && 'target' in el).map(edge => edge.id);
+    
+        console.log('Pasted node IDs:', pastedNodeIds);
+        console.log('Pasted edge IDs:', pastedEdgeIds);
         
-        const pastedBlocks = typedElements.filter((el): el is Node => {
-          if (!isNode(el)) return false;
-          return isBlock(el);
-        });
+        const updatedNodes = currentNodes.map(node => ({
+          ...node,
+          selected: pastedNodeIds.includes(node.id)
+        }));
         
-        if (pastedBlocks.length > 0) {
-          const pastedBlockIds = pastedBlocks.map(node => node.id);
-          console.log('Pasted blocks IDs:', pastedBlockIds);
-          
-          const updatedNodes = currentNodes.map(node => ({
-            ...node,
-            selected: pastedBlockIds.includes(node.id)
-          }));
-          
-          const updatedEdges = currentEdges.map(edge => ({
-            ...edge,
-            selected: false
-          }));
-          
-          setNodes(updatedNodes);
-          setEdges(updatedEdges);
-        }
+        const updatedEdges = currentEdges.map(edge => ({
+          ...edge,
+          selected: pastedEdgeIds.includes(edge.id)
+        }));
+        
+        setNodes(updatedNodes);
+        setEdges(updatedEdges);
       }
     } else {
       const newElement = await handleSinglePaste(clipboardElements);
@@ -141,9 +136,9 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     const idMap = generateNewNodeIds(clipboardNodes);
     console.log('Generated ID Map:', idMap);
     
-    const blockOffsets: Record<string, {x: number, y: number}> = {};
+    const blockOffsets: Record<string, { x: number, y: number }> = {};
     blocks.forEach(block => {
-      blockOffsets[block.id] = { x: 22, y: 22 }; // Standard offset
+      blockOffsets[block.id] = { x: 22, y: 22 }; 
     });
     
     const newNodes = clipboardNodes.map(node => {
@@ -218,7 +213,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     }, {} as Record<string, string>);
   };
 
-  const createNewNode = (node: Node, idMap?: Record<string, string>, blockOffsets?: Record<string, {x: number, y: number}>) => {
+  const createNewNode = (node: Node, idMap?: Record<string, string>, blockOffsets?: Record<string, { x: number, y: number }>) => {
     const newId = idMap ? idMap[node.id] : `${node.type}-${uuidv4()}`;
     
     let position;
@@ -268,19 +263,66 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const handleConfirmDelete = async () => {
-    const currentNodes = useStore.getState().nodes;
-    const currentEdges = useStore.getState().edges;
+    const { nodes: currentNodes, edges: currentEdges, setNodes} = useStore.getState();
+    
     const selectedNodes = currentNodes.filter(n => n.selected);
     const selectedEdges = currentEdges.filter(e => e.selected);
-    const nodeIds = selectedNodes.map(node => node.id);
-    const edgeIds = selectedEdges.map(edge => edge.id);
-    if (nodeIds.length > 0) await deleteMultipleNodes(nodeIds);
-    if (edgeIds.length > 0) await deleteMultipleEdges(edgeIds);
+    const nodeIdsToDelete = new Set(selectedNodes.map(node => node.id));
   
-    // Clear selection on remaining nodes and edges:
-    setNodes(currentNodes.filter(n => !nodeIds.includes(n.id)).map(n => ({ ...n, selected: false })));
-    setEdges(currentEdges.filter(e => !edgeIds.includes(e.id)).map(e => ({ ...e, selected: false })));
+    const blockIdsToDelete = new Set(
+      selectedNodes.filter(n => n.type === 'block').map(n => n.id)
+    );
+  
+    const updatedNodes = currentNodes.map((node) => {
+      if (
+        node.type === 'terminal' &&
+        node.parentId &&
+        blockIdsToDelete.has(node.parentId) &&
+        !node.selected
+      ) {
+        const parentBlock = currentNodes.find(b => b.id === node.parentId);
+        if (parentBlock) {
+          const absolutePosition = {
+            x: parentBlock.position.x + node.position.x,
+            y: parentBlock.position.y + node.position.y,
+          };
+          return {
+            ...node,
+            position: absolutePosition,
+            parentId: undefined,
+            data: {
+              ...node.data,
+              terminalOf: undefined,
+              parent: 'void', 
+            },
+          };
+        }
+      }
+      return node;
+    });
+  
+    const nodesAfterDeletion = updatedNodes.filter(n => !nodeIdsToDelete.has(n.id));
+    setNodes(nodesAfterDeletion);
+  
+    if (nodeIdsToDelete.size > 0) {
+      await deleteMultipleNodes(Array.from(nodeIdsToDelete));
+    }
+    const edgeIdsToDelete = selectedEdges.map(edge => edge.id);
+    if (edgeIdsToDelete.length > 0) {
+      await deleteMultipleEdges(edgeIdsToDelete);
+    }
+  
+    const orphanTerminals = updatedNodes.filter(
+      node =>
+        node.type === 'terminal' &&
+        node.parentId === undefined &&
+        currentNodes.some(orig => orig.id === node.id && orig.parentId)
+    );
+    for (const terminal of orphanTerminals) {
+      await updateNode(terminal.id);
+    }
   };
+  
   
   const handleTriggerDelete = useCallback(() => {
     const selectedNodes = nodes.filter(n => n.selected);
