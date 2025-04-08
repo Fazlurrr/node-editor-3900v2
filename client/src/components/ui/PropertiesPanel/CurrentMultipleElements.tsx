@@ -92,7 +92,7 @@ const CurrentMultipleElements: React.FC<CurrentMultipleElementsProps> = ({ selec
                       )}
                     </summary>
                   <ul className="list-disc list-outside ml-5">
-                    {connectors.map((node) => (
+                    {terminals.map((node) => (
                       <li key={node.id} className="break-words">{getElementLabel(node)}</li>
                     ))}
                   </ul>
