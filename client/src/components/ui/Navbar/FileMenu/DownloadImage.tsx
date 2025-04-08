@@ -3,7 +3,8 @@ import { toPng, toSvg } from 'html-to-image';
 import { useTheme } from '@/hooks';
 import { Button } from '../../button';
 import { buttonVariants } from '@/lib/config.ts';
-
+import { useEffect } from 'react';
+import { on } from 'events';
 interface DownloadImageProps {
     fileName: string;
     fileType?: 'png' | 'svg';
@@ -18,6 +19,21 @@ const Download = (dataUrl: string, fileName: string ) => {
 };
 
 const DownloadImage = ({ fileName, fileType }: DownloadImageProps) => {
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Enter' && (fileType === 'png' || fileType === 'svg')) {
+                onClick();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [fileType]);
+
+
     const { getNodes } = useReactFlow();
     const { theme } = useTheme();
 

@@ -56,20 +56,6 @@ const Navbar = () => {
     }
   }, [firstVisit, setFirstVisit, currentPage]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        if (isHelpMenuVisible) setIsHelpMenuVisible(false);
-        if (isModalVisible) setIsModalVisible(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isHelpMenuVisible, isModalVisible]);
-
   // used for debugging
   const toggleGrid = () => {
     setGridVisible(!isGridVisible);
