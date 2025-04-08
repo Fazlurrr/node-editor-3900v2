@@ -61,8 +61,12 @@ const Terminal = (props: CustomNodeProps) => {
         <TooltipTrigger className="block p-0 m-0" style={{ lineHeight: 0 }}>
           {terminalContent}
         </TooltipTrigger>
-        <TooltipContent side="top" sideOffset={5}>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+        <TooltipContent
+          side="top"
+          sideOffset={5}
+          className="z-9999"
+        >
+          <p className="text-base text-gray-500 dark:text-white break-words whitespace-normal max-w-[200px]">
             {props.data.customName}
           </p>
         </TooltipContent>

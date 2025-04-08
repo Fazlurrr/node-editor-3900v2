@@ -34,7 +34,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
       <div className="mb-2 p-4 flex flex-col gap-2 items-start border-b border-[#9facbc]">
         <div className="flex items-center gap-2">
           <strong>Edge from:</strong>
-          <div className="ml-2 text-black-600">
+          <div className="ml-2 text-black-600 break-all whitespace-normal">
             {sourceNode ? sourceNode.data.customName || sourceNode.data.label : currentEdge.source}
           </div>
           <button onClick={handleTriggerDelete} title="Delete Relation" className="flex items-center">
@@ -43,7 +43,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
         </div>
         <div className="flex items-center gap-2">
           <strong>To:</strong>
-          <div className="ml-2 text-black-600 flex-grow">
+          <div className="ml-2 text-black-600 break-all whitespace-normal">
             {targetNode ? targetNode.data.customName || targetNode.data.label : currentEdge.target}
           </div>
         </div>
