@@ -5,14 +5,9 @@ import { Separator } from '@/components/ui/Misc/separator';
 import Register from './Register';
 import { columns } from './Columns';
 import DataTable from './DataTable';
-import { Button } from '@/components/ui/Misc/button';
-import { buttonVariants } from '@/lib/config.ts';
 import { SetStateAction, useState } from 'react';
-import { useSession } from '@/hooks';
-
 
 const AdminDashboard = () => {
-  const { setDashboard } = useSession();
   const [selectedTab, setSelectedTab] = useState('manage');
   const { data, error, isRefetching, refetch } = useQuery({
     queryKey: ['users'],
@@ -57,11 +52,6 @@ const AdminDashboard = () => {
       </TabsContent>
 
       <div className="mt-6 flex justify-center ">
-        <Button 
-        className={buttonVariants.cancel}
-        onClick={() => setDashboard(false)}>
-          Go back to editor
-        </Button>
       </div>
     </Tabs>
   );

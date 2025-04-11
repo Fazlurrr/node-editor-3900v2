@@ -21,7 +21,7 @@ import { useTheme } from '@/hooks';
 import { X } from 'lucide-react';
 
 const UserDashboard = () => {
-  const { user, setDashboard } = useSession();
+  const { user } = useSession();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   return (
@@ -60,15 +60,6 @@ const UserDashboard = () => {
           setDialogOpen={setDialogOpen}
         />
       )}
-
-      <div className="mt-6 flex justify-center">
-        <Button 
-          className={buttonVariants.cancel}
-          onClick={() => setDashboard(false)}
-        >
-          Go back to editor
-        </Button>
-      </div>
     </div>
   );
 };
