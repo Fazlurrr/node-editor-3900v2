@@ -181,7 +181,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
   
   return (
     <div className="flex flex-col flex-1 h-full">
-      <div className="mb-2 p-4 border-b border-[#9facbc]">
+      <div className="mb-2 p-4 pt-2 border-b border-[#9facbc]">
         <div className="flex items-start justify-between gap-2 w-full">
           {editLabel ? (
             <div className="flex flex-col flex-1 min-w-0">
@@ -191,9 +191,9 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                 className="w-full bg-transparent text-black dark:text-white resize-none focus:outline-none overflow-hidden break-words border"
                 style={{
                   wordBreak: 'break-word',
-                  minHeight: '1.5em', // Gives it breathing room
+                  minHeight: '1.5em',
                   height: 'auto',
-                  overflow: 'hidden', // Prevents scroll
+                  overflow: 'hidden',
                 }}
                 value={tempName}
                 autoFocus
@@ -240,22 +240,24 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
             </div>
           )}
 
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {!editLabel && (
+          <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+            <span title="Rename">
               <Edit2
                 size={18}
-                className="text-blue-500 cursor-pointer"
+                className="cursor-pointer"
                 onClick={() => {
                   setTempName(currentElement.data.customName || currentElement.data.label || '');
                   setEditLabel(true);
                 }}
               />
-            )}
-            <Trash2
-              size={18}
-              onClick={handleTriggerDelete}
-              className="text-red-700 cursor-pointer"
-            />
+            </span>
+            <span title="Delete Element">
+              <Trash2
+                size={18}
+                onClick={handleTriggerDelete}
+                className="cursor-pointer"
+              />
+            </span>
           </div>
         </div>
       </div>
@@ -624,24 +626,28 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
           [scrollbar-color:lightGray_transparent]"
         >
           {customAttributes.map((attr, index) => (
-            <div key={index} className="flex border-b p-2">
+            <div key={index} className="flex border-b dark:border-gray-600 p-2">
               <div className="flex w-full items-center justify-between">
                 <div className="w-full">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <span className="text-sm font-semibold break-words break-all">{attr.name}</span>
                     </div>
-                    <div title="Attribute actions" className="flex items-center space-x-1 ml-2">
-                      <Edit2
-                        size={16}
-                        className="cursor-pointer text-blue-500"
-                        onClick={() => handleEditAttribute(index)}
-                      />
-                      <Minus
-                        size={20}
-                        onClick={() => handleDeleteAttribute(attr)}
-                        className="cursor-pointer text-red-500"
-                      />
+                    <div className="flex items-center space-x-1 ml-2">
+                      <span title="Edit Attribute">
+                        <Edit2
+                          size={16}
+                          className="cursor-pointer"
+                          onClick={() => handleEditAttribute(index)}
+                        />
+                      </span>
+                      <span title="Delete Attribute">
+                        <Minus
+                          size={20}
+                          onClick={() => handleDeleteAttribute(attr)}
+                          className="cursor-pointer"
+                        />
+                      </span>
                     </div>
                   </div>
                   <div className="text-sm break-words"></div>
@@ -650,7 +656,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                     attr.quantityDatums?.scope ||
                     attr.quantityDatums?.range ||
                     attr.quantityDatums?.regularity) && (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
                       {attr.quantityDatums.provenance && (
                         <div>
                           <span className="font-medium">Provenance:</span> {attr.quantityDatums.provenance}
