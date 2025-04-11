@@ -156,7 +156,20 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       currentNode.data.aspect = newAspect;
     }
   };
-
+  const aspectOptions = [
+    { value: AspectType.Function, label: 'Function', color: '#fff000' },
+    { value: AspectType.Product, label: 'Product', color: '#00ffff' },
+    { value: AspectType.Location, label: 'Location', color: '#ff00ff' },
+    { value: AspectType.Installed, label: 'Installed', color: '#424bb2' },
+    { value: AspectType.NoAspect, label: 'No Aspect', color: '#E0E0E0' },
+    { value: AspectType.UnspecifiedAspect, label: 'Unspecified', color: '#9E9E9E' },
+  ];
+  
+  const filteredAspectOptions =
+    currentNode.type === 'terminal'
+      ? aspectOptions.filter(option => option.value !== AspectType.Location)
+      : aspectOptions;
+  
   return (
     <div className="flex flex-col flex-1 h-full">
       <div className="mb-2 p-4 flex gap-2 justify-between items-center border-b border-[#9facbc]">
@@ -211,42 +224,22 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
           dark:[&_.MuiSelect-icon]:text-white"
           >
-          <MenuItem value={AspectType.Function}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#fff000', borderRadius: '50%', marginRight: '10px' }}></span>
-              Function
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.Product}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#00ffff', borderRadius: '50%', marginRight: '10px' }}></span>
-              Product
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.Location}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#ff00ff', borderRadius: '50%', marginRight: '10px' }}></span>
-              Location
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.Installed}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#424bb2', borderRadius: '50%', marginRight: '10px' }}></span>
-              Installed
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.NoAspect}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#E0E0E0', borderRadius: '50%', marginRight: '10px' }}></span>
-              No Aspect
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.UnspecifiedAspect}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#9E9E9E', borderRadius: '50%', marginRight: '10px' }}></span>
-              Unspecified
-            </span>
-          </MenuItem>
+          {filteredAspectOptions.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                  style={{
+                    height: '10px',
+                    width: '10px',
+                    backgroundColor: option.color,
+                    borderRadius: '50%',
+                    marginRight: '10px',
+                  }}
+                ></span>
+                {option.label}
+              </span>
+            </MenuItem>
+          ))}
         </TextField>
       </div>
 
