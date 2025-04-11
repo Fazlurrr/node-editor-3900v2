@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { buttonVariants } from '@/lib/config.ts';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Misc/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface TutorialProps {

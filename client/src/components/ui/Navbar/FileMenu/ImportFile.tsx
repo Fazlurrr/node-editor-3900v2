@@ -1,4 +1,4 @@
-import { Button } from '../../button';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { z } from 'zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';

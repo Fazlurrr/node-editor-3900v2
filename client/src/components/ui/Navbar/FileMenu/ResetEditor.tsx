@@ -1,4 +1,4 @@
-import { Button } from '../../button';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { deleteEdges } from '@/api/edges';
 import { deleteNodes } from '@/api/nodes';

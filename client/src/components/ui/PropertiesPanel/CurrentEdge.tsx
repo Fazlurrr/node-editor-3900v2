@@ -1,4 +1,4 @@
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../Misc/select';
 import { updateEdge } from '@/api/edges';
 import { updateNodeConnectionData } from '@/lib/utils/nodes';
 import { EdgeType } from '@/lib/types';

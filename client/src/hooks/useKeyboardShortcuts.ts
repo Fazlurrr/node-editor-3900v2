@@ -2,8 +2,8 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useClipboard } from './useClipboard';
 import { useStore } from '@/hooks';
 import { useMode } from '@/hooks/useMode';
-import { useGridContext } from '@/components/ui/toggleGrid';
-import { useMiniMapContext } from '@/components/ui/toggleMiniMap';
+import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
+import { useMiniMapContext } from '@/components/ui/Navbar/SettingsMenu/toggleMiniMap';
 import { useReactFlow } from 'reactflow';
 
 export const useKeyboardShortcuts = (

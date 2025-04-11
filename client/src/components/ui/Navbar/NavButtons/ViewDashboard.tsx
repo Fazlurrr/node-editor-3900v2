@@ -4,7 +4,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../../tooltip';
+} from '../../Misc/tooltip';
 import { useSession } from '@/hooks';
 
 const ViewDashboard = () => {

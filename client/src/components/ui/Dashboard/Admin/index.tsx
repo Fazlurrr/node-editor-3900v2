@@ -1,11 +1,11 @@
 import { fetchAllUsers } from '@/api/auth';
 import { useQuery } from '@tanstack/react-query';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Misc/tabs';
+import { Separator } from '@/components/ui/Misc/separator';
 import Register from './Register';
 import { columns } from './Columns';
 import DataTable from './DataTable';
-import { Button } from '../../button';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { SetStateAction, useState } from 'react';
 import { useSession } from '@/hooks';

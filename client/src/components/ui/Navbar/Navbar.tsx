@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { NavigationMenu, NavigationMenuLink } from '@/components/ui/navigation-menu';
+import { NavigationMenu, NavigationMenuLink } from '@/components/ui/Misc/navigation-menu';
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -13,14 +13,14 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger
-} from "@/components/ui/menubar";
+} from "@/components/ui/Misc/menubar";
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import { Logout, ViewDashboard } from './_components';
-import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
-import { useGridContext } from '../toggleGrid';
-import { useMiniMapContext } from '../toggleMiniMap';
+import { Logout, ViewDashboard } from './NavButtons';
+import { toggleFullScreen } from '@/components/ui/Navbar/SettingsMenu/toggleFullScreen';
+import { useGridContext } from './SettingsMenu/toggleGrid';
+import { useMiniMapContext } from './SettingsMenu/toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
 import Modal from './FileMenu/Modal';
 import { toast } from 'react-toastify';
@@ -29,7 +29,7 @@ import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
 import { useEffect, useState } from 'react';
 import { useFirstVisit } from '@/hooks/useLocalStorage';
-import AdvancedSettingsModal from './_components/AdvancedSettings';
+import AdvancedSettingsModal from './SettingsMenu/AdvancedSettings';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);

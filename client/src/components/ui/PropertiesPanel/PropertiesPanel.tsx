@@ -5,7 +5,7 @@ import CurrentMultipleElements from './CurrentMultipleElements';
 import { MiniMapStyled } from '@/components/ui/styled';
 import { AspectType } from '@/lib/types';
 import React from 'react';
-import { MiniMapProvider, useMiniMapContext } from '../toggleMiniMap';
+import { MiniMapProvider, useMiniMapContext } from '../Navbar/SettingsMenu/toggleMiniMap';
 import { Info } from 'lucide-react';
 
 interface PropertiesPanelProps {

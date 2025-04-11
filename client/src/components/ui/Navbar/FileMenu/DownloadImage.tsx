@@ -1,7 +1,7 @@
 import { useReactFlow, getNodesBounds, getViewportForBounds } from 'reactflow';
 import { toPng, toSvg } from 'html-to-image';
 import { useTheme } from '@/hooks';
-import { Button } from '../../button';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { useEffect } from 'react';
 
