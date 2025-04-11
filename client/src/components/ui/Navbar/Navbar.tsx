@@ -17,7 +17,7 @@ import {
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import { Logout, ViewDashboard } from './_components';
+import { Logout, ViewDashboard } from './NavButtons';
 import { toggleFullScreen } from '@/components/ui/toggleFullScreen';
 import { useGridContext } from '../toggleGrid';
 import { useMiniMapContext } from '../toggleMiniMap';
@@ -29,7 +29,7 @@ import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
 import { useEffect, useState } from 'react';
 import { useFirstVisit } from '@/hooks/useLocalStorage';
-import AdvancedSettingsModal from './_components/AdvancedSettings';
+import AdvancedSettingsModal from './SettingsMenu/AdvancedSettings';
 
 const Navbar = () => {
   const { nodes } = useStore(storeSelector, shallow);
