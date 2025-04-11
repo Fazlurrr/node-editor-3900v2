@@ -24,7 +24,7 @@ import { useMiniMapContext } from './SettingsMenu/toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
 import Modal from './FileMenu/Modal';
 import { toast } from 'react-toastify';
-import { Check } from 'lucide-react';
+import { Check, ChevronLeft } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
 import { useEffect, useState } from 'react';
@@ -79,9 +79,18 @@ const Navbar = () => {
     <NavigationMenu className="fixed h-12 border-b border-[#9facbc] bg-white dark:bg-navbar-dark">
       <div className="flex w-full items-center justify-between ">
         <div className="flex items-center">
-          <span className="cursor-pointer" onClick={() => setDashboard(false)}>
-            <img src={`/logo-${theme}.png`} alt="Logo" className="h-16 p-4" />
-          </span>
+          
+            {currentPage === AppPage.Dashboard ? (
+                <div className="flex items-center gap-1 font-semibold cursor-pointer hover:bg-muted ml-3 p-1 rounded-md" onClick={() => setDashboard(false)}>
+                <span className="cursor-pointer h-8 flex items-center" onClick={() => setDashboard(false)}>
+                  <img src={`/logo-${theme}.png`} alt="Logo" className="h-8" />
+                </span>
+                <ChevronLeft />
+                <span className="flex items-center">Back to Editor</span>
+                </div>
+            ) : (
+              <img src={`/logo-${theme}.png`} alt="Logo" className="h-8 mx-4" />
+            )}
           {currentPage === AppPage.Editor && (
             <Menubar className="border-none shadow-none bg-transparent">
               <MenubarMenu>
