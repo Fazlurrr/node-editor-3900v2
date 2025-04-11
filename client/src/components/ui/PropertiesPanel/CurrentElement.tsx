@@ -240,7 +240,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
             </div>
           )}
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 mt-1">
             {!editLabel && (
               <Edit2
                 size={18}
