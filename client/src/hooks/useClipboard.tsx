@@ -11,7 +11,7 @@ import { createNode, uploadNodes, updateNode, deleteMultipleNodes } from '@/api/
 import { uploadEdges, deleteMultipleEdges } from '@/api/edges';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/hooks/useStore';
-import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
+import DeleteConfirmationDialog from '@/components/ui/Misc/DeleteConfirmationDialog';
 import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'react-toastify';
 

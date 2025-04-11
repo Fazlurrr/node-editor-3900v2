@@ -38,7 +38,7 @@ import Toolbar from '@/components/ui/Toolbar/Toolbar';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
 import { useClipboard } from '@/hooks/useClipboard';
-import CanvasMenu from '@/components/ui/CanvasMenu';
+import CanvasMenu from '@/components/ui/Misc/CanvasMenu';
 import { useNodeOperations } from '@/hooks/useNodeOperations';
 import useConnection from '@/hooks/useConnection';
 

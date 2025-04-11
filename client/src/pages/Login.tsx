@@ -8,9 +8,9 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/Misc/form';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Misc/card';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { TextField } from '@mui/material';
 

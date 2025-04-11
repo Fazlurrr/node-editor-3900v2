@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   TooltipContent,
-} from '../ui/tooltip';
+} from '../ui/Misc/tooltip';
 import { Asterisk } from 'lucide-react'; 
 import { selectionColor } from '@/lib/config';
 import { useMode } from '@/hooks/useMode';

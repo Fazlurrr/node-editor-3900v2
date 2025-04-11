@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { TextField, MenuItem, FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
 import { register } from '@/api/auth';
 import { buttonVariants } from '@/lib/config.ts';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Misc/button';
 
 // Schema for form validation using Zod
 const registerUserSchema = z.object({

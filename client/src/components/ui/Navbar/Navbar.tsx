@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { NavigationMenu, NavigationMenuLink } from '@/components/ui/navigation-menu';
+import { NavigationMenu, NavigationMenuLink } from '@/components/ui/Misc/navigation-menu';
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -13,7 +13,7 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger
-} from "@/components/ui/menubar";
+} from "@/components/ui/Misc/menubar";
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';

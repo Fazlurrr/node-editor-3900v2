@@ -1,8 +1,8 @@
 import { updatePassword } from '@/api/auth';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Misc/tabs';
 import { useSession } from '@/hooks';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/Misc/card';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -14,7 +14,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/Misc/form';
 import { useState } from 'react';
 import { updatePasswordUser } from '@/lib/schemas';
 import { useTheme } from '@/hooks';
