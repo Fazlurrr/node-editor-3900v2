@@ -624,7 +624,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
           [scrollbar-color:lightGray_transparent]"
         >
           {customAttributes.map((attr, index) => (
-            <div key={index} className="flex border-b p-2">
+            <div key={index} className="flex border-b dark:border-gray-600 p-2">
               <div className="flex w-full items-center justify-between">
                 <div className="w-full">
                   <div className="flex items-center justify-between">
@@ -650,7 +650,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                     attr.quantityDatums?.scope ||
                     attr.quantityDatums?.range ||
                     attr.quantityDatums?.regularity) && (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
                       {attr.quantityDatums.provenance && (
                         <div>
                           <span className="font-medium">Provenance:</span> {attr.quantityDatums.provenance}
