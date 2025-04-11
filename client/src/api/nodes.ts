@@ -462,8 +462,8 @@ export const deleteMultipleNodes = async (nodeIds: string[]): Promise<boolean> =
       return false;
     }
 
-    const currentNodes = useStore.getState().nodes;
-    setNodes(currentNodes.filter((node) => !nodeIds.includes(node.id)));
+    const currentElements = useStore.getState().nodes;
+    setNodes(currentElements.filter((node) => !nodeIds.includes(node.id)));
     return true;
   } catch (error) {
     toast.error(`Error deleting nodes: ${(error as Error).message}`);

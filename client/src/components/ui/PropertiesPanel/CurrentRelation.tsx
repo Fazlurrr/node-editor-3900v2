@@ -6,26 +6,26 @@ import { useStore } from '@/hooks';
 import { Trash2 } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 
-interface CurrentEdgeProps {
-  currentEdge: any;
+interface CurrentRelationProps {
+  currentRelation: any;
 }
 
-const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
+const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) => {
   const { nodes } = useStore();
-  const sourceNode = nodes.find((node: any) => node.id === currentEdge.source);
-  const targetNode = nodes.find((node: any) => node.id === currentEdge.target);
+  const sourceNode = nodes.find((node: any) => node.id === currentRelation.source);
+  const targetNode = nodes.find((node: any) => node.id === currentRelation.target);
   const { handleTriggerDelete } = useClipboard();
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
-    const updatedEdge = await updateEdge(currentEdge.id, newEdgeType);
+    const updatedEdge = await updateEdge(currentRelation.id, newEdgeType);
     if (updatedEdge) {
       await updateNodeConnectionData(
-        currentEdge.source,
-        currentEdge.target,
-        currentEdge.type,
+        currentRelation.source,
+        currentRelation.target,
+        currentRelation.type,
         newEdgeType
       );
-      currentEdge.type = newEdgeType;
+      currentRelation.type = newEdgeType;
     }
   };
 
@@ -35,7 +35,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
         <div className="flex items-center gap-2">
           <strong>Edge from:</strong>
           <div className="ml-2 text-black-600 break-all whitespace-normal">
-            {sourceNode ? sourceNode.data.customName || sourceNode.data.label : currentEdge.source}
+            {sourceNode ? sourceNode.data.customName || sourceNode.data.label : currentRelation.source}
           </div>
           <button onClick={handleTriggerDelete} title="Delete Relation" className="flex items-center">
             <Trash2 size={18} className="text-red-700" />
@@ -44,7 +44,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
         <div className="flex items-center gap-2">
           <strong>To:</strong>
           <div className="ml-2 text-black-600 break-all whitespace-normal">
-            {targetNode ? targetNode.data.customName || targetNode.data.label : currentEdge.target}
+            {targetNode ? targetNode.data.customName || targetNode.data.label : currentRelation.target}
           </div>
         </div>
       </div>
@@ -53,13 +53,13 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
         <strong>Relation Type:</strong>
         <div className="mb-2"></div>
         <Select 
-          value={currentEdge.type} 
+          value={currentRelation.type} 
           onValueChange={(value) => handleConnectionTypeChange(value as EdgeType)}
         >
           <SelectTrigger className="w-[180px] p-3">
             <SelectValue>
               {(() => {
-              switch (currentEdge.type) {
+              switch (currentRelation.type) {
                 case EdgeType.Connected:
                 return 'Connected to';
                 case EdgeType.Transfer:
@@ -77,7 +77,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
                 case EdgeType.Equality:
                 return 'Same as';
                 default:
-                return currentEdge.type;
+                return currentRelation.type;
               }
               })()}
             </SelectValue>
@@ -100,4 +100,4 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
   );
 };
 
-export default CurrentEdge;
+export default CurrentRelation;
