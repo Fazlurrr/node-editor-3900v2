@@ -86,35 +86,106 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   };
 
+  const handleMultiplePaste = async (clipboardElements: (Node | Edge)[]) => {
+    const { clipboardNodes, clipboardEdges } = separateNodesAndEdges(clipboardElements);
+    
+    const blocks = clipboardNodes.filter(node => isBlock(node));
+    const idMap = generateNewNodeIds(clipboardNodes);
+    console.log('Generated ID Map:', idMap);
+    
+    const blockOffsets: Record<string, { x: number, y: number }> = {};
+    blocks.forEach(block => {
+      blockOffsets[block.id] = { x: 22, y: 22 }; 
+    });
+    
+    const newNodes = clipboardNodes.map(node => {
+      const newNode = createNewNode(node, idMap, blockOffsets);
+      // Mark the node as selected so the multi-selection box will highlight it
+      newNode.selected = true;
+      if (isTerminal(node) && node.data.terminalOf) {
+        const newBlockId = idMap[node.data.terminalOf];
+        if (newBlockId) {
+          newNode.data.terminalOf = newBlockId;
+          newNode.parentId = newBlockId;
+        }
+      }
+      if (isBlock(node) && node.data.terminals && node.data.terminals.length > 0) {
+        newNode.data.terminals = node.data.terminals
+          .map((terminal: any) => ({
+            id: idMap[terminal.id] || terminal.id,
+          }))
+          .filter((t: { id: any }) => !!t.id);
+      }
+    
+      console.log('New Node:', newNode);
+      return newNode;
+    });
+    
+    const newEdges = createNewEdges(clipboardEdges, idMap);
+    
+    // Retrieve the current state from the store and update it directly.
+    const currentNodes = useStore.getState().nodes;
+    setNodes([...currentNodes, ...newNodes]);
+    
+    if (newEdges.length > 0) {
+      const currentEdges = useStore.getState().edges;
+      setEdges([...currentEdges, ...newEdges]);
+    }
+    
+    // Upload the new elements to the backend.
+    await uploadNodes(newNodes);
+    if (newEdges.length > 0) {
+      await uploadEdges(newEdges);
+    }
+    
+    // Return combined elements so they can be used for selection update.
+    return [...newNodes, ...newEdges];
+  };
+  
+  const handleSinglePaste = async (clipboardElement: Node | Edge) => {
+    if (isNode(clipboardElement)) {
+      const newNode = createNewNode(clipboardElement);
+      setNodes([...nodes, newNode]);
+      await createNode(newNode);
+      if (newNode.data.customAttributes && newNode.data.customAttributes.length > 0) {
+        await updateNode(newNode.id, { customAttributes: newNode.data.customAttributes });
+      }
+      return newNode;
+    } else {
+      console.warn('Skipping single-edge paste because source/target nodes were not copied.');
+      return null;
+    }
+  };
+  
   const handlePaste = async (clipboardElements: Node | Edge | (Node | Edge)[]) => {
     if (!clipboardElements) return;
   
     if (Array.isArray(clipboardElements)) {
-      console.log('Handling multiple paste for clipboard elements:', clipboardElements);
       const newElements = await handleMultiplePaste(clipboardElements);
-      if (newElements && newElements.length > 0) {
-        const currentNodes = useStore.getState().nodes;
-        const currentEdges = useStore.getState().edges;
-        
-        const pastedNodeIds = newElements.filter(isNode).map(node => node.id);
-        const pastedEdgeIds = newElements.filter((el): el is Edge => 'source' in el && 'target' in el).map(edge => edge.id);
-    
-        console.log('Pasted node IDs:', pastedNodeIds);
-        console.log('Pasted edge IDs:', pastedEdgeIds);
-        
-        const updatedNodes = currentNodes.map(node => ({
-          ...node,
-          selected: pastedNodeIds.includes(node.id)
-        }));
-        
-        const updatedEdges = currentEdges.map(edge => ({
-          ...edge,
-          selected: pastedEdgeIds.includes(edge.id)
-        }));
-        
-        setNodes(updatedNodes);
-        setEdges(updatedEdges);
-      }
+  
+      const pastedNodeIds = newElements.filter(isNode).map(node => node.id);
+      const pastedEdgeIds = newElements
+        .filter((el): el is Edge => 'source' in el && 'target' in el)
+        .map(edge => edge.id);
+  
+      console.log('Pasted node IDs:', pastedNodeIds);
+      console.log('Pasted edge IDs:', pastedEdgeIds);
+  
+      const currentNodes = useStore.getState().nodes;
+      const currentEdges = useStore.getState().edges;
+  
+      const updatedNodes = currentNodes.map(node => ({
+        ...node,
+        selected: pastedNodeIds.includes(node.id)
+      }));
+      const updatedEdges = currentEdges.map(edge => ({
+        ...edge,
+        selected: pastedEdgeIds.includes(edge.id)
+      }));
+  
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
+  
     } else {
       const newElement = await handleSinglePaste(clipboardElements);
       if (newElement && isNode(newElement)) {
@@ -127,75 +198,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       }
     }
   };
-
-  const handleMultiplePaste = async (clipboardElements: (Node | Edge)[]) => {
-    const { clipboardNodes, clipboardEdges } = separateNodesAndEdges(clipboardElements);
-    
-    const blocks = clipboardNodes.filter(node => isBlock(node));
-    
-    const idMap = generateNewNodeIds(clipboardNodes);
-    console.log('Generated ID Map:', idMap);
-    
-    const blockOffsets: Record<string, { x: number, y: number }> = {};
-    blocks.forEach(block => {
-      blockOffsets[block.id] = { x: 22, y: 22 }; 
-    });
-    
-    const newNodes = clipboardNodes.map(node => {
-      console.log(`Creating new node for old ID ${node.id}`);
-      const newNode = createNewNode(node, idMap, blockOffsets);
-      console.log(`New node created. Old ID: ${node.id}, New ID: ${newNode.id}`);
-      
-      if (isTerminal(node) && node.data.terminalOf) {
-        const newBlockId = idMap[node.data.terminalOf];
-        console.log(`Mapping terminal ${node.id}: old parent ${node.data.terminalOf} -> new parent ${newBlockId}`);
-        if (newBlockId) {
-          newNode.data.terminalOf = newBlockId;
-          newNode.parentId = newBlockId;
-        }
-      }
-      
-      if (isBlock(node) && node.data.terminals && node.data.terminals.length > 0) {
-        newNode.data.terminals = node.data.terminals.map((terminal: any) => {
-          const mappedId = idMap[terminal.id] || terminal.id;
-          console.log(`Mapping terminal in block ${node.id}: old terminal ID ${terminal.id} -> new terminal ID ${mappedId}`);
-          return { id: mappedId };
-        }).filter((t: { id: any; }) => !!t.id); 
-      }
-      
-      return newNode;
-    });
-    
-    console.log('New Nodes after paste mapping:', newNodes);
-    setNodes([...nodes, ...newNodes]);
-    
-    await uploadNodes(newNodes);
-    
-    const newEdges = createNewEdges(clipboardEdges, idMap);
-    console.log('New Edges after paste mapping:', newEdges);
-    if (newEdges.length > 0) {
-      setEdges([...edges, ...newEdges]);
-      await uploadEdges(newEdges);
-    }
-    return [...newNodes, ...newEdges];
-  };
-
-  const handleSinglePaste = async (clipboardElement: Node | Edge) => {
-    if (isNode(clipboardElement)) {
-      console.log(`Handling single paste for node ID: ${clipboardElement.id}`);
-      const newNode = createNewNode(clipboardElement);
-      console.log(`Created new node for single paste. Old ID: ${clipboardElement.id}, New ID: ${newNode.id}`);
-      setNodes([...nodes, newNode]);
-      await createNode(newNode);
-      if (newNode.data.customAttributes && newNode.data.customAttributes.length > 0) {
-        await updateNode(newNode.id, { customAttributes: newNode.data.customAttributes });
-      }
-      return newNode;
-    } else {
-      console.warn('Skipping single-edge paste because source/target nodes were not copied.');
-      return null;
-    }
-  };
+  
 
   const separateNodesAndEdges = (elements: (Node | Edge)[]) => {
     return {
@@ -213,43 +216,54 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     }, {} as Record<string, string>);
   };
 
-  const createNewNode = (node: Node, idMap?: Record<string, string>, blockOffsets?: Record<string, { x: number, y: number }>) => {
+  const createNewNode = (
+    node: Node,
+    idMap?: Record<string, string>,
+    blockOffsets?: Record<string, { x: number, y: number }>
+  ) => {
     const newId = idMap ? idMap[node.id] : `${node.type}-${uuidv4()}`;
     
     let position;
-    
     if (isTerminal(node) && node.data.terminalOf) {
       if (blockOffsets && blockOffsets[node.data.terminalOf]) {
         position = {
           x: node.position.x,
-          y: node.position.y
+          y: node.position.y,
         };
       } else {
         position = {
           x: node.position.x + 22,
-          y: node.position.y + 22
+          y: node.position.y + 22,
         };
       }
     } else {
       position = {
         x: node.position.x + 22,
-        y: node.position.y + 22
+        y: node.position.y + 22,
       };
     }
     
-    return {
+    const newNode: Node = {
       ...node,
       id: newId,
       position,
       width: node.width ?? 110,
       height: node.height ?? 66,
+      selected: true, // Ensure this node is marked as selected
       data: {
         ...node.data,
         label: node.data.customName?.trim() ? node.data.customName : node.data.label,
         customAttributes: node.data.customAttributes ?? [],
       },
     };
+  
+    // Log the new node's properties. You can use JSON.stringify for a pretty print.
+    console.log("New Node properties:", JSON.stringify(newNode, null, 2));
+    console.log("New Node keys:", Object.keys(newNode));
+
+    return newNode;
   };
+  
 
   const createNewEdges = (edges: Edge[], idMap: Record<string, string>) => {
     return edges
