@@ -181,7 +181,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
   
   return (
     <div className="flex flex-col flex-1 h-full">
-      <div className="mb-2 p-4 border-b border-[#9facbc]">
+      <div className="mb-2 p-4 pt-2 border-b border-[#9facbc]">
         <div className="flex items-start justify-between gap-2 w-full">
           {editLabel ? (
             <div className="flex flex-col flex-1 min-w-0">
