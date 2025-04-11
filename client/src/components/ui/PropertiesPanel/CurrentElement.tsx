@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '../Misc/input';
 import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Misc/form';
@@ -12,8 +11,8 @@ import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } fro
 import { TextField, MenuItem } from '@mui/material';
 import { useClipboard } from '@/hooks/useClipboard';
 
-interface CurrentNodeProps {
-  currentNode: any;
+interface CurrentElementProps {
+  currentElement: any;
 }
 
 const customAttributeSchema = z.object({
@@ -28,10 +27,10 @@ const customAttributeSchema = z.object({
   }).optional(),
 });
 
-const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
+const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
   const [editLabel, setEditLabel] = useState(false);
-  const [tempName, setTempName] = useState(currentNode.data.customName || currentNode.data.label || '');
-  const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
+  const [tempName, setTempName] = useState(currentElement.data.customName || currentElement.data.label || '');
+  const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentElement.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showMaxLengthMsg, setShowMaxLengthMsg] = useState(false);
@@ -60,15 +59,15 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   }, [editLabel]);
 
   useEffect(() => {
-    setTempName(currentNode.data.customName || currentNode.data.label || '');
-    setCustomAttributes(currentNode.data.customAttributes || []);
-  }, [currentNode]);
+    setTempName(currentElement.data.customName || currentElement.data.label || '');
+    setCustomAttributes(currentElement.data.customAttributes || []);
+  }, [currentElement]);
 
   const handleUpdateCustomName = async () => {
     const trimmedName = tempName.trim();
-    const updated = await updateNode(currentNode.id, { customName: trimmedName });
+    const updated = await updateNode(currentElement.id, { customName: trimmedName });
     if (updated) {
-      currentNode.data.customName = trimmedName;
+      currentElement.data.customName = trimmedName;
     }
     setEditLabel(false);
   };
@@ -78,7 +77,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       e.preventDefault(); // prevents newline in textarea
       handleUpdateCustomName(); // submits the name
     } else if (e.key === 'Escape') {
-      setTempName(currentNode.data.customName || currentNode.data.label || '');
+      setTempName(currentElement.data.customName || currentElement.data.label || '');
       setEditLabel(false); // exits editing without saving
     }
   };
@@ -99,9 +98,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           },
         },
       ];
-      const updated = await updateNode(currentNode.id, { customAttributes: newAttributes });
+      const updated = await updateNode(currentElement.id, { customAttributes: newAttributes });
       if (updated) {
-        currentNode.data.customAttributes = newAttributes;
+        currentElement.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
         form.reset();
         setIsAttributesVisible(false);
@@ -123,9 +122,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         }
         return attr;
       });
-      const updated = await updateNode(currentNode.id, { customAttributes: newAttributes });
+      const updated = await updateNode(currentElement.id, { customAttributes: newAttributes });
       if (updated) {
-        currentNode.data.customAttributes = newAttributes;
+        currentElement.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
         form.reset();
         setEditingIndex(null);
@@ -137,9 +136,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const handleDeleteAttribute = async (attr: CustomAttribute) => {
     const updatedAttributes = customAttributes.filter(a => a !== attr);
     setCustomAttributes(updatedAttributes);
-    const updated = await updateNode(currentNode.id, { customAttributes: updatedAttributes });
+    const updated = await updateNode(currentElement.id, { customAttributes: updatedAttributes });
     if (updated) {
-      currentNode.data.customAttributes = updatedAttributes;
+      currentElement.data.customAttributes = updatedAttributes;
     }
   };
 
@@ -161,9 +160,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   };
 
   const handleAspectChange = async (newAspect: AspectType) => {
-    const updated = await updateNode(currentNode.id, { aspect: newAspect });
+    const updated = await updateNode(currentElement.id, { aspect: newAspect });
     if (updated) {
-      currentNode.data.aspect = newAspect;
+      currentElement.data.aspect = newAspect;
     }
   };
   const aspectOptions = [
@@ -176,7 +175,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   ];
   
   const filteredAspectOptions =
-    currentNode.type === 'terminal'
+    currentElement.type === 'terminal'
       ? aspectOptions.filter(option => option.value !== AspectType.Location)
       : aspectOptions;
   
@@ -227,7 +226,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             <div
               className="flex-1 min-w-0"
               onDoubleClick={() => {
-                setTempName(currentNode.data.customName || currentNode.data.label || '');
+                setTempName(currentElement.data.customName || currentElement.data.label || '');
                 setEditLabel(true);
               }}
             >
@@ -236,7 +235,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                 style={{ wordBreak: 'break-word' }}
                 title="Double-click to edit name"
               >
-                {currentNode.data.customName || currentNode.data.label || 'N/A'}
+                {currentElement.data.customName || currentElement.data.label || 'N/A'}
               </p>
             </div>
           )}
@@ -247,7 +246,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                 size={18}
                 className="text-blue-500 cursor-pointer"
                 onClick={() => {
-                  setTempName(currentNode.data.customName || currentNode.data.label || '');
+                  setTempName(currentElement.data.customName || currentElement.data.label || '');
                   setEditLabel(true);
                 }}
               />
@@ -269,7 +268,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         <TextField
           select
           variant="outlined"
-          value={currentNode.data.aspect}
+          value={currentElement.data.aspect}
           onChange={(e) => handleAspectChange(e.target.value as AspectType)}
           size="small"
           fullWidth
@@ -685,4 +684,4 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   );
 };
 
-export default CurrentNode;
+export default CurrentElement;

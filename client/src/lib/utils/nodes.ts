@@ -152,19 +152,19 @@ export const addTerminalToBlock = async (
 
 // This function is called to update props of a node when a connection is deleted or a node connected to it is deleted
 export const updateNodeRelations = async (
-  currentEdge: Edge,
+  currentRelation: Edge,
   nodeIdToDelete?: string
 ) => {
   const { nodes } = useStore.getState();
 
   // Deleting a terminal -> terminal connection
-  if (isTerminal(currentEdge.source!) && isTerminal(currentEdge.target!)) {
+  if (isTerminal(currentRelation.source!) && isTerminal(currentRelation.target!)) {
     const sourceTerminal = nodes.find(
-      terminal => terminal.id === currentEdge.source
+      terminal => terminal.id === currentRelation.source
     );
 
     const targetTerminal = nodes.find(
-      terminal => terminal.id === currentEdge.target
+      terminal => terminal.id === currentRelation.target
     );
 
     if (!sourceTerminal || !targetTerminal) return;
@@ -185,9 +185,9 @@ export const updateNodeRelations = async (
   }
 
   // Deleting a terminal -> block connection
-  if (isTerminal(currentEdge.source!) && isBlock(currentEdge.target!)) {
-    const terminal = nodes.find(node => node.id === currentEdge.source);
-    const block = nodes.find(node => node.id === currentEdge.target);
+  if (isTerminal(currentRelation.source!) && isBlock(currentRelation.target!)) {
+    const terminal = nodes.find(node => node.id === currentRelation.source);
+    const block = nodes.find(node => node.id === currentRelation.target);
 
     if (!terminal || !block) return;
 
@@ -210,9 +210,9 @@ export const updateNodeRelations = async (
   }
 
   // Deleting a block -> terminal connection
-  if (isTerminal(currentEdge.target!) && isBlock(currentEdge.source!)) {
-    const terminal = nodes.find(node => node.id === currentEdge.target);
-    const block = nodes.find(node => node.id === currentEdge.source);
+  if (isTerminal(currentRelation.target!) && isBlock(currentRelation.source!)) {
+    const terminal = nodes.find(node => node.id === currentRelation.target);
+    const block = nodes.find(node => node.id === currentRelation.source);
 
     if (!terminal || !block) return;
 
@@ -235,9 +235,9 @@ export const updateNodeRelations = async (
 
   // Deleting a conneected edge
   // Can be between blocks -> terminal, block -> connector, terminal -> connector
-  if (currentEdge.type === EdgeType.Connected) {
-    const sourceNode = nodes.find(node => node.id === currentEdge.source);
-    const targetNode = nodes.find(node => node.id === currentEdge.target);
+  if (currentRelation.type === EdgeType.Connected) {
+    const sourceNode = nodes.find(node => node.id === currentRelation.source);
+    const targetNode = nodes.find(node => node.id === currentRelation.target);
 
     if (!sourceNode || !targetNode) return;
 
@@ -265,22 +265,22 @@ export const updateNodeRelations = async (
 
   // Deleting a part edge
   // Can be between block -> block, block -> connector
-  if (currentEdge.type === EdgeType.Part) {
-    const sourceNode = nodes.find(node => node.id === currentEdge.source);
-    const targetNode = nodes.find(node => node.id === currentEdge.target);
+  if (currentRelation.type === EdgeType.Part) {
+    const sourceNode = nodes.find(node => node.id === currentRelation.source);
+    const targetNode = nodes.find(node => node.id === currentRelation.target);
 
     if (!sourceNode || !targetNode) return;
 
     if (targetNode.id !== nodeIdToDelete) {
       const filteredDirectParts = targetNode.data.directParts.filter(
-        (part: { id: string }) => part.id !== currentEdge.source
+        (part: { id: string }) => part.id !== currentRelation.source
       );
       // Remove sourceNode id from directParts property for target node
       targetNode.data.directParts =
         filteredDirectParts.length > 0 ? filteredDirectParts : [];
 
       const filteredChildren = targetNode.data.children.filter(
-        (child: { id: string }) => child.id !== currentEdge.source
+        (child: { id: string }) => child.id !== currentRelation.source
       );
 
       // Remove sourceNode id from children property for target node
@@ -304,15 +304,15 @@ export const updateNodeRelations = async (
 
   // Deleting a fulfilled edge
   // Can be between block -> block
-  if (currentEdge.type === EdgeType.Fulfilled) {
-    const sourceNode = nodes.find(node => node.id === currentEdge.source);
-    const targetNode = nodes.find(node => node.id === currentEdge.target);
+  if (currentRelation.type === EdgeType.Fulfilled) {
+    const sourceNode = nodes.find(node => node.id === currentRelation.source);
+    const targetNode = nodes.find(node => node.id === currentRelation.target);
 
     if (!sourceNode || !targetNode) return;
 
     if (targetNode.id !== nodeIdToDelete) {
       const filteredFulfills = targetNode.data.fulfills.filter(
-        (node: { id: string }) => node.id !== currentEdge.source
+        (node: { id: string }) => node.id !== currentRelation.source
       );
       // Remove sourceNode id from fulfills property for target node
       targetNode.data.fulfills =
@@ -323,7 +323,7 @@ export const updateNodeRelations = async (
 
     if (sourceNode.id !== nodeIdToDelete) {
       const filteredFulfilledBy = sourceNode.data.fulfilledBy.filter(
-        (node: { id: string }) => node.id !== currentEdge.target
+        (node: { id: string }) => node.id !== currentRelation.target
       );
       // Remove targetNode id from fulfilledBy property for source node
       sourceNode.data.fulfilledBy =
@@ -338,7 +338,7 @@ export const updateNodeRelations = async (
 // REMEMBER: This is commented out before we potentially reworked relation structure in back end + NodeData in types.ts
 // Display node relations if they are not empty in sidebar when node is clicked on canvas & sidebar is displayed
 // export const getNodeRelations = (
-//   currentNode: CustomNodeProps
+//   currentElement: CustomNodeProps
 // ): RelationKeysWithChildren[] => {
 //   const transformableKeys: RelationKeys[] = [
 //     'connectedTo',
@@ -365,13 +365,13 @@ export const updateNodeRelations = async (
 
 //   return transformableKeys.reduce(
 //     (acc: RelationKeysWithChildren[], key: RelationKeys) => {
-//       if (currentNode.data[key]) {
+//       if (currentElement.data[key]) {
 //         let children: { id: string }[];
 
-//         if (typeof currentNode.data[key] === 'string') {
-//           children = [{ id: currentNode.data[key] as string }];
+//         if (typeof currentElement.data[key] === 'string') {
+//           children = [{ id: currentElement.data[key] as string }];
 //         } else {
-//           children = currentNode.data[key] as { id: string }[];
+//           children = currentElement.data[key] as { id: string }[];
 //         }
 
 //         acc.push({
