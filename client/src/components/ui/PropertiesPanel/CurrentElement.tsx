@@ -191,9 +191,9 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                 className="w-full bg-transparent text-black dark:text-white resize-none focus:outline-none overflow-hidden break-words border"
                 style={{
                   wordBreak: 'break-word',
-                  minHeight: '1.5em', // Gives it breathing room
+                  minHeight: '1.5em',
                   height: 'auto',
-                  overflow: 'hidden', // Prevents scroll
+                  overflow: 'hidden',
                 }}
                 value={tempName}
                 autoFocus
@@ -244,7 +244,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
             {!editLabel && (
               <Edit2
                 size={18}
-                className="text-blue-500 cursor-pointer"
+                className="cursor-pointer"
                 onClick={() => {
                   setTempName(currentElement.data.customName || currentElement.data.label || '');
                   setEditLabel(true);
@@ -254,7 +254,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
             <Trash2
               size={18}
               onClick={handleTriggerDelete}
-              className="text-red-700 cursor-pointer"
+              className="cursor-pointer"
             />
           </div>
         </div>
@@ -634,13 +634,13 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                     <div title="Attribute actions" className="flex items-center space-x-1 ml-2">
                       <Edit2
                         size={16}
-                        className="cursor-pointer text-blue-500"
+                        className="cursor-pointer"
                         onClick={() => handleEditAttribute(index)}
                       />
                       <Minus
                         size={20}
                         onClick={() => handleDeleteAttribute(attr)}
-                        className="cursor-pointer text-red-500"
+                        className="cursor-pointer"
                       />
                     </div>
                   </div>
