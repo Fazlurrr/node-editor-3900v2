@@ -162,7 +162,7 @@ const getAspectColor = (aspect: AspectType) => {
     }
 }
 
-const NodesPanel: React.FC = () => {
+const ModellingPanel: React.FC = () => {
   const onDragStart = (event: React.DragEvent, nodeType: NodeType, aspect: AspectType) => {
     // Custom drag preview
     const dragPreview = document.createElement("div");
@@ -295,4 +295,4 @@ const NodesPanel: React.FC = () => {
   };
   
 
-export default NodesPanel;
+export default ModellingPanel;

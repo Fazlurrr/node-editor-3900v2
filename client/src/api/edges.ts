@@ -314,8 +314,8 @@ export const deleteMultipleEdges = async (edgeIds: string[]): Promise<boolean> =
       return false;
     }
 
-    const currentEdges = useStore.getState().edges;
-    setEdges(currentEdges.filter((edge) => !edgeIds.includes(edge.id)));
+    const currentRelations = useStore.getState().edges;
+    setEdges(currentRelations.filter((edge) => !edgeIds.includes(edge.id)));
     return true;
   } catch (error) {
     toast.error(`Error deleting edges: ${(error as Error).message}`);

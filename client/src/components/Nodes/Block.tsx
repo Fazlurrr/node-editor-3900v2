@@ -40,8 +40,8 @@ const Block = (props: CustomNodeProps) => {
   const handleSubmit = () => {
     const updatedName = tempName.trim();
     if (updatedName !== props.data.customName) {
-      const currentNodes = useStore.getState().nodes as RFNode[];
-      const updatedNodes = currentNodes.map((node: RFNode) =>
+      const currentElements = useStore.getState().nodes as RFNode[];
+      const updatedNodes = currentElements.map((node: RFNode) =>
         node.id === props.id 
           ? { ...node, data: { ...node.data, customName: updatedName } }
           : node
