@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +34,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [showMaxLengthMsg, setShowMaxLengthMsg] = useState(false);
   const { handleTriggerDelete } = useClipboard();
   const form = useForm<z.infer<typeof customAttributeSchema>>({
     resolver: zodResolver(customAttributeSchema),
@@ -49,6 +50,14 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       },
     },
   });
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (editLabel && textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // reset height
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // fit content
+    }
+  }, [editLabel]);
 
   useEffect(() => {
     setTempName(currentNode.data.customName || currentNode.data.label || '');
@@ -64,12 +73,13 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     setEditLabel(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleUpdateCustomName();
+      e.preventDefault(); // prevents newline in textarea
+      handleUpdateCustomName(); // submits the name
     } else if (e.key === 'Escape') {
       setTempName(currentNode.data.customName || currentNode.data.label || '');
-      setEditLabel(false);
+      setEditLabel(false); // exits editing without saving
     }
   };
 
@@ -172,39 +182,89 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   
   return (
     <div className="flex flex-col flex-1 h-full">
-      <div className="mb-2 p-4 flex gap-2 justify-between items-center border-b border-[#9facbc]">
-        <div className="flex items-center gap-2">
-            {editLabel ? (
-              <Input
-                className="min-w-[100px] w-full"
+      <div className="mb-2 p-4 border-b border-[#9facbc]">
+        <div className="flex items-start justify-between gap-2 w-full">
+          {editLabel ? (
+            <div className="flex flex-col flex-1 min-w-0">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                className="w-full bg-transparent text-black dark:text-white resize-none focus:outline-none overflow-hidden break-words border"
+                style={{
+                  wordBreak: 'break-word',
+                  minHeight: '1.5em', // Gives it breathing room
+                  height: 'auto',
+                  overflow: 'hidden', // Prevents scroll
+                }}
                 value={tempName}
-                onChange={(e) => setTempName(e.target.value)}
-                onBlur={handleUpdateCustomName}
                 autoFocus
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.length <= 50) {
+                    setTempName(val);
+                    setShowMaxLengthMsg(false);
+                  } else {
+                    setShowMaxLengthMsg(true);
+                  }
+
+                  // Auto-grow as user types
+                  if (textareaRef.current) {
+                    textareaRef.current.style.height = 'auto';
+                    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+                  }
+                }}
+                onBlur={handleUpdateCustomName}
                 onKeyDown={handleKeyDown}
               />
-            ) : (
-              <span
-                title="Edit Name"
+
+              {showMaxLengthMsg && (
+                <span className="text-xs text-red-500 mt-1">
+                  Maximum of 50 characters reached
+                </span>
+              )}
+            </div>
+          ) : (
+            <div
+              className="flex-1 min-w-0"
+              onDoubleClick={() => {
+                setTempName(currentNode.data.customName || currentNode.data.label || '');
+                setEditLabel(true);
+              }}
+            >
+              <p
+                className="flex-grow cursor-pointer flex items-center break-all"
+                style={{ wordBreak: 'break-word' }}
+                title="Double-click to edit name"
+              >
+                {currentNode.data.customName || currentNode.data.label || 'N/A'}
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {!editLabel && (
+              <Edit2
+                size={18}
+                className="text-blue-500 cursor-pointer"
                 onClick={() => {
                   setTempName(currentNode.data.customName || currentNode.data.label || '');
                   setEditLabel(true);
                 }}
-                className="flex-grow cursor-pointer font-bold flex items-center break-all"
-              >
-                {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
-                <Edit2 size={18} className="ml-1 flex-shrink-0" />
-              </span>
+              />
             )}
+            <Trash2
+              size={18}
+              onClick={handleTriggerDelete}
+              className="text-red-700 cursor-pointer"
+            />
+          </div>
         </div>
-        <button onClick={handleTriggerDelete} title="Delete Element">
-          <Trash2 size={18} className="mr-2 text-red-700" />
-        </button>
       </div>
+
 
       {/* Aspect Type */}
       <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
-        <strong>Aspect type:</strong>
+        <div className="font-semibold">Aspect</div>
         <div className="mb-2"></div>
         <TextField
           select
@@ -247,7 +307,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       <div className="flex-1 pb-12 px-4 h-96 overflow-hidden">
         <div className="flex justify-between items-center mb-2 relative">
           <p className="text-black dark:text-white">
-            <strong>Custom attributes</strong>
+            <div className="font-semibold">Attributes</div>
           </p>
           <div className="relative">
             {!isAttributesVisible ? (
@@ -290,7 +350,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             {isAttributesVisible && (
               <div className="fixed top-64 right-56 w-80 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
                 <div className="flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc]">
-                  <h2 className="font-bold">{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h2>
+                  <h2 className="font-semibold">{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h2>
                   <span className="cursor-pointer" title="Close" onClick={() => setIsAttributesVisible(false)}>
                     <X size={18} />
                   </span>
@@ -549,7 +609,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             )}
           </div>
         </div>
-      </div>
+
 
       {/* List existing custom attributes */}
       {customAttributes.length > 0 && (
@@ -570,25 +630,23 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
                 <div className="w-full">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <strong className="text-sm break-words break-all">{attr.name}</strong>
-                      <div title="Edit Attribute">
-                        <Edit2
-                          size={16}
-                          className="cursor-pointer ml-2 text-blue-500"
-                          onClick={() => handleEditAttribute(index)}
-                        />
-                      </div>
+                      <span className="text-sm font-semibold break-words break-all">{attr.name}</span>
                     </div>
-                    <div title="Delete Attribute">
+                    <div title="Attribute actions" className="flex items-center space-x-1 ml-2">
+                      <Edit2
+                        size={16}
+                        className="cursor-pointer text-blue-500"
+                        onClick={() => handleEditAttribute(index)}
+                      />
                       <Minus
                         size={20}
                         onClick={() => handleDeleteAttribute(attr)}
-                        className="cursor-pointer text-red-500 ml-2"
+                        className="cursor-pointer text-red-500"
                       />
                     </div>
                   </div>
-                  <div className="text-sm break-words">{attr.value}</div>
-                  <div className="text-sm break-words">{attr.unitOfMeasure ? ` (${attr.unitOfMeasure})` : ''}</div>
+                  <div className="text-sm break-words"></div>
+                  <div className="text-sm break-words">{attr.value}<span className="italic">{attr.unitOfMeasure ? ` ${attr.unitOfMeasure}` : ''}</span></div>
                   {(attr.quantityDatums?.provenance ||
                     attr.quantityDatums?.scope ||
                     attr.quantityDatums?.range ||
@@ -622,6 +680,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           ))}
         </div>
       )}
+            </div>
     </div>
   );
 };

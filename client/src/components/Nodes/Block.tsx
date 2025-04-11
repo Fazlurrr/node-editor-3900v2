@@ -148,7 +148,12 @@ const Block = (props: CustomNodeProps) => {
             onMouseDown={(e) => e.stopPropagation()} 
             className="w-auto h-auto bg-transparent text-center text-black resize-none focus:outline-none overflow-x-hidden break-words"
             value={tempName}
-            onChange={(e) => setTempName(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length <= 50) {
+                setTempName(value);
+              }
+            }}
             onBlur={handleSubmit}
             onKeyDown={handleKeyDown}
           />
@@ -161,6 +166,7 @@ const Block = (props: CustomNodeProps) => {
         )}
         </header>
       </div>
+
 
       {hasCustomAttributes && (
         <div className="absolute -top-6 -right-10 flex items-center space-x-1 bg-white dark:bg-[#232528] px-1 border-2 border-black dark:border-white rounded shadow">
