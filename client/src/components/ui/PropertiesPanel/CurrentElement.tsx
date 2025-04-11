@@ -241,7 +241,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
           )}
 
           <div className="flex items-center gap-2 flex-shrink-0 mt-1">
-            {!editLabel && (
+            <span title="Rename">
               <Edit2
                 size={18}
                 className="cursor-pointer"
@@ -250,12 +250,14 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                   setEditLabel(true);
                 }}
               />
-            )}
-            <Trash2
-              size={18}
-              onClick={handleTriggerDelete}
-              className="cursor-pointer"
-            />
+            </span>
+            <span title="Delete Element">
+              <Trash2
+                size={18}
+                onClick={handleTriggerDelete}
+                className="cursor-pointer"
+              />
+            </span>
           </div>
         </div>
       </div>
@@ -631,17 +633,21 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                     <div className="flex items-center">
                       <span className="text-sm font-semibold break-words break-all">{attr.name}</span>
                     </div>
-                    <div title="Attribute actions" className="flex items-center space-x-1 ml-2">
-                      <Edit2
-                        size={16}
-                        className="cursor-pointer"
-                        onClick={() => handleEditAttribute(index)}
-                      />
-                      <Minus
-                        size={20}
-                        onClick={() => handleDeleteAttribute(attr)}
-                        className="cursor-pointer"
-                      />
+                    <div className="flex items-center space-x-1 ml-2">
+                      <span title="Edit Attribute">
+                        <Edit2
+                          size={16}
+                          className="cursor-pointer"
+                          onClick={() => handleEditAttribute(index)}
+                        />
+                      </span>
+                      <span title="Delete Attribute">
+                        <Minus
+                          size={20}
+                          onClick={() => handleDeleteAttribute(attr)}
+                          className="cursor-pointer"
+                        />
+                      </span>
                     </div>
                   </div>
                   <div className="text-sm break-words"></div>
