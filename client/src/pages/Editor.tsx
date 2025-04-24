@@ -7,7 +7,8 @@ import {
   EdgeTypes,
   NodeTypes,
   SelectionMode,
-  ReactFlowInstance
+  ReactFlowInstance,
+  NodeChange
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 import 'reactflow/dist/style.css';
@@ -42,23 +43,32 @@ import CanvasMenu from '@/components/ui/Misc/CanvasMenu';
 import { useNodeOperations } from '@/hooks/useNodeOperations';
 import useConnection from '@/hooks/useConnection';
 
+import { updateNode } from '@/api/nodes';  
+import { isPointInsideNode, getSnappedPosition } from '@/lib/utils/nodes';
+
 const Editor = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
-  const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
+
   const { isGridVisible } = useGridContext();
   const [canvasMenu, setCanvasMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null);
+
+  const {
+    nodes,
+    setNodes,
+    onNodesChange: storeOnNodesChange,
+    edges,
+    setEdges,
+    onEdgesChange,
+  } = useStore(storeSelector, shallow);
+
   const { 
-    onNodeDrag, 
-    onNodeDragStop, 
+    onNodeDrag,            
     handleDrop,
     handleTerminalDetach,
-    handleSelectionDragStart,
-    handleSelectionDragStop,
-  } = useNodeOperations(reactFlowWrapper, reactFlowInstance, initialPositions);
+  } = useNodeOperations(reactFlowWrapper, reactFlowInstance);
+
   const [, setCurrentZoom] = useState<number>(1);
-  const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
-    useStore(storeSelector, shallow);
   const { handleTriggerDelete, handlePaste } = useClipboard();
   const { theme } = useTheme();
   const [lockState, setLockState] = useState<boolean>(false);
@@ -153,11 +163,75 @@ const Editor = () => {
 
   const onLoad = (instance: ReactFlowInstance) => setReactFlowInstance(instance);
 
-  useKeyboardShortcuts(handleTriggerDelete, handlePaste, () => setLockState(prev => !prev));
+  const handleNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      storeOnNodesChange(changes);
+      const updatedStoreNodes = useStore.getState().nodes;
+  
+      changes.forEach((change) => {
+        if (change.type === 'position' && !change.dragging) {
+          const changedNode = updatedStoreNodes.find((n) => n.id === change.id);
+          if (!changedNode) return;
+  
+          if (changedNode.type === 'terminal' && !changedNode.parentId) {
+            const blockNode = updatedStoreNodes.find(
+              (potentialBlock) =>
+                potentialBlock.type === 'block' &&
+                isPointInsideNode(
+                  {
+                    x: changedNode.position.x + (changedNode.width || 22) / 2,
+                    y: changedNode.position.y + (changedNode.height || 22) / 2,
+                  },
+                  potentialBlock
+                )
+            );
+  
+            if (blockNode) {
+              const relPos = {
+                x: changedNode.position.x - blockNode.position.x,
+                y: changedNode.position.y - blockNode.position.y,
+              };
+              const snappedPos = getSnappedPosition(
+                { ...changedNode, position: relPos },
+                blockNode
+              );
+  
+              const currentNodes = useStore.getState().nodes;
+              let newNodes = currentNodes.map((node) =>
+                node.id === changedNode.id
+                  ? { ...node, position: snappedPos, parentId: blockNode.id }
+                  : node
+              );
+  
+              newNodes = newNodes.map((node) => {
+                if (node.id !== blockNode.id) return node;
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    terminals: Array.isArray(node.data.terminals)
+                      ? [...node.data.terminals, { id: changedNode.id }]
+                      : [{ id: changedNode.id }],
+                  },
+                };
+              });
+  
+              setNodes(newNodes);
+            }
+          }
+  
+          void updateNode(change.id);
+        }
+      });
+    },
+    [storeOnNodesChange, setNodes]
+  );
+  
+  useKeyboardShortcuts(handleTriggerDelete, handlePaste, () => setLockState((prev) => !prev));
 
   const selectedElements = useMemo(() => {
-    const selectedNodes = nodes.filter(n => n.selected);
-    const selectedEdges = edges.filter(e => e.selected);
+    const selectedNodes = nodes.filter((n) => n.selected);
+    const selectedEdges = edges.filter((e) => e.selected);
     return [...selectedNodes, ...selectedEdges];
   }, [nodes, edges]);
 
@@ -170,31 +244,23 @@ const Editor = () => {
           elementsSelectable={!lockState}
           nodes={nodes}
           edges={edges}
-          selectionOnDrag
+          selectionOnDrag 
+          selectNodesOnDrag={true}
           selectionMode={SelectionMode.Partial}
           panOnDrag={panOnDrag}
-          onNodesChange={onNodesChange}
+          onNodesChange={handleNodesChange}
           onEdgesChange={onEdgesChange}
+          
           onConnectStart={startDraggingRelation}
           onConnectEnd={endDraggingRelation}
           onConnect={onConnect}
+          
           nodeTypes={nodeTypes as unknown as NodeTypes}
           edgeTypes={edgeTypes as unknown as EdgeTypes}
-          onNodeDragStart={(_, node) => {
-            initialPositions.current[node.id] = {
-              x: node.position.x,
-              y: node.position.y,
-            };
-          }}
-          onNodeDragStop={onNodeDragStop}
-          onSelectionDragStart={handleSelectionDragStart}
-          onSelectionDragStop={handleSelectionDragStop}
+          
           onNodeDrag={onNodeDrag}
+
           deleteKeyCode={null}
-          onPaneClick={() => {
-            setNodes(nodes.map(n => ({ ...n, selected: false })));
-            setEdges(edges.map(e => ({ ...e, selected: false })));
-          }}
           onInit={onLoad}
           snapToGrid={true}
           snapGrid={[11, 11]}
