@@ -5,8 +5,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../../dropdown-menu';
-import { Button } from '../../button';
+} from '@/components/ui/Misc/dropdown-menu';
+import { Button } from '../../Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { ArrowUpDown, MoreHorizontal, X } from 'lucide-react';
 import {
@@ -16,7 +16,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../select';
+} from '@/components/ui/Misc/select';
 import { deleteUser, updatePassword, updateUserRole } from '@/api/auth';
 import { queryClient } from '@/main';
 import { cn } from '@/lib/utils';
@@ -29,7 +29,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/Misc/form';
 import { useState } from 'react';
 import { updatePasswordAdmin } from '@/lib/schemas';
 import { TextField } from '@mui/material';

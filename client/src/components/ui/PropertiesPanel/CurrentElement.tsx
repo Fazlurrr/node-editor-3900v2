@@ -1,21 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '../input';
-import { Button } from '../button';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Misc/form';
 import { Edit2, Plus, Minus, X, Trash2 } from 'lucide-react';
-import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { updateNode} from '@/api/nodes';
 import { AspectType, CustomAttribute, Provenance, Scope, Range, Regularity } from '@/lib/types';
 import { TextField, MenuItem } from '@mui/material';
 import { useClipboard } from '@/hooks/useClipboard';
-import { useStore } from '@/hooks';
 
-interface CurrentNodeProps {
-  currentNode: any;
+interface CurrentElementProps {
+  currentElement: any;
 }
 
 const customAttributeSchema = z.object({
@@ -30,15 +27,14 @@ const customAttributeSchema = z.object({
   }).optional(),
 });
 
-const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
+const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
   const [editLabel, setEditLabel] = useState(false);
-  const [tempName, setTempName] = useState(currentNode.data.customName || currentNode.data.label || '');
-  const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentNode.data.customAttributes || []);
+  const [tempName, setTempName] = useState(currentElement.data.customName || currentElement.data.label || '');
+  const [customAttributes, setCustomAttributes] = useState<CustomAttribute[]>(currentElement.data.customAttributes || []);
   const [isAttributesVisible, setIsAttributesVisible] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [showMaxLengthMsg, setShowMaxLengthMsg] = useState(false);
   const { handleTriggerDelete } = useClipboard();
-  const { setNodes } = useStore();
   const form = useForm<z.infer<typeof customAttributeSchema>>({
     resolver: zodResolver(customAttributeSchema),
     defaultValues: {
@@ -53,27 +49,36 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       },
     },
   });
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
-    setTempName(currentNode.data.customName || currentNode.data.label || '');
-    setCustomAttributes(currentNode.data.customAttributes || []);
-  }, [currentNode]);
+    if (editLabel && textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // reset height
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // fit content
+    }
+  }, [editLabel]);
+
+  useEffect(() => {
+    setTempName(currentElement.data.customName || currentElement.data.label || '');
+    setCustomAttributes(currentElement.data.customAttributes || []);
+  }, [currentElement]);
 
   const handleUpdateCustomName = async () => {
     const trimmedName = tempName.trim();
-    const updated = await updateNode(currentNode.id, { customName: trimmedName });
+    const updated = await updateNode(currentElement.id, { customName: trimmedName });
     if (updated) {
-      currentNode.data.customName = trimmedName;
+      currentElement.data.customName = trimmedName;
     }
     setEditLabel(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleUpdateCustomName();
+      e.preventDefault(); // prevents newline in textarea
+      handleUpdateCustomName(); // submits the name
     } else if (e.key === 'Escape') {
-      setTempName(currentNode.data.customName || currentNode.data.label || '');
-      setEditLabel(false);
+      setTempName(currentElement.data.customName || currentElement.data.label || '');
+      setEditLabel(false); // exits editing without saving
     }
   };
 
@@ -93,9 +98,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           },
         },
       ];
-      const updated = await updateNode(currentNode.id, { customAttributes: newAttributes });
+      const updated = await updateNode(currentElement.id, { customAttributes: newAttributes });
       if (updated) {
-        currentNode.data.customAttributes = newAttributes;
+        currentElement.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
         form.reset();
         setIsAttributesVisible(false);
@@ -117,9 +122,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
         }
         return attr;
       });
-      const updated = await updateNode(currentNode.id, { customAttributes: newAttributes });
+      const updated = await updateNode(currentElement.id, { customAttributes: newAttributes });
       if (updated) {
-        currentNode.data.customAttributes = newAttributes;
+        currentElement.data.customAttributes = newAttributes;
         setCustomAttributes(newAttributes);
         form.reset();
         setEditingIndex(null);
@@ -131,9 +136,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
   const handleDeleteAttribute = async (attr: CustomAttribute) => {
     const updatedAttributes = customAttributes.filter(a => a !== attr);
     setCustomAttributes(updatedAttributes);
-    const updated = await updateNode(currentNode.id, { customAttributes: updatedAttributes });
+    const updated = await updateNode(currentElement.id, { customAttributes: updatedAttributes });
     if (updated) {
-      currentNode.data.customAttributes = updatedAttributes;
+      currentElement.data.customAttributes = updatedAttributes;
     }
   };
 
@@ -154,61 +159,118 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
     setIsAttributesVisible(true);
   };
 
-  const handleDeleteClick = async () => {
-    const currentNodes = useStore.getState().nodes;
-    setNodes(
-      currentNodes.map(n => (n.id === currentNode.id ? { ...n, selected: true } : n))
-    );
-    await handleTriggerDelete();
-  };
-
   const handleAspectChange = async (newAspect: AspectType) => {
-    const updated = await updateNode(currentNode.id, { aspect: newAspect });
+    const updated = await updateNode(currentElement.id, { aspect: newAspect });
     if (updated) {
-      currentNode.data.aspect = newAspect;
+      currentElement.data.aspect = newAspect;
     }
   };
-
+  const aspectOptions = [
+    { value: AspectType.Function, label: 'Function', color: '#fff000' },
+    { value: AspectType.Product, label: 'Product', color: '#00ffff' },
+    { value: AspectType.Location, label: 'Location', color: '#ff00ff' },
+    { value: AspectType.Installed, label: 'Installed', color: '#424bb2' },
+    { value: AspectType.NoAspect, label: 'No Aspect', color: '#E0E0E0' },
+    { value: AspectType.UnspecifiedAspect, label: 'Unspecified', color: '#9E9E9E' },
+  ];
+  
+  const filteredAspectOptions =
+    currentElement.type === 'terminal'
+      ? aspectOptions.filter(option => option.value !== AspectType.Location)
+      : aspectOptions;
+  
   return (
     <div className="flex flex-col flex-1 h-full">
-      <div className="mb-2 p-4 flex gap-2 justify-between items-center border-b border-[#9facbc]">
-        <div className="flex items-start gap-2">
+      <div className="mb-2 p-4 pt-2 border-b border-[#9facbc]">
+        <div className="flex items-start justify-between gap-2 w-full">
           {editLabel ? (
-            <Input
-              className="min-w-[100px] w-full break-words overflow-hidden text-overflow-ellipsis"
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onBlur={handleUpdateCustomName}
-              autoFocus
-              onKeyDown={handleKeyDown}
-            />
+            <div className="flex flex-col flex-1 min-w-0">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                className="w-full bg-transparent text-black dark:text-white resize-none focus:outline-none overflow-hidden break-words border"
+                style={{
+                  wordBreak: 'break-word',
+                  minHeight: '1.5em',
+                  height: 'auto',
+                  overflow: 'hidden',
+                }}
+                value={tempName}
+                autoFocus
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.length <= 50) {
+                    setTempName(val);
+                    setShowMaxLengthMsg(false);
+                  } else {
+                    setShowMaxLengthMsg(true);
+                  }
+
+                  // Auto-grow as user types
+                  if (textareaRef.current) {
+                    textareaRef.current.style.height = 'auto';
+                    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+                  }
+                }}
+                onBlur={handleUpdateCustomName}
+                onKeyDown={handleKeyDown}
+              />
+
+              {showMaxLengthMsg && (
+                <span className="text-xs text-red-500 mt-1">
+                  Maximum of 50 characters reached
+                </span>
+              )}
+            </div>
           ) : (
-            <span
-              title="Edit Name"
-              onClick={() => {
-                setTempName(currentNode.data.customName || currentNode.data.label || '');
+            <div
+              className="flex-1 min-w-0"
+              onDoubleClick={() => {
+                setTempName(currentElement.data.customName || currentElement.data.label || '');
                 setEditLabel(true);
               }}
-              className="flex-grow cursor-pointer font-bold flex items-center break-all"
             >
-              {currentNode.data.customName || currentNode.data.label || 'N/A'}{' '}
-              <Edit2 size={18} className="ml-1" />
-            </span>
+              <p
+                className="flex-grow cursor-pointer flex items-center break-all"
+                style={{ wordBreak: 'break-word' }}
+                title="Double-click to edit name"
+              >
+                {currentElement.data.customName || currentElement.data.label || 'N/A'}
+              </p>
+            </div>
           )}
+
+          <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+            <span title="Rename">
+              <Edit2
+                size={18}
+                className="cursor-pointer"
+                onClick={() => {
+                  setTempName(currentElement.data.customName || currentElement.data.label || '');
+                  setEditLabel(true);
+                }}
+              />
+            </span>
+            <span title="Delete Element">
+              <Trash2
+                size={18}
+                onClick={handleTriggerDelete}
+                className="cursor-pointer"
+              />
+            </span>
+          </div>
         </div>
-        <button onClick={handleDeleteClick} title="Delete Element">
-          <Trash2 size={18} className="mr-2 text-red-700" />
-        </button>
       </div>
+
 
       {/* Aspect Type */}
       <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
-        <strong>Aspect type:</strong>
+        <div className="font-semibold">Aspect</div>
         <div className="mb-2"></div>
         <TextField
           select
           variant="outlined"
-          value={currentNode.data.aspect}
+          value={currentElement.data.aspect}
           onChange={(e) => handleAspectChange(e.target.value as AspectType)}
           size="small"
           fullWidth
@@ -223,42 +285,22 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           dark:[&_.MuiOutlinedInput-root.Mui-focused_.MuiInputLabel-root]:text-white
           dark:[&_.MuiSelect-icon]:text-white"
           >
-          <MenuItem value={AspectType.Function}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#fff000', borderRadius: '50%', marginRight: '10px' }}></span>
-              Function
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.Product}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#00ffff', borderRadius: '50%', marginRight: '10px' }}></span>
-              Product
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.Location}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#ff00ff', borderRadius: '50%', marginRight: '10px' }}></span>
-              Location
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.Installed}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#424bb2', borderRadius: '50%', marginRight: '10px' }}></span>
-              Installed
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.NoAspect}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#E0E0E0', borderRadius: '50%', marginRight: '10px' }}></span>
-              No Aspect
-            </span>
-          </MenuItem>
-          <MenuItem value={AspectType.UnspecifiedAspect}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ height: '10px', width: '10px', backgroundColor: '#9E9E9E', borderRadius: '50%', marginRight: '10px' }}></span>
-              Unspecified
-            </span>
-          </MenuItem>
+          {filteredAspectOptions.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                  style={{
+                    height: '10px',
+                    width: '10px',
+                    backgroundColor: option.color,
+                    borderRadius: '50%',
+                    marginRight: '10px',
+                  }}
+                ></span>
+                {option.label}
+              </span>
+            </MenuItem>
+          ))}
         </TextField>
       </div>
 
@@ -266,7 +308,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
       <div className="flex-1 pb-12 px-4 h-96 overflow-hidden">
         <div className="flex justify-between items-center mb-2 relative">
           <p className="text-black dark:text-white">
-            <strong>Custom attributes</strong>
+            <div className="font-semibold">Attributes</div>
           </p>
           <div className="relative">
             {!isAttributesVisible ? (
@@ -309,7 +351,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             {isAttributesVisible && (
               <div className="fixed top-64 right-56 w-80 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
                 <div className="flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc]">
-                  <h2 className="font-bold">{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h2>
+                  <h2 className="font-semibold">{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h2>
                   <span className="cursor-pointer" title="Close" onClick={() => setIsAttributesVisible(false)}>
                     <X size={18} />
                   </span>
@@ -568,7 +610,7 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
             )}
           </div>
         </div>
-      </div>
+
 
       {/* List existing custom attributes */}
       {customAttributes.length > 0 && (
@@ -584,35 +626,37 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           [scrollbar-color:lightGray_transparent]"
         >
           {customAttributes.map((attr, index) => (
-            <div key={index} className="flex border-b p-2">
+            <div key={index} className="flex border-b dark:border-gray-600 p-2">
               <div className="flex w-full items-center justify-between">
                 <div className="w-full">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <strong className="text-sm break-words break-all">{attr.name}</strong>
-                      <div title="Edit Attribute">
+                      <span className="text-sm font-semibold break-words break-all">{attr.name}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 ml-2">
+                      <span title="Edit Attribute">
                         <Edit2
                           size={16}
-                          className="cursor-pointer ml-2 text-blue-500"
+                          className="cursor-pointer"
                           onClick={() => handleEditAttribute(index)}
                         />
-                      </div>
-                    </div>
-                    <div title="Delete Attribute">
-                      <Minus
-                        size={20}
-                        onClick={() => handleDeleteAttribute(attr)}
-                        className="cursor-pointer text-red-500 ml-2"
-                      />
+                      </span>
+                      <span title="Delete Attribute">
+                        <Minus
+                          size={20}
+                          onClick={() => handleDeleteAttribute(attr)}
+                          className="cursor-pointer"
+                        />
+                      </span>
                     </div>
                   </div>
-                  <div className="text-sm break-words">{attr.value}</div>
-                  <div className="text-sm break-words">{attr.unitOfMeasure ? ` (${attr.unitOfMeasure})` : ''}</div>
+                  <div className="text-sm break-words"></div>
+                  <div className="text-sm break-words">{attr.value}<span className="italic">{attr.unitOfMeasure ? ` ${attr.unitOfMeasure}` : ''}</span></div>
                   {(attr.quantityDatums?.provenance ||
                     attr.quantityDatums?.scope ||
                     attr.quantityDatums?.range ||
                     attr.quantityDatums?.regularity) && (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
                       {attr.quantityDatums.provenance && (
                         <div>
                           <span className="font-medium">Provenance:</span> {attr.quantityDatums.provenance}
@@ -641,14 +685,9 @@ const CurrentNode: React.FC<CurrentNodeProps> = ({ currentNode }) => {
           ))}
         </div>
       )}
-      <DeleteConfirmationDialog
-        open={showDeleteDialog}
-        elementType="element"
-        onConfirm={handleDeleteClick}
-        onCancel={() => setShowDeleteDialog(false)}
-      />
+            </div>
     </div>
   );
 };
 
-export default CurrentNode;
+export default CurrentElement;

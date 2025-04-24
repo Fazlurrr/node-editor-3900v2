@@ -31,15 +31,15 @@ import {
   lightTheme,
 } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
-import { NodesPanel } from '@/components/ui';
+import { ModellingPanel } from '@/components/ui';
 import { fetchNodes } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import Toolbar from '@/components/ui/Toolbar/Toolbar';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { useGridContext } from '@/components/ui/toggleGrid';
+import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
 import { useClipboard } from '@/hooks/useClipboard';
-import CanvasMenu from '@/components/ui/CanvasMenu';
+import CanvasMenu from '@/components/ui/Misc/CanvasMenu';
 import { useNodeOperations } from '@/hooks/useNodeOperations';
 import useConnection from '@/hooks/useConnection';
 
@@ -81,8 +81,8 @@ const Editor = () => {
 
   const handleRightClick = useCallback(
     ({ x, y, nodeId }: { x: number; y: number; nodeId: string }) => {
-      const currentNodes = useStore.getState().nodes;
-      const updatedNodes = currentNodes.map((node) => ({
+      const currentElements = useStore.getState().nodes;
+      const updatedNodes = currentElements.map((node) => ({
         ...node,
         selected: node.id === nodeId,
       }));
@@ -117,10 +117,10 @@ const Editor = () => {
 
   const moveNodeToFront = useCallback(
     (nodeId: string) => {
-      const currentNodes = useStore.getState().nodes;
-      const targetNode = currentNodes.find((n) => n.id === nodeId);
+      const currentElements = useStore.getState().nodes;
+      const targetNode = currentElements.find((n) => n.id === nodeId);
       if (!targetNode) return;
-      const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
+      const remainingNodes = currentElements.filter((n) => n.id !== nodeId);
       setNodes([...remainingNodes, targetNode]);
     },
     [setNodes]
@@ -128,10 +128,10 @@ const Editor = () => {
 
   const moveNodeToBack = useCallback(
     (nodeId: string) => {
-      const currentNodes = useStore.getState().nodes;
-      const targetNode = currentNodes.find((n) => n.id === nodeId);
+      const currentElements = useStore.getState().nodes;
+      const targetNode = currentElements.find((n) => n.id === nodeId);
       if (!targetNode) return;
-      const remainingNodes = currentNodes.filter((n) => n.id !== nodeId);
+      const remainingNodes = currentElements.filter((n) => n.id !== nodeId);
       setNodes([targetNode, ...remainingNodes]);
     },
     [setNodes]
@@ -294,7 +294,7 @@ const Editor = () => {
         )}
       </div>
       <Toolbar isLocked={lockState} onLockToggle={() => setLockState(!lockState)} />
-      <NodesPanel />
+      <ModellingPanel />
       <PropertiesPanel selectedElements={selectedElements} />
     </ThemeProvider>
   );

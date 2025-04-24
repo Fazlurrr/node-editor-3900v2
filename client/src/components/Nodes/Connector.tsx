@@ -5,7 +5,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../ui/tooltip';
+} from '../ui/Misc/tooltip';
 import { Asterisk } from 'lucide-react';
 import { selectionColor } from '@/lib/config';
 import { useMode } from '@/hooks/useMode';
@@ -49,11 +49,15 @@ const Connector = (props: CustomNodeProps) => {
           </figure>
         </TooltipTrigger>
         {props.data.customName !== '' && (
-          <TooltipContent>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {props.data.customName}
-            </p>
-          </TooltipContent>
+          <TooltipContent
+            side="top"
+            sideOffset={5}
+            className="z-9999"
+          >
+          <p className="text-base text-gray-500 dark:text-white break-words whitespace-normal max-w-[200px]">
+            {props.data.customName}
+          </p>
+        </TooltipContent>
         )}
       </Tooltip>
     </TooltipProvider>

@@ -1,8 +1,9 @@
 import { useReactFlow, getNodesBounds, getViewportForBounds } from 'reactflow';
 import { toPng, toSvg } from 'html-to-image';
 import { useTheme } from '@/hooks';
-import { Button } from '../../button';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
+import { useEffect } from 'react';
 
 interface DownloadImageProps {
     fileName: string;
@@ -18,6 +19,21 @@ const Download = (dataUrl: string, fileName: string ) => {
 };
 
 const DownloadImage = ({ fileName, fileType }: DownloadImageProps) => {
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Enter' && (fileType === 'png' || fileType === 'svg')) {
+                onClick();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [fileType]);
+
+
     const { getNodes } = useReactFlow();
     const { theme } = useTheme();
 

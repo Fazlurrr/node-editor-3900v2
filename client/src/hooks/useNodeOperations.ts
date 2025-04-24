@@ -88,14 +88,14 @@ export const useNodeOperations = (
       };
 
       const handleTerminalDetach = useCallback((nodeId: string) => {
-          const currentNodes = useStore.getState().nodes;
-          const terminalNode = currentNodes.find(n => n.id === nodeId);
+          const currentElements = useStore.getState().nodes;
+          const terminalNode = currentElements.find(n => n.id === nodeId);
           const { setNodes } = useStore.getState();
           
           if (!terminalNode || terminalNode.type !== 'terminal') return;
           
           const parentId = terminalNode.parentId;
-          const parentBlock = currentNodes.find(n => n.id === parentId);
+          const parentBlock = currentElements.find(n => n.id === parentId);
           
           if (!parentBlock) return;
           
@@ -165,7 +165,8 @@ export const useNodeOperations = (
             }
           };
           
-          const otherNodes = currentNodes.filter(n => n.id !== nodeId && n.id !== parentId);
+          // Update the nodes
+          const otherNodes = currentElements.filter(n => n.id !== nodeId && n.id !== parentId);
           setNodes([...otherNodes, updatedParent, updatedTerminal]);
       
           updateNode(updatedParent.id);

@@ -4,8 +4,8 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type Sidebar = {
   open: boolean;
-  currentNode?: CustomNodeProps;
-  currentEdge?: CustomEdgeProps;
+  currentElement?: CustomNodeProps;
+  currentRelation?: CustomEdgeProps;
 };
 
 type SidebarState = {
@@ -30,14 +30,14 @@ const useSidebar = create<SidebarState>()(
           set({
             sidebar: {
               open: true,
-              currentEdge: data,
+              currentRelation: data,
             },
           });
         } else {
           set({
             sidebar: {
               open: true,
-              currentNode: data,
+              currentElement: data,
             },
           });
         }

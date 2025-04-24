@@ -11,7 +11,7 @@ import { createNode, uploadNodes, updateNode, deleteMultipleNodes } from '@/api/
 import { uploadEdges, deleteMultipleEdges } from '@/api/edges';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '@/hooks/useStore';
-import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
+import DeleteConfirmationDialog from '@/components/ui/Misc/DeleteConfirmationDialog';
 import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'react-toastify';
 
@@ -171,14 +171,14 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       console.log('Pasted node IDs:', pastedNodeIds);
       console.log('Pasted edge IDs:', pastedEdgeIds);
   
-      const currentNodes = useStore.getState().nodes;
-      const currentEdges = useStore.getState().edges;
+      const currentElements = useStore.getState().nodes;
+      const currentRelations = useStore.getState().edges;
   
-      const updatedNodes = currentNodes.map(node => ({
+      const updatedNodes = currentElements.map(node => ({
         ...node,
         selected: pastedNodeIds.includes(node.id)
       }));
-      const updatedEdges = currentEdges.map(edge => ({
+      const updatedEdges = currentRelations.map(edge => ({
         ...edge,
         selected: pastedEdgeIds.includes(edge.id)
       }));
@@ -189,8 +189,8 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     } else {
       const newElement = await handleSinglePaste(clipboardElements);
       if (newElement && isNode(newElement)) {
-        const currentNodes = useStore.getState().nodes;
-        const updatedNodes = currentNodes.map(node => ({
+        const currentElements = useStore.getState().nodes;
+        const updatedNodes = currentElements.map(node => ({
           ...node,
           selected: node.id === newElement.id
         }));
@@ -277,24 +277,24 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const handleConfirmDelete = async () => {
-    const { nodes: currentNodes, edges: currentEdges, setNodes} = useStore.getState();
+    const { nodes: currentElements, edges: currentRelations, setNodes} = useStore.getState();
     
-    const selectedNodes = currentNodes.filter(n => n.selected);
-    const selectedEdges = currentEdges.filter(e => e.selected);
+    const selectedNodes = currentElements.filter(n => n.selected);
+    const selectedEdges = currentRelations.filter(e => e.selected);
     const nodeIdsToDelete = new Set(selectedNodes.map(node => node.id));
   
     const blockIdsToDelete = new Set(
       selectedNodes.filter(n => n.type === 'block').map(n => n.id)
     );
   
-    const updatedNodes = currentNodes.map((node) => {
+    const updatedNodes = currentElements.map((node) => {
       if (
         node.type === 'terminal' &&
         node.parentId &&
         blockIdsToDelete.has(node.parentId) &&
         !node.selected
       ) {
-        const parentBlock = currentNodes.find(b => b.id === node.parentId);
+        const parentBlock = currentElements.find(b => b.id === node.parentId);
         if (parentBlock) {
           const absolutePosition = {
             x: parentBlock.position.x + node.position.x,
@@ -330,7 +330,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       node =>
         node.type === 'terminal' &&
         node.parentId === undefined &&
-        currentNodes.some(orig => orig.id === node.id && orig.parentId)
+        currentElements.some(orig => orig.id === node.id && orig.parentId)
     );
     for (const terminal of orphanTerminals) {
       await updateNode(terminal.id);

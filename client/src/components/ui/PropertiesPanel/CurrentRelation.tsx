@@ -1,43 +1,32 @@
-import { useState } from 'react';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../Misc/select';
 import { updateEdge } from '@/api/edges';
 import { updateNodeConnectionData } from '@/lib/utils/nodes';
 import { EdgeType } from '@/lib/types';
 import { useStore } from '@/hooks';
-import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import { Trash2 } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 
-interface CurrentEdgeProps {
-  currentEdge: any;
+interface CurrentRelationProps {
+  currentRelation: any;
 }
 
-const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
-  const { nodes, setEdges} = useStore();
-  const sourceNode = nodes.find((node: any) => node.id === currentEdge.source);
-  const targetNode = nodes.find((node: any) => node.id === currentEdge.target);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) => {
+  const { nodes } = useStore();
+  const sourceNode = nodes.find((node: any) => node.id === currentRelation.source);
+  const targetNode = nodes.find((node: any) => node.id === currentRelation.target);
   const { handleTriggerDelete } = useClipboard();
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
-    const updatedEdge = await updateEdge(currentEdge.id, newEdgeType);
+    const updatedEdge = await updateEdge(currentRelation.id, newEdgeType);
     if (updatedEdge) {
       await updateNodeConnectionData(
-        currentEdge.source,
-        currentEdge.target,
-        currentEdge.type,
+        currentRelation.source,
+        currentRelation.target,
+        currentRelation.type,
         newEdgeType
       );
-      currentEdge.type = newEdgeType;
+      currentRelation.type = newEdgeType;
     }
-  };
-
-  const handleDeleteClick = async () => {
-    const currentEdges = useStore.getState().edges;
-    setEdges(
-      currentEdges.map(e => (e.id === currentEdge.id ? { ...e, selected: true } : e))
-    );
-    await handleTriggerDelete();
   };
 
   return (
@@ -45,17 +34,17 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
       <div className="mb-2 p-4 flex flex-col gap-2 items-start border-b border-[#9facbc]">
         <div className="flex items-center gap-2">
           <strong>Edge from:</strong>
-          <div className="ml-2 text-black-600">
-            {sourceNode ? sourceNode.data.customName || sourceNode.data.label : currentEdge.source}
+          <div className="ml-2 text-black-600 break-all whitespace-normal">
+            {sourceNode ? sourceNode.data.customName || sourceNode.data.label : currentRelation.source}
           </div>
-          <button onClick={handleDeleteClick} title="Delete Relation" className="flex items-center">
+          <button onClick={handleTriggerDelete} title="Delete Relation" className="flex items-center">
             <Trash2 size={18} className="text-red-700" />
           </button>
         </div>
         <div className="flex items-center gap-2">
           <strong>To:</strong>
-          <div className="ml-2 text-black-600 flex-grow">
-            {targetNode ? targetNode.data.customName || targetNode.data.label : currentEdge.target}
+          <div className="ml-2 text-black-600 break-all whitespace-normal">
+            {targetNode ? targetNode.data.customName || targetNode.data.label : currentRelation.target}
           </div>
         </div>
       </div>
@@ -64,13 +53,13 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
         <strong>Relation Type:</strong>
         <div className="mb-2"></div>
         <Select 
-          value={currentEdge.type} 
+          value={currentRelation.type} 
           onValueChange={(value) => handleConnectionTypeChange(value as EdgeType)}
         >
           <SelectTrigger className="w-[180px] p-3">
             <SelectValue>
               {(() => {
-              switch (currentEdge.type) {
+              switch (currentRelation.type) {
                 case EdgeType.Connected:
                 return 'Connected to';
                 case EdgeType.Transfer:
@@ -88,7 +77,7 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
                 case EdgeType.Equality:
                 return 'Same as';
                 default:
-                return currentEdge.type;
+                return currentRelation.type;
               }
               })()}
             </SelectValue>
@@ -107,14 +96,8 @@ const CurrentEdge: React.FC<CurrentEdgeProps> = ({ currentEdge }) => {
           </SelectContent>
         </Select>
       </div>
-      <DeleteConfirmationDialog
-        open={showDeleteDialog}
-        elementType="relation"
-        onConfirm={handleDeleteClick}
-        onCancel={() => setShowDeleteDialog(false)}
-      />
     </div>
   );
 };
 
-export default CurrentEdge;
+export default CurrentRelation;

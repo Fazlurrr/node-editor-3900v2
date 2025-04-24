@@ -4,6 +4,7 @@ import { buttonVariants } from '@/lib/config.ts';
 import { X } from 'lucide-react';
 import { useTheme } from '@/hooks';
 import { useSettings } from '@/hooks/useSettings'
+import { useHotkeys } from 'react-hotkeys-hook';
 
 interface DeleteConfirmationDialogProps {
   open: boolean;
@@ -18,6 +19,16 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
+
+  useHotkeys('esc', () => onCancel());
+  useHotkeys(
+    'enter',
+    () => {
+      onConfirm();
+    },
+    { preventDefault: true }
+  );
+
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
   const { theme } = useTheme();

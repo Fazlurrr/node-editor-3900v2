@@ -1,11 +1,11 @@
 import { Node, Edge } from 'reactflow';
-import CurrentNode from './CurrentNode';
-import CurrentEdge from './CurrentEdge';
+import CurrentElement from './CurrentElement';
+import CurrentRelation from './CurrentRelation';
 import CurrentMultipleElements from './CurrentMultipleElements';
 import { MiniMapStyled } from '@/components/ui/styled';
 import { AspectType } from '@/lib/types';
 import React from 'react';
-import { MiniMapProvider, useMiniMapContext } from '../toggleMiniMap';
+import { MiniMapProvider, useMiniMapContext } from '../Navbar/SettingsMenu/toggleMiniMap';
 import { Info } from 'lucide-react';
 
 interface PropertiesPanelProps {
@@ -59,9 +59,9 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElements }) =
             isMultiple ? (
               <CurrentMultipleElements selectedElements={selectedElements} />
             ) : (singleElement && !isEdgeElement(singleElement)) ? (
-              <CurrentNode currentNode={singleElement} />
+              <CurrentElement currentElement={singleElement} />
             ) : singleElement && isEdgeElement(singleElement) ? (
-              <CurrentEdge currentEdge={singleElement} />
+              <CurrentRelation currentRelation={singleElement} />
             ) : null
           ) : (
             <div className="flex items-center justify-center p-4">

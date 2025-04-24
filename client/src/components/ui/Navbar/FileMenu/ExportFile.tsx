@@ -1,17 +1,34 @@
-import { useState } from 'react';
-import { Button } from '../../button';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { downloadFile } from '@/lib/utils/download';
 import { TextField, MenuItem } from '@mui/material';
 import DownloadImage from './DownloadImage';
+
 
 interface ExportFileProps {
     close: () => void;
 }
 
 const ExportFile: React.FC<ExportFileProps> = ({close}) => {
-    const [fileName, setFileName] = useState<string>('Untitled');
-    const [fileType, setFileType] = useState<string>('imf');
+
+  const [fileName, setFileName] = useState<string>('Untitled');
+  const [fileType, setFileType] = useState<string>('imf');
+
+    useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Enter' && fileType !== 'png' && fileType !== 'svg') {
+          downloadFile(fileType, fileName);
+        }
+        if (event.key === 'Escape') {
+          close();
+        }
+      };
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }, [fileType, fileName, close]);
 
     return (
         <div className='p-4'>

@@ -2,6 +2,7 @@ import React from 'react'
 import { X } from 'lucide-react'
 import { useSettings } from '@/hooks/useSettings'
 import { useTheme } from '@/hooks';
+import { useHotkeys } from 'react-hotkeys-hook'
 
 
 interface AdvancedSettingsModalProps {
@@ -19,6 +20,8 @@ const AdvancedSettingsModal: React.FC<AdvancedSettingsModalProps> = ({
   const handleClose = () => {
     onOpenChange(false)
   }
+
+  useHotkeys('esc', () => handleClose());
 
   if (!open) {
     return null

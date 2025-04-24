@@ -1,7 +1,7 @@
 import { LogOut, X } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../Misc/tooltip';
 import { buttonVariants } from '@/lib/config';
-import { Button } from '../../button';
+import { Button } from '@/components/ui/Misc/button';
 import { useSession } from '@/hooks';
 import { useState } from 'react';
 import { useTheme } from '@/hooks';

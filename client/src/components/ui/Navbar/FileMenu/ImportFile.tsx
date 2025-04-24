@@ -1,4 +1,4 @@
-import { Button } from '../../button';
+import { Button } from '@/components/ui/Misc/button';
 import { buttonVariants } from '@/lib/config.ts';
 import { z } from 'zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { uploadNodes } from '@/api/nodes';
 import { uploadEdges } from '@/api/edges';
 import { generateNewNodeId } from '@/lib/utils';
 import { Edge, Node } from 'reactflow';
+import { useEffect } from 'react';
 
   
   // Updated schema to expect only one .imf file
@@ -26,6 +27,22 @@ import { Edge, Node } from 'reactflow';
   
   const ImportFile: React.FC<ImportFileProps> = ({close}) => {
     const { user } = useSession();
+
+    useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          close();
+        }
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleSubmit(onSubmit)();
+        }
+      };
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }, [close]);
   
     const {
       control,

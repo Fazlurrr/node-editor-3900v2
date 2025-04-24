@@ -64,13 +64,13 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
       // If key for node.data is a string (one to one relation), find the node with the id and add the relation
       if (typeof node.data[key] === 'string') {
         const id = node.data[key];
-        const currentNode = nodes.find(node => node.id === id);
+        const currentElement = nodes.find(node => node.id === id);
 
-        const currentLabel = currentNode?.data.customName
-          ? currentNode.data.customName.replace(/ /g, '_')
-          : currentNode?.data.label;
+        const currentLabel = currentElement?.data.customName
+          ? currentElement.data.customName.replace(/ /g, '_')
+          : currentElement?.data.label;
 
-        if (currentNode) {
+        if (currentElement) {
           relations
             .get(nodeLabel)
             ?.push(`${getReadableKey(key)} ${currentLabel}`);
@@ -80,12 +80,12 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
 
       // If key for node.data is an array (one to many relation), loop through the array and add the relation
       for (const item of node.data[key]) {
-        const currentNode = nodes.find(node => node.id === item.id);
+        const currentElement = nodes.find(node => node.id === item.id);
 
-        const currentLabel = currentNode?.data.customName
-          ? currentNode.data.customName.replace(/ /g, '_')
-          : currentNode?.data.label;
-        if (currentNode) {
+        const currentLabel = currentElement?.data.customName
+          ? currentElement.data.customName.replace(/ /g, '_')
+          : currentElement?.data.label;
+        if (currentElement) {
           relations
             .get(nodeLabel)
             ?.push(`${getReadableKey(key)} ${currentLabel}`);
