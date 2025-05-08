@@ -251,6 +251,8 @@ const Editor = () => {
           onNodesChange={handleNodesChange}
           onEdgesChange={onEdgesChange}
           
+          minZoom={0.2}
+
           onConnectStart={startDraggingRelation}
           onConnectEnd={endDraggingRelation}
           onConnect={onConnect}
