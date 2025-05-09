@@ -72,13 +72,11 @@ const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) =>
             <Trash2
               size={18}
               className="text-red-700 cursor-pointer"
-              title="Delete Relation"
               onClick={handleTriggerDelete}
             />
             <ArrowLeftRight
               size={18}
               className="text-blue-700 cursor-pointer"
-              title="Switch direction"
               onClick={handleSwitchDirection}
             />
           </div>
