@@ -1,20 +1,49 @@
+// src/components/Nodes/Terminal.tsx
+
 import Handles from './Handles';
-import type { CustomNodeProps } from '@/lib/types';
+import type { CustomNodeProps, CustomAttribute } from '@/lib/types';
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
   TooltipContent,
 } from '../ui/Misc/tooltip';
-import { Asterisk } from 'lucide-react'; 
+import { Asterisk } from 'lucide-react';
 import { selectionColor } from '@/lib/config';
 import { useMode } from '@/hooks/useMode';
 
 const Terminal = (props: CustomNodeProps) => {
   const { mode } = useMode();
 
-  const hasCustomAttributes = props.data.customAttributes && props.data.customAttributes.length > 0;
-  const amountOfCustomAttributes = props.data.customAttributes ? props.data.customAttributes.length : 0;
+  const hasCustomAttributes =
+    Array.isArray(props.data.customAttributes) &&
+    props.data.customAttributes.length > 0;
+  const amountOfCustomAttributes = hasCustomAttributes
+    ? props.data.customAttributes.length
+    : 0;
+
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  // build tooltip, skipping empty fields
+  const customAttrTooltip = hasCustomAttributes
+    ? (props.data.customAttributes as CustomAttribute[])
+        .map((attr) => {
+          const lines: string[] = [];
+          if (attr.name)           lines.push(`Name: ${attr.name}`);
+          if (attr.value)          lines.push(`Value: ${attr.value}`);
+          if (attr.unitOfMeasure)  lines.push(`Unit: ${attr.unitOfMeasure}`);
+
+          const { provenance, scope, range, regularity } = attr.quantityDatums;
+          if (provenance) lines.push(`Provenance: ${capitalize(provenance)}`);
+          if (scope)      lines.push(`Scope: ${capitalize(scope)}`);
+          if (range)      lines.push(`Range: ${capitalize(range)}`);
+          if (regularity) lines.push(`Regularity: ${capitalize(regularity)}`);
+
+          return lines.join('\n');
+        })
+        .filter((txt) => txt.trim().length > 0)
+        .join('\n\n')
+    : '';
 
   const terminalContent = (
     <figure
@@ -23,23 +52,33 @@ const Terminal = (props: CustomNodeProps) => {
       style={{ lineHeight: 0 }}
       onContextMenu={(e) => {
         e.preventDefault();
-        props.onRightClick?.({ x: e.clientX, y: e.clientY, nodeId: props.id });
+        props.onRightClick?.({
+          x: e.clientX,
+          y: e.clientY,
+          nodeId: props.id,
+        });
       }}
     >
       <div
-        className={`h-[22px] w-[22px] overflow-hidden whitespace-nowrap border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
-        style={{ 
-          display: 'inline-block', 
-          verticalAlign: 'top', 
-          ...(props.selected ? { boxShadow: `0 0 0 2px ${selectionColor}` } : {}) 
+        className={`h-[22px] w-[22px] border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+        style={{
+          display: 'inline-block',
+          verticalAlign: 'top',
+          ...(props.selected
+            ? { boxShadow: `0 0 0 2px ${selectionColor}` }
+            : {}),
         }}
-      >
-      </div>
+      />
 
       {hasCustomAttributes && (
-        <div className="absolute -top-6 -right-10 flex items-center space-x-1 bg-white px-1 border-2 border-black rounded shadow">
+        <div
+          className="absolute -top-6 -right-10 flex items-center space-x-1 bg-white px-1 border-2 border-black rounded shadow"
+          title={customAttrTooltip}
+        >
           <Asterisk size={14} />
-          <span className="text-xs font-bold">{amountOfCustomAttributes}</span>
+          <span className="text-xs font-bold">
+            {amountOfCustomAttributes}
+          </span>
         </div>
       )}
 
@@ -61,11 +100,7 @@ const Terminal = (props: CustomNodeProps) => {
         <TooltipTrigger className="block p-0 m-0" style={{ lineHeight: 0 }}>
           {terminalContent}
         </TooltipTrigger>
-        <TooltipContent
-          side="top"
-          sideOffset={5}
-          className="z-9999"
-        >
+        <TooltipContent side="top" sideOffset={5} className="z-9999">
           <p className="text-base text-gray-500 dark:text-white break-words whitespace-normal max-w-[200px]">
             {props.data.customName}
           </p>

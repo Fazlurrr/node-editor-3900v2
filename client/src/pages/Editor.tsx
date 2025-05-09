@@ -59,6 +59,7 @@ const PANEL_WIDTH = 224; // equals w-56 in Tailwind
 const Editor: React.FC = () => {
   // — refs & instances —
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
   const { isGridVisible } = useGridContext();
@@ -74,15 +75,16 @@ const Editor: React.FC = () => {
   const {
     nodes,
     setNodes,
-    onNodesChange: storeOnNodesChange,
+    onNodesChange,
     edges,
     setEdges,
     onEdgesChange,
   } = useStore(storeSelector, shallow);
 
-  const { onNodeDrag, handleDrop, handleTerminalDetach } = useNodeOperations(
+  const { onNodeDrag, onNodeDragStop, handleDrop, handleTerminalDetach } = useNodeOperations(
     reactFlowWrapper,
-    reactFlowInstance
+    reactFlowInstance,
+    initialPositions
   );
   const [, setCurrentZoom] = useState<number>(1);
   const { handleTriggerDelete, handlePaste } = useClipboard();
@@ -154,61 +156,6 @@ const Editor: React.FC = () => {
   const onLoad = (inst: ReactFlowInstance) => setReactFlowInstance(inst);
   const onMoveEnd = () => setCurrentZoom(reactFlowInstance?.getZoom() || 1);
 
-  // — handle nodes change & snapping —
-  const handleNodesChange = useCallback(
-    (changes: NodeChange[]) => {
-      storeOnNodesChange(changes);
-      const current = useStore.getState().nodes;
-      changes.forEach((chg) => {
-        if (chg.type === 'position' && !chg.dragging) {
-          const changed = current.find((n) => n.id === chg.id);
-          if (!changed) return;
-          if (changed.type === 'terminal' && !changed.parentId) {
-            const parent = current.find((n) =>
-              isPointInsideNode(
-                {
-                  x: changed.position.x + ((changed.width ?? 22) / 2),
-                  y: changed.position.y + ((changed.height ?? 22) / 2),
-                },
-                n
-              )
-            );
-            if (parent) {
-              const rel = {
-                x: changed.position.x - parent.position.x,
-                y: changed.position.y - parent.position.y,
-              };
-              const snapped = getSnappedPosition(
-                { ...changed, position: rel },
-                parent
-              );
-              let newNodes = current.map((n) =>
-                n.id === changed.id
-                  ? { ...n, position: snapped, parentId: parent.id }
-                  : n
-              );
-              newNodes = newNodes.map((n) =>
-                n.id !== parent.id
-                  ? n
-                  : {
-                      ...n,
-                      data: {
-                        ...n.data,
-                        terminals: Array.isArray(n.data.terminals)
-                          ? [...n.data.terminals, { id: changed.id }]
-                          : [{ id: changed.id }],
-                      },
-                    }
-              );
-              setNodes(newNodes);
-            }
-          }
-          void updateNode(chg.id);
-        }
-      });
-    },
-    [storeOnNodesChange, setNodes]
-  );
 
   // — keyboard shortcuts —
   useKeyboardShortcuts(
@@ -260,7 +207,7 @@ const Editor: React.FC = () => {
             selectNodesOnDrag
             selectionMode={SelectionMode.Partial}
             panOnDrag={panOnDrag}
-            onNodesChange={handleNodesChange}
+            onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnectStart={startDraggingRelation}
             onConnectEnd={endDraggingRelation}
@@ -268,6 +215,13 @@ const Editor: React.FC = () => {
             nodeTypes={nodeTypes as unknown as NodeTypes}
             edgeTypes={edgeTypes}
             onNodeDrag={onNodeDrag}
+            onNodeDragStart={(_, node) => {
+              initialPositions.current[node.id] = {
+                x: node.position.x,
+                y: node.position.y,
+              };
+            }}
+            onNodeDragStop={onNodeDragStop}
             deleteKeyCode={null}
             onInit={onLoad}
             snapToGrid
