@@ -16,12 +16,10 @@ import {
   NodeTypes,
   SelectionMode,
   ReactFlowInstance,
-  NodeChange,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { shallow } from 'zustand/shallow';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
 import { Block, Connector, Terminal } from '@/components/Nodes';
 import { onConnect } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
@@ -37,41 +35,33 @@ import {
 } from '@/components/Edges';
 import { ReactFlowStyled, darkTheme, lightTheme } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
-
 import ModellingPanel from '@/components/ui/ModellingPanel/ModellingPanel';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import Toolbar from '@/components/ui/Toolbar/Toolbar';
 import CanvasMenu from '@/components/ui/Misc/CanvasMenu';
-
 import { fetchNodes } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
-import { updateNode } from '@/api/nodes';
-import { isPointInsideNode, getSnappedPosition } from '@/lib/utils/nodes';
-
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
 import { useNodeOperations } from '@/hooks/useNodeOperations';
 import useConnection from '@/hooks/useConnection';
 
-const PANEL_WIDTH = 224; // equals w-56 in Tailwind
+const PANEL_WIDTH = 224;
 
 const Editor: React.FC = () => {
-  // — refs & instances —
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
   const { isGridVisible } = useGridContext();
 
-  // — context menu state —
   const [canvasMenu, setCanvasMenu] = useState<{
     x: number;
     y: number;
     nodeId: string;
   } | null>(null);
 
-  // — zustand store & hooks —
   const {
     nodes,
     setNodes,
@@ -93,11 +83,10 @@ const Editor: React.FC = () => {
   const panOnDrag = [1, 2];
   const { startDraggingRelation, endDraggingRelation } = useConnection();
 
-  // — panel collapse state —
+
   const [isModellingCollapsed, setIsModellingCollapsed] = useState(false);
   const [isPropertiesCollapsed, setIsPropertiesCollapsed] = useState(false);
 
-  // — handle right-click on node via ReactFlow’s hook —
   const handleNodeContextMenu = useCallback(
     (event: React.MouseEvent, node: Node) => {
       event.preventDefault();
@@ -106,24 +95,19 @@ const Editor: React.FC = () => {
         ...n,
         selected: n.id === node.id,
       }));
-      // select only this node
       setNodes(updated);
-      // record raw viewport coords
       setCanvasMenu({ x: event.clientX, y: event.clientY, nodeId: node.id });
     },
     [setNodes]
   );
 
-  // — node & edge types (unchanged) —
-  const nodeTypes = useMemo<NodeTypes>(
-    () => ({
-      block: (p) => <Block {...p} onRightClick={() => {}} />,
-      connector: (p) => <Connector {...p} onRightClick={() => {}} />,
-      terminal: (p) => <Terminal {...p} onRightClick={() => {}} />,
-    }),
-    []
-  );
-  const edgeTypes = useMemo<EdgeTypes>(
+  const nodeTypes = useMemo<Record<string, React.FC<any>>>(() => ({
+    block: (p: any) => <Block {...p} onRightClick={handleNodeContextMenu} />,
+    connector: (p: any) => <Connector {...p} onRightClick={handleNodeContextMenu} />,
+    terminal: (p: any) => <Terminal {...p} onRightClick={handleNodeContextMenu} />,
+  }), [handleNodeContextMenu]);
+  
+  const edgeTypes = useMemo(
     () => ({
       part: Part,
       connected: Connected,
@@ -137,7 +121,6 @@ const Editor: React.FC = () => {
     []
   );
 
-  // — fetch initial data —
   useEffect(() => {
     (async () => {
       const fetchedEdges = (await fetchEdges()) ?? [];
@@ -152,19 +135,15 @@ const Editor: React.FC = () => {
     })();
   }, [setNodes, setEdges]);
 
-  // — ReactFlow init & move —
   const onLoad = (inst: ReactFlowInstance) => setReactFlowInstance(inst);
   const onMoveEnd = () => setCurrentZoom(reactFlowInstance?.getZoom() || 1);
 
-
-  // — keyboard shortcuts —
   useKeyboardShortcuts(
     handleTriggerDelete,
     handlePaste,
     () => setLockState((p) => !p)
   );
 
-  // — selected elements for PropertiesPanel —
   const selectedElements = useMemo(() => {
     const selN = nodes.filter((n) => n.selected);
     const selE = edges.filter((e) => e.selected);
@@ -173,7 +152,6 @@ const Editor: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      {/* grid: [modelling | canvas | properties] */}
       <div
         className="mt-20 h-[calc(100vh-5rem)]"
         style={{
@@ -185,15 +163,12 @@ const Editor: React.FC = () => {
           `,
         }}
       >
-        {/* modelling panel */}
         <div className="overflow-hidden">
           <ModellingPanel
             collapsed={isModellingCollapsed}
             onToggle={() => setIsModellingCollapsed((c) => !c)}
           />
         </div>
-
-        {/* canvas */}
         <div ref={reactFlowWrapper} className="relative h-full w-full">
           <ReactFlowStyled
             style={{ width: '100%', height: '100%' }}
@@ -213,7 +188,7 @@ const Editor: React.FC = () => {
             onConnectEnd={endDraggingRelation}
             onConnect={onConnect}
             nodeTypes={nodeTypes as unknown as NodeTypes}
-            edgeTypes={edgeTypes}
+            edgeTypes={edgeTypes as unknown as EdgeTypes}
             onNodeDrag={onNodeDrag}
             onNodeDragStart={(_, node) => {
               initialPositions.current[node.id] = {
@@ -243,8 +218,6 @@ const Editor: React.FC = () => {
             )}
           </ReactFlowStyled>
         </div>
-
-        {/* properties panel */}
         <div className="overflow-hidden">
           <PropertiesPanel
             collapsed={isPropertiesCollapsed}
@@ -254,7 +227,6 @@ const Editor: React.FC = () => {
         </div>
       </div>
 
-      {/* modelling toggle handle */}
       <button
         onClick={() => setIsModellingCollapsed((c) => !c)}
         className="fixed z-50 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-r flex items-center justify-center"
@@ -271,7 +243,6 @@ const Editor: React.FC = () => {
         )}
       </button>
 
-      {/* properties toggle handle */}
       <button
         onClick={() => setIsPropertiesCollapsed((c) => !c)}
         className="fixed z-50 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-l flex items-center justify-center"
@@ -288,7 +259,6 @@ const Editor: React.FC = () => {
         )}
       </button>
 
-      {/* floating context‐menu wrapper */}
       {canvasMenu && (
         <div
           style={{
@@ -299,15 +269,14 @@ const Editor: React.FC = () => {
           }}
         >
           <CanvasMenu
-            onMoveToFront={() => {}}
-            onMoveToBack={() => {}}
+            onMoveToFront={() => { } }
+            onMoveToBack={() => { } }
             onTerminalDetach={() => handleTerminalDetach(canvasMenu.nodeId)}
             onClose={() => setCanvasMenu(null)}
             nodeType={nodes.find((n) => n.id === canvasMenu.nodeId)?.type}
             hasParent={Boolean(
               nodes.find((n) => n.id === canvasMenu.nodeId)?.parentId
-            )}
-          />
+            )} x={0} y={0}          />
         </div>
       )}
 
