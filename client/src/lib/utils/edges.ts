@@ -3,8 +3,13 @@ import { Connection, Edge } from 'reactflow';
 import { EdgeType, NodeRelation } from '../types';
 import { toast } from 'react-toastify';
 import { isBlock, isTerminal } from '.';
-import { createEdge } from '@/api/edges';
+import { createEdge, deleteEdge } from '@/api/edges';
 import { handleNewNodeRelations } from './nodes';
+import { updateNodeConnectionData } from './nodes';
+
+interface SwitchOptions {
+  edge: Edge & { type: EdgeType };
+}
 
 // Triggered when a connection is made between two nodes
 export const onConnect = async (params: Edge | Connection) => {
@@ -72,4 +77,73 @@ export const addEdge = async (
     // Update node relations with new node relations
     handleNewNodeRelations(newNodeRelations as NodeRelation[]);
   }
+};
+
+export const switchEdgeDirection = async ({
+  edge,
+}: SwitchOptions): Promise<Edge | null> => {
+  // 1) remove the old edge on the backend + store
+  const deleted = await deleteEdge(edge.id);
+  if (!deleted) {
+    toast.error('Failed to delete the old edge.');
+    return null;
+  }
+
+  // 2) build a reversed‐endpoint payload
+  //    swap handles by regex, recompute the ReactFlow id
+  const handlePattern = /(.+)_(top|bottom|left|right)_(source|target)$/;
+
+  const targetMatch = handlePattern.exec(edge.targetHandle!);
+  const newSourceHandle = targetMatch
+    ? `${targetMatch[1]}_${targetMatch[2]}_source`
+    : edge.targetHandle!;
+
+  const sourceMatch = handlePattern.exec(edge.sourceHandle!);
+  const newTargetHandle = sourceMatch
+    ? `${sourceMatch[1]}_${sourceMatch[2]}_target`
+    : edge.sourceHandle!;
+
+  const newSource = edge.target;
+  const newTarget = edge.source;
+  const newId = `reactflow__edge-${newSource}${newSourceHandle}-${newTarget}${newTargetHandle}`;
+  const now = Date.now();
+
+  const reversed: Partial<Edge> = {
+    id: newId,
+    source: newSource,
+    target: newTarget,
+    sourceHandle: newSourceHandle,
+    targetHandle: newTargetHandle,
+    type: edge.type,
+    data: {
+      ...edge.data,
+      createdAt: now,
+      updatedAt: now,
+    },
+  };
+
+  // 3) POST the new edge
+  const created = await createEdge(reversed as Edge);
+  if (!created) {
+    toast.error('Failed to create the reversed edge.');
+    return null;
+  }
+
+  // 4) sync your per-node metadata
+  await updateNodeConnectionData(
+    created.source,
+    created.target,
+    edge.type,
+    edge.type
+  );
+
+  // 5) mark the new one as selected (and clear selection on the rest)
+  const { edges: allEdges, setEdges } = useStore.getState();
+  const updatedEdges = allEdges.map(e => ({
+    ...e,
+    selected: e.id === created.id,
+  }));
+  setEdges(updatedEdges);
+
+  return created;
 };
