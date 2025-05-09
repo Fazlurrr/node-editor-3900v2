@@ -241,6 +241,18 @@ const Navbar = () => {
                   >
                     Tutorial
                   </MenubarItem>
+                  <MenubarItem
+                    className="cursor-pointer"
+                    onClick={() => { if (!isHelpMenuVisible) toggleHelpMenu(); setHelpMenuPage('KeyboardShortcuts'); }}
+                  >
+                    Keyboard shortcuts
+                  </MenubarItem>
+                  <MenubarItem
+                    className="cursor-pointer"
+                    onClick={() => { if (!isHelpMenuVisible) toggleHelpMenu(); setHelpMenuPage('Guru'); }}
+                  >
+                    IMF Guru
+                  </MenubarItem>
                   <MenubarItem className="cursor-pointer" onClick={() => window.open('https://sirius-labs.no/imf/')}>
                     IMF Documentation
                   </MenubarItem>

@@ -229,7 +229,7 @@ const Editor: React.FC = () => {
 
       <button
         onClick={() => setIsModellingCollapsed((c) => !c)}
-        className="fixed z-50 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-r flex items-center justify-center"
+        className="fixed z-49 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-r flex items-center justify-center"
         style={{
           top: '50%',
           left: isModellingCollapsed ? 0 : PANEL_WIDTH,
@@ -245,7 +245,7 @@ const Editor: React.FC = () => {
 
       <button
         onClick={() => setIsPropertiesCollapsed((c) => !c)}
-        className="fixed z-50 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-l flex items-center justify-center"
+        className="fixed z-49 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-l flex items-center justify-center"
         style={{
           top: '50%',
           right: isPropertiesCollapsed ? 0 : PANEL_WIDTH,
