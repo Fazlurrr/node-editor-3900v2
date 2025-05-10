@@ -304,7 +304,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
         </TextField>
       </div>
 
-      {/* Custom Attributes Section */}
+      {/* custom attributes section */}
       <div className="flex-1 pb-12 px-4 h-96 overflow-hidden">
         <div className="flex justify-between items-center mb-2 relative">
           <p className="text-black dark:text-white">
@@ -312,40 +312,50 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
           </p>
           <div className="relative">
             {!isAttributesVisible ? (
-              <span title="Add new attribute">
+              <button
+                onClick={() => {
+                  form.reset({
+                    name: '',
+                    value: '',
+                    unitOfMeasure: '',
+                    quantityDatums: {
+                      provenance: '',
+                      scope: '',
+                      range: '',
+                      regularity: '',
+                    },
+                  });
+                  setEditingIndex(null);
+                  setIsAttributesVisible(true);
+                }}
+                title="Add new attribute"
+                className="
+                  inline-flex 
+                  items-center 
+                  justify-center 
+                  p-2           /* ← bump the hit-area */
+                  rounded       /* ← optional visual cue */
+                  hover:bg-gray-200
+                "
+              >
                 <Plus
-                  onClick={() => {
-                    form.reset({
-                      name: '',
-                      value: '',
-                      unitOfMeasure: '',
-                      quantityDatums: {
-                        provenance: '',
-                        scope: '',
-                        range: '',
-                        regularity: '',
-                      },
-                    });
-                    setEditingIndex(null);
-                    setIsAttributesVisible(true);
-                  }}
-                  className="text-black dark:text-white hover:cursor-pointer"
-                  size={18}
+                  className="text-black dark:text-white"
+                  size={18}   /* ← icon stays 18px */
                 />
-              </span>
+              </button>
             ) : (
-              <span title="Close">
-                <Minus
+              <button
                   onClick={() => {
                     form.reset();
                     setIsAttributesVisible(false);
                     setEditingIndex(null);
                   }}
-                  className="text-red-500 hover:cursor-pointer"
-                  size={18}
-                />
-              </span>
-            )}
+                  title="Close attributes"
+                  className="inline-flex items-center justify-center p-2 rounded hover:bg-red-100 "
+                >
+                  <Minus className="text-red-500" size={18} />
+                </button>
+              )}
 
             {/* Create Attribute Menu */}
             {isAttributesVisible && (
