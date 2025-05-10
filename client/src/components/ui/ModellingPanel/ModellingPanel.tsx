@@ -253,11 +253,10 @@ const ModellingPanel: React.FC<ModellingPanelProps> = () => {
                     )}
                     {component.nodeType === NodeType.Terminal && (
                       <span
-                        className="block ml-3 w-8 h-8 border border-gray-400"
-                        style={{ backgroundColor: getAspectColor(node.aspect) }}
+                        className="block ml-1 w-10 h-10 border-dashed border-2 border-gray-400"
                       >
                         <span
-                          className="block mt-2 ml-6 w-4 h-4 bg-[#ffff00] border border-black"
+                          className="block mt-3 ml-9 w-4 h-4 bg-[#ffff00] border border-black"
                           style={{ backgroundColor: getAspectColor(node.aspect) }}
                         />
                       </span>
