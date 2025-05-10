@@ -236,9 +236,9 @@ const ModellingPanel: React.FC<ModellingPanelProps> = () => {
               <h3 className="ml-4 text-sm text-black dark:text-white">{node.title}</h3>
               <div className="flex justify-center gap-2">
                 {node.children.map((component) => (
-                  <button
+                  <span
                     key={component.title}
-                    className="w-16 h-16 text-left text-black hover:bg-gray-200"
+                    className="flex items-center w-16 h-16 text-left text-black hover:bg-gray-200 cursor-pointer"
                     title={component.title}
                     draggable
                     onDragStart={(event) =>
@@ -268,7 +268,7 @@ const ModellingPanel: React.FC<ModellingPanelProps> = () => {
                         style={{ backgroundColor: getAspectColor(node.aspect) }}
                       />
                     )}
-                  </button>
+                  </span>
                 ))}
               </div>
             </div>
