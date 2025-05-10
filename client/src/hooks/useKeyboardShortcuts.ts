@@ -10,8 +10,9 @@ import { EdgeType } from '@/lib/types';
 
 export const useKeyboardShortcuts = (
   onTriggerDelete: () => void,
+  onTerminalDetach: (selectedNodes: any) => void,
   onPaste: (clipboardElements: any) => void,
-  onLockToggle: () => void
+  onLockToggle: () => void,
 ) => {
   const { copy, cut, paste } = useClipboard();
   const { mode, setMode } = useMode();
@@ -22,6 +23,7 @@ export const useKeyboardShortcuts = (
   const selectedEdges = useStore(state => state.edges.filter(e => e.selected));
   const selectedElements = [...selectedNodes, ...selectedEdges];
   const hasSelection = selectedElements.length > 0;
+  
 
   useHotkeys(
     'delete, backspace',
@@ -156,4 +158,16 @@ export const useKeyboardShortcuts = (
     },
     [selectedEdges] 
   );
+
+  useHotkeys(
+    'd',
+    () => {
+      // only detach terminals
+      selectedNodes
+        .filter(n => n.type === 'terminal')
+        .forEach(n => onTerminalDetach(n.id))
+    },
+    { enableOnFormTags: false, preventDefault: true },
+    [selectedNodes]
+  )
 };

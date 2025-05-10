@@ -140,6 +140,7 @@ const Editor: React.FC = () => {
 
   useKeyboardShortcuts(
     handleTriggerDelete,
+    handleTerminalDetach,
     handlePaste,
     () => setLockState((p) => !p)
   );
