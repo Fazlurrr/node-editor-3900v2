@@ -61,6 +61,10 @@ const KeyboardShortcuts = () => {
                             <span className="font-medium">S</span>
                             <span className="text-gray-600 ml-4">Switch direction of selected edge</span>
                         </div>
+                        <div className="flex justify-between mb-4">
+                            <span className="font-medium">D</span>
+                            <span className="text-gray-600 ml-4">Detach selected terminal from block</span>
+                        </div>
                     </div>
                 </div>
             </div>
