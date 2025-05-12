@@ -2,8 +2,9 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useClipboard } from './useClipboard';
 import { useStore } from '@/hooks';
 import { useMode } from '@/hooks/useMode';
-import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
-import { useMiniMapContext } from '@/components/ui/Navbar/SettingsMenu/toggleMiniMap';
+import { useTogglePanel } from './useTogglePanel';
+import { useGridContext } from '@/components/ui/Navbar/ViewMenu/toggleGrid';
+import { useMiniMapContext } from '@/components/ui/Navbar/ViewMenu/toggleMiniMap';
 import { useReactFlow } from 'reactflow';
 import { switchEdgeDirection } from '@/lib/utils/edges';
 import { EdgeType } from '@/lib/types';
@@ -18,6 +19,7 @@ export const useKeyboardShortcuts = (
   const { mode, setMode } = useMode();
   const { isGridVisible, setGridVisible } = useGridContext();
   const { isMiniMapVisible, setMiniMapVisible } = useMiniMapContext();
+  const { toggleModelingPanel, togglePropertiesPanel } = useTogglePanel();
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const selectedNodes = useStore(state => state.nodes.filter(n => n.selected));
   const selectedEdges = useStore(state => state.edges.filter(e => e.selected));
@@ -126,6 +128,24 @@ export const useKeyboardShortcuts = (
     },
     { enableOnFormTags: false, preventDefault: true },
     [onLockToggle]
+  );
+
+  useHotkeys(
+    'ctrl+shift+e',
+    () => {
+      toggleModelingPanel();
+    },
+    { preventDefault: true },
+    [toggleModelingPanel]
+  );
+
+    useHotkeys(
+    'ctrl+shift+p',
+    () => {
+      togglePropertiesPanel();
+    },
+    { preventDefault: true },
+    [togglePropertiesPanel]
   );
 
   useHotkeys(

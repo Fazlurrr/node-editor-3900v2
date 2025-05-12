@@ -164,7 +164,6 @@ const getAspectColor = (aspect: AspectType) => {
 
 interface ModellingPanelProps {
   collapsed: boolean;
-  onToggle: () => void;
 }
 
 const ModellingPanel: React.FC<ModellingPanelProps> = () => {
@@ -253,10 +252,10 @@ const ModellingPanel: React.FC<ModellingPanelProps> = () => {
                     )}
                     {component.nodeType === NodeType.Terminal && (
                       <span
-                        className="block ml-1 w-10 h-10 border-dashed border-2 border-gray-400"
+                        className="relative ml-2 w-8 h-8 border-dashed border-2 border-gray-400"
                       >
                         <span
-                          className="block mt-3 ml-9 w-4 h-4 bg-[#ffff00] border border-black"
+                          className="absolute top-1/2 left-7 transform -translate-y-1/2 w-4 h-4 border border-black"
                           style={{ backgroundColor: getAspectColor(node.aspect) }}
                         />
                       </span>

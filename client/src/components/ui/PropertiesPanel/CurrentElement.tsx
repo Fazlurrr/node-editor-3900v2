@@ -333,14 +333,14 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                   inline-flex 
                   items-center 
                   justify-center 
-                  p-2           /* ← bump the hit-area */
-                  rounded       /* ← optional visual cue */
+                  p-2
+                  rounded
                   hover:bg-gray-200
                 "
               >
                 <Plus
                   className="text-black dark:text-white"
-                  size={18}   /* ← icon stays 18px */
+                  size={18}
                 />
               </button>
             ) : (
@@ -351,9 +351,9 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                     setEditingIndex(null);
                   }}
                   title="Close attributes"
-                  className="inline-flex items-center justify-center p-2 rounded hover:bg-red-100 "
+                  className="inline-flex items-center justify-center p-2 rounded hover:bg-gray-200"
                 >
-                  <Minus className="text-red-500" size={18} />
+                  <Minus className="text-black dark:text-white" size={18} />
                 </button>
               )}
 

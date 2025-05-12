@@ -64,7 +64,7 @@ const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) =>
           {/* From/To column */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <strong>From:</strong>
+              <div className="font-semibold">From:</div>
               <div className="ml-2 text-black-600 break-all whitespace-normal">
                 {sourceNode
                   ? sourceNode.data.customName || sourceNode.data.label
@@ -72,7 +72,7 @@ const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) =>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <strong>To:</strong>
+              <div className="font-semibold">To:</div>
               <div className="ml-2 text-black-600 break-all whitespace-normal">
                 {targetNode
                   ? targetNode.data.customName || targetNode.data.label
@@ -82,24 +82,28 @@ const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) =>
           </div>
 
           {/* Action icons */}
-          <div className="flex flex-col items-end space-y-2 flex-shrink-0">
-            <Trash2
-              size={18}
-              className="text-red-700 cursor-pointer"
-              onClick={handleTriggerDelete}
-            />
-            <ArrowLeftRight
-              size={18}
-              className="text-blue-700 cursor-pointer"
-              onClick={handleSwitchDirection}
-            />
-          </div>
+            <div className="flex flex-col items-end space-y-2 flex-shrink-0">
+              <span title="Delete relation">
+              <Trash2
+                size={18}
+                className="cursor-pointer"
+                onClick={handleTriggerDelete}
+              />
+              </span>
+              <span title="Flip direction (S)">
+              <ArrowLeftRight
+                size={18}
+                className="cursor-pointer"
+                onClick={handleSwitchDirection}
+              />
+              </span>
+            </div>
         </div>
       </div>
 
       {/* Relation Type selector */}
       <div className="mb-4 px-4 pb-4 border-b border-[#9facbc]">
-        <strong>Relation Type:</strong>
+        <div className="font-semibold">Relation Type:</div>
         <div className="mb-2" />
         <Select
           value={currentRelation.type}
