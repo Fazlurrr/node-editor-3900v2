@@ -5,70 +5,89 @@ import useConnection from '@/hooks/useConnection';
 const Handles: FC<{
   nodeId: string;
 }> = ({ nodeId }) => {
-  const handleStyle = {
-    background: 'black',
-    border: '1px solid white',
-    width: '7px',
-    height: '7px', 
-    borderRadius: '50%',
-  };
   const draggingRelation = useConnection(state => state.draggingRelation);
 
   return (
     <>
-      {/* Target Handles (always visible) */}
+      <style>
+        {`
+          .handle {
+            background: black;
+            border: 1px solid white;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+          }
+          
+          .handle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            cursor: crosshair;
+            pointer-events: all;
+            border-radius: 50%;
+          }
+        `}
+      </style>
+
+      {/* Target Handles */}
       <Handle
         type="target"
         position={Position.Top}
         id={`${nodeId}_top_target`}
-        style={handleStyle}
+        className="handle"
       />
       <Handle
         type="target"
         position={Position.Bottom}
         id={`${nodeId}_bottom_target`}
-        style={handleStyle}
+        className="handle"
       />
       <Handle
         type="target"
         position={Position.Left}
         id={`${nodeId}_left_target`}
-        style={handleStyle}
+        className="handle"
       />
       <Handle
         type="target"
         position={Position.Right}
         id={`${nodeId}_right_target`}
-        style={handleStyle}
+        className="handle"
       />
 
-      {/* Source Handles (hidden when connecting) */}
+      {/* Source Handles */}
       <Handle
         type="source"
         position={Position.Top}
         id={`${nodeId}_top_source`}
-        style={handleStyle}
+        className="handle"
         hidden={draggingRelation}
       />
       <Handle
         type="source"
         position={Position.Bottom}
         id={`${nodeId}_bottom_source`}
-        style={handleStyle}
+        className="handle"
         hidden={draggingRelation}
       />
       <Handle
         type="source"
         position={Position.Left}
         id={`${nodeId}_left_source`}
-        style={handleStyle}
+        className="handle"
         hidden={draggingRelation}
       />
       <Handle
         type="source"
         position={Position.Right}
         id={`${nodeId}_right_source`}
-        style={handleStyle}
+        className="handle"
         hidden={draggingRelation}
       />
     </>
