@@ -43,7 +43,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({selectedElements}) => 
           h-full w-full flex flex-col
           bg-white dark:bg-navbar-dark
           border-l border-[#9facbc]
-          flex flex-col overflow-auto
+          flex flex-col
         "
       >
         <div className="pb-2 pl-4 pt-2 mb-2 border-b border-[#9facbc]">
