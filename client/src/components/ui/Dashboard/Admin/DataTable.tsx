@@ -79,9 +79,11 @@ export default function DataTable<TData, TValue>({
                   dark:[&_.MuiSelect-icon]:text-white"
           InputProps={{  
             startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
+                <InputAdornment position="start">
+                <span className="dark:text-gray-300">
+                  <SearchIcon />
+                </span>
+                </InputAdornment>
             ),
           }}
           value={(table.getColumn('username')?.getFilterValue() as string) ?? ''}
@@ -128,50 +130,50 @@ export default function DataTable<TData, TValue>({
         [scrollbar-width:thin] 
         [scrollbar-color:lightGray_transparent]"
       >
-        <Table>
+        <Table className="dark:[&_*]:border-gray-500">
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+          {headerGroup.headers.map(header => {
+            return (
+              <TableHead key={header.id}>
+                {header.isPlaceholder
+            ? null
+            : flexRender(
+                header.column.columnDef.header,
+                header.getContext()
+              )}
+              </TableHead>
+            );
+          })}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+          <TableRow
+            key={row.id}
+            data-state={row.getIsSelected() && 'selected'}
+          >
+            {row.getVisibleCells().map(cell => (
+              <TableCell key={cell.id}>
+                {flexRender(
+            cell.column.columnDef.cell,
+            cell.getContext()
+                )}
+              </TableCell>
+            ))}
+          </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
+          <TableCell
+            colSpan={columns.length}
+            className="h-24 text-center"
+          >
+            No results.
+          </TableCell>
               </TableRow>
             )}
           </TableBody>

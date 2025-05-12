@@ -37,8 +37,8 @@ const AdminDashboard = () => {
           className="mt-14 flex w-screen flex-col items-center justify-start"
     >
       <TabsList className="bg-transparent grid w-[300px] grid-cols-3">
-        <TabsTrigger value="manage" style={{ fontSize: '1.25rem' }}>Manage users</TabsTrigger>
-        <Separator orientation="vertical" className="mx-auto" />
+        <TabsTrigger value="manage" style={{ fontSize: '1.25rem' }} className="dark:text-white">Manage users</TabsTrigger>
+        <Separator orientation="vertical" className="mx-auto dark:bg-white" />
         <TabsTrigger value="register" style={{ fontSize: '1.25rem' }}>Register user</TabsTrigger>
     </TabsList>
 
