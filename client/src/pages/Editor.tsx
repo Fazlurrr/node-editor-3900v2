@@ -202,7 +202,6 @@ const Editor: React.FC = () => {
             onInit={onLoad}
             snapToGrid
             snapGrid={[11, 11]}
-            minZoom={0.1}
             onDrop={handleDrop}
             onDragOver={(e) => {
               e.preventDefault();
