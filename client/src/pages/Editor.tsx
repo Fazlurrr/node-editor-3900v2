@@ -19,7 +19,6 @@ import {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { shallow } from 'zustand/shallow';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Block, Connector, Terminal } from '@/components/Nodes';
 import { onConnect } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
@@ -43,8 +42,9 @@ import { fetchNodes } from '@/api/nodes';
 import { fetchEdges } from '@/api/edges';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useClipboard } from '@/hooks/useClipboard';
-import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
+import { useGridContext } from '@/components/ui/Navbar/ViewMenu/toggleGrid';
 import { useNodeOperations } from '@/hooks/useNodeOperations';
+import { useTogglePanel } from '@/hooks/useTogglePanel';
 import useConnection from '@/hooks/useConnection';
 
 const PANEL_WIDTH = 224;
@@ -83,9 +83,9 @@ const Editor: React.FC = () => {
   const panOnDrag = [1, 2];
   const { startDraggingRelation, endDraggingRelation } = useConnection();
 
-
-  const [isModellingCollapsed, setIsModellingCollapsed] = useState(false);
-  const [isPropertiesCollapsed, setIsPropertiesCollapsed] = useState(false);
+  const { isModelingPanelCollapsed, isPropertiesPanelCollapsed } = useTogglePanel();
+    
+  
 
   const handleNodeContextMenu = useCallback(
     (event: React.MouseEvent, node: Node) => {
@@ -158,16 +158,15 @@ const Editor: React.FC = () => {
         style={{
           display: 'grid',
           gridTemplateColumns: `
-            ${isModellingCollapsed ? 0 : PANEL_WIDTH}px
+            ${isModelingPanelCollapsed ? 0 : PANEL_WIDTH}px
             1fr
-            ${isPropertiesCollapsed ? 0 : PANEL_WIDTH}px
+            ${isPropertiesPanelCollapsed ? 0 : PANEL_WIDTH}px
           `,
         }}
       >
         <div className="overflow-hidden">
           <ModellingPanel
-            collapsed={isModellingCollapsed}
-            onToggle={() => setIsModellingCollapsed((c) => !c)}
+            collapsed={isModelingPanelCollapsed}
           />
         </div>
         <div ref={reactFlowWrapper} className="relative h-full w-full">
@@ -222,44 +221,11 @@ const Editor: React.FC = () => {
         </div>
         <div className="overflow-hidden">
           <PropertiesPanel
-            collapsed={isPropertiesCollapsed}
-            onToggle={() => setIsPropertiesCollapsed((c) => !c)}
+            collapsed={isPropertiesPanelCollapsed}
             selectedElements={selectedElements}
           />
         </div>
       </div>
-
-      <button
-        onClick={() => setIsModellingCollapsed((c) => !c)}
-        className="fixed z-49 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-r flex items-center justify-center"
-        style={{
-          top: '50%',
-          left: isModellingCollapsed ? 0 : PANEL_WIDTH,
-          transform: 'translateY(-50%)',
-        }}
-      >
-        {isModellingCollapsed ? (
-          <ChevronRight size={16} />
-        ) : (
-          <ChevronLeft size={16} />
-        )}
-      </button>
-
-      <button
-        onClick={() => setIsPropertiesCollapsed((c) => !c)}
-        className="fixed z-49 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-l flex items-center justify-center"
-        style={{
-          top: '50%',
-          right: isPropertiesCollapsed ? 0 : PANEL_WIDTH,
-          transform: 'translateY(-50%)',
-        }}
-      >
-        {isPropertiesCollapsed ? (
-          <ChevronLeft size={16} />
-        ) : (
-          <ChevronRight size={16} />
-        )}
-      </button>
 
       {canvasMenu && (
         <div

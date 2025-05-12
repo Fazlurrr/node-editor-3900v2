@@ -164,7 +164,6 @@ const getAspectColor = (aspect: AspectType) => {
 
 interface ModellingPanelProps {
   collapsed: boolean;
-  onToggle: () => void;
 }
 
 const ModellingPanel: React.FC<ModellingPanelProps> = () => {

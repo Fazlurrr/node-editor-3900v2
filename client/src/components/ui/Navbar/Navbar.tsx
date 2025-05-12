@@ -19,14 +19,15 @@ import { AppPage } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import { Logout, ViewDashboard } from './NavButtons';
 import { toggleFullScreen } from '@/components/ui/Navbar/SettingsMenu/toggleFullScreen';
-import { useGridContext } from './SettingsMenu/toggleGrid';
-import { useMiniMapContext } from './SettingsMenu/toggleMiniMap';
+import { useGridContext } from './ViewMenu/toggleGrid';
+import { useMiniMapContext } from './ViewMenu/toggleMiniMap';
 import HelpMenu from './HelpMenu/HelpMenu';
 import Modal from './FileMenu/Modal';
 import { toast } from 'react-toastify';
 import { Check, ChevronLeft } from 'lucide-react';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useMode } from '@/hooks/useMode';
+import { useTogglePanel } from '@/hooks/useTogglePanel';
 import { useEffect, useState } from 'react';
 import { useFirstVisit } from '@/hooks/useLocalStorage';
 import AdvancedSettingsModal from './SettingsMenu/AdvancedSettings';
@@ -44,6 +45,7 @@ const Navbar = () => {
   const [ modalPage, setModalPage ] = useState('');
   const { copy, cut, paste, handlePaste, handleTriggerDelete } = useClipboard();
   const { setMode } = useMode();
+  const { isModelingPanelCollapsed, isPropertiesPanelCollapsed, toggleModelingPanel, togglePropertiesPanel } = useTogglePanel();
   const { firstVisit, setFirstVisit } = useFirstVisit();
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = React.useState(false);
   const selectedNodes = useStore(state => state.nodes.filter(n => n.selected));
@@ -213,15 +215,8 @@ const Navbar = () => {
                       </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
-                  <MenubarCheckboxItem className="cursor-pointer" checked={isGridVisible} onCheckedChange={toggleGrid}>
-                    {isGridVisible ? 'Grid' : 'Grid'} <MenubarShortcut>Ctrl+Shift+G</MenubarShortcut>
-                  </MenubarCheckboxItem>
-                  <MenubarCheckboxItem className="cursor-pointer" checked={isMiniMapVisible} onCheckedChange={toggleMiniMap}>
-                    {isMiniMapVisible ? 'MiniMap' : 'MiniMap'} <MenubarShortcut className="ml-4">Ctrl+Shift+M</MenubarShortcut>
-                  </MenubarCheckboxItem>
-                  <MenubarSeparator />
                   <MenubarCheckboxItem className="cursor-pointer" checked={isFullScreen} onCheckedChange={toggleFullScreen}>
-                    {isFullScreen ? 'Fullscreen' : 'Fullscreen'} <MenubarShortcut>F11</MenubarShortcut>
+                    Fullscreen <MenubarShortcut>F11</MenubarShortcut>
                   </MenubarCheckboxItem>
                   <MenubarItem
                     inset
@@ -231,6 +226,31 @@ const Navbar = () => {
                     Advanced Settings
                   </MenubarItem>
                 </MenubarContent>
+              </MenubarMenu>
+              <MenubarMenu>
+                <MenubarTrigger className="cursor-pointer">View</MenubarTrigger>
+                <MenubarContent className="dark:bg-navbar-dark">
+                  <MenubarCheckboxItem
+                    className="cursor-pointer"
+                    checked={!isModelingPanelCollapsed}
+                    onCheckedChange={toggleModelingPanel}
+                  >
+                    Modeling <MenubarShortcut>Ctrl+Shift+E</MenubarShortcut>
+                  </MenubarCheckboxItem>
+                  <MenubarCheckboxItem
+                    className="cursor-pointer"
+                    checked={!isPropertiesPanelCollapsed}
+                    onCheckedChange={togglePropertiesPanel}
+                  >
+                    Properties <MenubarShortcut>Ctrl+Shift+P</MenubarShortcut>
+                  </MenubarCheckboxItem>
+                  <MenubarCheckboxItem className="cursor-pointer" checked={isGridVisible} onCheckedChange={toggleGrid}>
+                    {isGridVisible ? 'Grid' : 'Grid'} <MenubarShortcut>Ctrl+Shift+G</MenubarShortcut>
+                  </MenubarCheckboxItem>
+                  <MenubarCheckboxItem className="cursor-pointer" checked={isMiniMapVisible} onCheckedChange={toggleMiniMap}>
+                    {isMiniMapVisible ? 'MiniMap' : 'MiniMap'} <MenubarShortcut className="ml-4">Ctrl+Shift+M</MenubarShortcut>
+                  </MenubarCheckboxItem>
+              </MenubarContent>
               </MenubarMenu>
               <MenubarMenu>
                 <MenubarTrigger className="cursor-pointer">Help</MenubarTrigger>
