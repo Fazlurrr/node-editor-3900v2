@@ -82,18 +82,22 @@ const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) =>
           </div>
 
           {/* Action icons */}
-          <div className="flex flex-col items-end space-y-2 flex-shrink-0">
-            <Trash2
-              size={18}
-              className="text-red-700 cursor-pointer"
-              onClick={handleTriggerDelete}
-            />
-            <ArrowLeftRight
-              size={18}
-              className="text-blue-700 cursor-pointer"
-              onClick={handleSwitchDirection}
-            />
-          </div>
+            <div className="flex flex-col items-end space-y-2 flex-shrink-0">
+              <span title="Delete relation">
+              <Trash2
+                size={18}
+                className="cursor-pointer"
+                onClick={handleTriggerDelete}
+              />
+              </span>
+              <span title="Flip direction (S)">
+              <ArrowLeftRight
+                size={18}
+                className="cursor-pointer"
+                onClick={handleSwitchDirection}
+              />
+              </span>
+            </div>
         </div>
       </div>
 
