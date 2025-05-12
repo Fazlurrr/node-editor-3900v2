@@ -5,11 +5,14 @@ import { useMode } from '@/hooks/useMode';
 import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
 import { useMiniMapContext } from '@/components/ui/Navbar/SettingsMenu/toggleMiniMap';
 import { useReactFlow } from 'reactflow';
+import { switchEdgeDirection } from '@/lib/utils/edges';
+import { EdgeType } from '@/lib/types';
 
 export const useKeyboardShortcuts = (
   onTriggerDelete: () => void,
+  onTerminalDetach: (selectedNodes: any) => void,
   onPaste: (clipboardElements: any) => void,
-  onLockToggle: () => void
+  onLockToggle: () => void,
 ) => {
   const { copy, cut, paste } = useClipboard();
   const { mode, setMode } = useMode();
@@ -20,6 +23,7 @@ export const useKeyboardShortcuts = (
   const selectedEdges = useStore(state => state.edges.filter(e => e.selected));
   const selectedElements = [...selectedNodes, ...selectedEdges];
   const hasSelection = selectedElements.length > 0;
+  
 
   useHotkeys(
     'delete, backspace',
@@ -141,4 +145,29 @@ export const useKeyboardShortcuts = (
     { preventDefault: true },
     [isMiniMapVisible]
   );
+
+  useHotkeys(
+    's',
+    async () => {
+      if (selectedEdges.length === 1) { 
+        const edge = selectedEdges[0];  
+        if (edge.type) {
+          await switchEdgeDirection({ edge: { ...edge, type: edge.type as EdgeType } });
+        }
+      }
+    },
+    [selectedEdges] 
+  );
+
+  useHotkeys(
+    'd',
+    () => {
+      // only detach terminals
+      selectedNodes
+        .filter(n => n.type === 'terminal')
+        .forEach(n => onTerminalDetach(n.id))
+    },
+    { enableOnFormTags: false, preventDefault: true },
+    [selectedNodes]
+  )
 };

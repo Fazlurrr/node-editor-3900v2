@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+// src/components/Editor.tsx
+
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import {
   type Edge,
   type Node,
@@ -8,10 +16,10 @@ import {
   NodeTypes,
   SelectionMode,
   ReactFlowInstance,
-  NodeChange
 } from 'reactflow';
-import { shallow } from 'zustand/shallow';
 import 'reactflow/dist/style.css';
+import { shallow } from 'zustand/shallow';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Block, Connector, Terminal } from '@/components/Nodes';
 import { onConnect } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
@@ -25,49 +33,49 @@ import {
   Projection,
   Specialization,
 } from '@/components/Edges';
-import {
-  ReactFlowStyled,
-  darkTheme,
-  lightTheme,
-} from '@/components/ui/styled';
+import { ReactFlowStyled, darkTheme, lightTheme } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
-import { ModellingPanel } from '@/components/ui';
-import { fetchNodes } from '@/api/nodes';
-import { fetchEdges } from '@/api/edges';
+import ModellingPanel from '@/components/ui/ModellingPanel/ModellingPanel';
 import PropertiesPanel from '@/components/ui/PropertiesPanel/PropertiesPanel';
 import Toolbar from '@/components/ui/Toolbar/Toolbar';
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
-import { useClipboard } from '@/hooks/useClipboard';
 import CanvasMenu from '@/components/ui/Misc/CanvasMenu';
+import { fetchNodes } from '@/api/nodes';
+import { fetchEdges } from '@/api/edges';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useClipboard } from '@/hooks/useClipboard';
+import { useGridContext } from '@/components/ui/Navbar/SettingsMenu/toggleGrid';
 import { useNodeOperations } from '@/hooks/useNodeOperations';
 import useConnection from '@/hooks/useConnection';
 
-import { updateNode } from '@/api/nodes';  
-import { isPointInsideNode, getSnappedPosition } from '@/lib/utils/nodes';
+const PANEL_WIDTH = 224;
 
-const Editor = () => {
+const Editor: React.FC = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
-
+  const initialPositions = useRef<Record<string, { x: number; y: number }>>({});
+  const [reactFlowInstance, setReactFlowInstance] =
+    useState<ReactFlowInstance | null>(null);
   const { isGridVisible } = useGridContext();
-  const [canvasMenu, setCanvasMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null);
+
+  const [canvasMenu, setCanvasMenu] = useState<{
+    x: number;
+    y: number;
+    nodeId: string;
+  } | null>(null);
 
   const {
     nodes,
     setNodes,
-    onNodesChange: storeOnNodesChange,
+    onNodesChange,
     edges,
     setEdges,
     onEdgesChange,
   } = useStore(storeSelector, shallow);
 
-  const { 
-    onNodeDrag,            
-    handleDrop,
-    handleTerminalDetach,
-  } = useNodeOperations(reactFlowWrapper, reactFlowInstance);
-
+  const { onNodeDrag, onNodeDragStop, handleDrop, handleTerminalDetach } = useNodeOperations(
+    reactFlowWrapper,
+    reactFlowInstance,
+    initialPositions
+  );
   const [, setCurrentZoom] = useState<number>(1);
   const { handleTriggerDelete, handlePaste } = useClipboard();
   const { theme } = useTheme();
@@ -75,32 +83,30 @@ const Editor = () => {
   const panOnDrag = [1, 2];
   const { startDraggingRelation, endDraggingRelation } = useConnection();
 
-  useEffect(() => {
-    setLockState(lockState);
-  }, [lockState]);
 
-  const handleRightClick = useCallback(
-    ({ x, y, nodeId }: { x: number; y: number; nodeId: string }) => {
-      const currentElements = useStore.getState().nodes;
-      const updatedNodes = currentElements.map((node) => ({
-        ...node,
-        selected: node.id === nodeId,
+  const [isModellingCollapsed, setIsModellingCollapsed] = useState(false);
+  const [isPropertiesCollapsed, setIsPropertiesCollapsed] = useState(false);
+
+  const handleNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      const current = useStore.getState().nodes;
+      const updated = current.map((n) => ({
+        ...n,
+        selected: n.id === node.id,
       }));
-      setNodes(updatedNodes);
-      setCanvasMenu({ x, y, nodeId });
+      setNodes(updated);
+      setCanvasMenu({ x: event.clientX, y: event.clientY, nodeId: node.id });
     },
     [setNodes]
   );
 
-  const nodeTypes = useMemo(
-    () => ({
-      block: (nodeProps: any) => <Block {...nodeProps} onRightClick={handleRightClick} />,
-      connector: (nodeProps: any) => <Connector {...nodeProps} onRightClick={handleRightClick} />,
-      terminal: (nodeProps: any) => <Terminal {...nodeProps} onRightClick={handleRightClick} />,
-    }),
-    [handleRightClick]
-  );
-
+  const nodeTypes = useMemo<Record<string, React.FC<any>>>(() => ({
+    block: (p: any) => <Block {...p} onRightClick={handleNodeContextMenu} />,
+    connector: (p: any) => <Connector {...p} onRightClick={handleNodeContextMenu} />,
+    terminal: (p: any) => <Terminal {...p} onRightClick={handleNodeContextMenu} />,
+  }), [handleNodeContextMenu]);
+  
   const edgeTypes = useMemo(
     () => ({
       part: Part,
@@ -115,189 +121,167 @@ const Editor = () => {
     []
   );
 
-  const moveNodeToFront = useCallback(
-    (nodeId: string) => {
-      const currentElements = useStore.getState().nodes;
-      const targetNode = currentElements.find((n) => n.id === nodeId);
-      if (!targetNode) return;
-      const remainingNodes = currentElements.filter((n) => n.id !== nodeId);
-      setNodes([...remainingNodes, targetNode]);
-    },
-    [setNodes]
-  );
-
-  const moveNodeToBack = useCallback(
-    (nodeId: string) => {
-      const currentElements = useStore.getState().nodes;
-      const targetNode = currentElements.find((n) => n.id === nodeId);
-      if (!targetNode) return;
-      const remainingNodes = currentElements.filter((n) => n.id !== nodeId);
-      setNodes([targetNode, ...remainingNodes]);
-    },
-    [setNodes]
-  );
-  
   useEffect(() => {
     (async () => {
       const fetchedEdges = (await fetchEdges()) ?? [];
       let fetchedNodes = (await fetchNodes()) ?? [];
-
-      fetchedNodes = fetchedNodes.map((node) => {
-        if (node.type === 'block' && node.width && node.height) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              width: node.width,
-              height: node.height,
-            },
-          };
-        }
-        return node;
-      });
-
+      fetchedNodes = fetchedNodes.map((n) =>
+        n.type === 'block' && n.width && n.height
+          ? { ...n, data: { ...n.data, width: n.width, height: n.height } }
+          : n
+      );
       setNodes(fetchedNodes as Node[]);
       setEdges(fetchedEdges as Edge[]);
     })();
   }, [setNodes, setEdges]);
 
-  const onLoad = (instance: ReactFlowInstance) => setReactFlowInstance(instance);
+  const onLoad = (inst: ReactFlowInstance) => setReactFlowInstance(inst);
+  const onMoveEnd = () => setCurrentZoom(reactFlowInstance?.getZoom() || 1);
 
-  const handleNodesChange = useCallback(
-    (changes: NodeChange[]) => {
-      storeOnNodesChange(changes);
-      const updatedStoreNodes = useStore.getState().nodes;
-  
-      changes.forEach((change) => {
-        if (change.type === 'position' && !change.dragging) {
-          const changedNode = updatedStoreNodes.find((n) => n.id === change.id);
-          if (!changedNode) return;
-  
-          if (changedNode.type === 'terminal' && !changedNode.parentId) {
-            const blockNode = updatedStoreNodes.find(
-              (potentialBlock) =>
-                potentialBlock.type === 'block' &&
-                isPointInsideNode(
-                  {
-                    x: changedNode.position.x + (changedNode.width || 22) / 2,
-                    y: changedNode.position.y + (changedNode.height || 22) / 2,
-                  },
-                  potentialBlock
-                )
-            );
-  
-            if (blockNode) {
-              const relPos = {
-                x: changedNode.position.x - blockNode.position.x,
-                y: changedNode.position.y - blockNode.position.y,
-              };
-              const snappedPos = getSnappedPosition(
-                { ...changedNode, position: relPos },
-                blockNode
-              );
-  
-              const currentNodes = useStore.getState().nodes;
-              let newNodes = currentNodes.map((node) =>
-                node.id === changedNode.id
-                  ? { ...node, position: snappedPos, parentId: blockNode.id }
-                  : node
-              );
-  
-              newNodes = newNodes.map((node) => {
-                if (node.id !== blockNode.id) return node;
-                return {
-                  ...node,
-                  data: {
-                    ...node.data,
-                    terminals: Array.isArray(node.data.terminals)
-                      ? [...node.data.terminals, { id: changedNode.id }]
-                      : [{ id: changedNode.id }],
-                  },
-                };
-              });
-  
-              setNodes(newNodes);
-            }
-          }
-  
-          void updateNode(change.id);
-        }
-      });
-    },
-    [storeOnNodesChange, setNodes]
+  useKeyboardShortcuts(
+    handleTriggerDelete,
+    handleTerminalDetach,
+    handlePaste,
+    () => setLockState((p) => !p)
   );
-  
-  useKeyboardShortcuts(handleTriggerDelete, handlePaste, () => setLockState((prev) => !prev));
 
   const selectedElements = useMemo(() => {
-    const selectedNodes = nodes.filter((n) => n.selected);
-    const selectedEdges = edges.filter((e) => e.selected);
-    return [...selectedNodes, ...selectedEdges];
+    const selN = nodes.filter((n) => n.selected);
+    const selE = edges.filter((e) => e.selected);
+    return [...selN, ...selE];
   }, [nodes, edges]);
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <div ref={reactFlowWrapper} className="mx-56 mt-20 h-[calc(100vh-5rem)]">
-        <ReactFlowStyled
-          nodesDraggable={!lockState}
-          nodesConnectable={!lockState}
-          elementsSelectable={!lockState}
-          nodes={nodes}
-          edges={edges}
-          selectionOnDrag 
-          selectNodesOnDrag={true}
-          selectionMode={SelectionMode.Partial}
-          panOnDrag={panOnDrag}
-          onNodesChange={handleNodesChange}
-          onEdgesChange={onEdgesChange}
-          
-          minZoom={0.2}
+      <div
+        className="mt-20 h-[calc(100vh-5rem)]"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `
+            ${isModellingCollapsed ? 0 : PANEL_WIDTH}px
+            1fr
+            ${isPropertiesCollapsed ? 0 : PANEL_WIDTH}px
+          `,
+        }}
+      >
+        <div className="overflow-hidden">
+          <ModellingPanel
+            collapsed={isModellingCollapsed}
+            onToggle={() => setIsModellingCollapsed((c) => !c)}
+          />
+        </div>
+        <div ref={reactFlowWrapper} className="relative h-full w-full">
+          <ReactFlowStyled
+            style={{ width: '100%', height: '100%' }}
+            onNodeContextMenu={handleNodeContextMenu}
+            nodesDraggable={!lockState}
+            nodesConnectable={!lockState}
+            elementsSelectable={!lockState}
+            nodes={nodes}
+            edges={edges}
+            selectionOnDrag
+            selectNodesOnDrag
+            selectionMode={SelectionMode.Partial}
+            panOnDrag={panOnDrag}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnectStart={startDraggingRelation}
+            onConnectEnd={endDraggingRelation}
+            onConnect={onConnect}
+            nodeTypes={nodeTypes as unknown as NodeTypes}
+            edgeTypes={edgeTypes as unknown as EdgeTypes}
+            onNodeDrag={onNodeDrag}
+            onNodeDragStart={(_, node) => {
+              initialPositions.current[node.id] = {
+                x: node.position.x,
+                y: node.position.y,
+              };
+            }}
+            onNodeDragStop={onNodeDragStop}
+            deleteKeyCode={null}
+            onInit={onLoad}
+            snapToGrid
+            snapGrid={[11, 11]}
+            onDrop={handleDrop}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+            }}
+            onMoveEnd={onMoveEnd}
+          >
+            {isGridVisible && (
+              <Background
+                color={theme === 'dark' ? '#2f3237' : '#eee'}
+                gap={11}
+                lineWidth={1}
+                variant={BackgroundVariant.Lines}
+              />
+            )}
+          </ReactFlowStyled>
+        </div>
+        <div className="overflow-hidden">
+          <PropertiesPanel
+            collapsed={isPropertiesCollapsed}
+            onToggle={() => setIsPropertiesCollapsed((c) => !c)}
+            selectedElements={selectedElements}
+          />
+        </div>
+      </div>
 
-          onConnectStart={startDraggingRelation}
-          onConnectEnd={endDraggingRelation}
-          onConnect={onConnect}
-          
-          nodeTypes={nodeTypes as unknown as NodeTypes}
-          edgeTypes={edgeTypes as unknown as EdgeTypes}
-          
-          onNodeDrag={onNodeDrag}
+      <button
+        onClick={() => setIsModellingCollapsed((c) => !c)}
+        className="fixed z-49 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-r flex items-center justify-center"
+        style={{
+          top: '50%',
+          left: isModellingCollapsed ? 0 : PANEL_WIDTH,
+          transform: 'translateY(-50%)',
+        }}
+      >
+        {isModellingCollapsed ? (
+          <ChevronRight size={16} />
+        ) : (
+          <ChevronLeft size={16} />
+        )}
+      </button>
 
-          deleteKeyCode={null}
-          onInit={onLoad}
-          snapToGrid={true}
-          snapGrid={[11, 11]}
-          onDrop={handleDrop}
-          onDragOver={(event: React.DragEvent<HTMLDivElement>) => {
-            event.preventDefault();
-            event.dataTransfer.dropEffect = 'move';
+      <button
+        onClick={() => setIsPropertiesCollapsed((c) => !c)}
+        className="fixed z-49 w-6 h-12 bg-gray-200 dark:bg-neutral-700 rounded-l flex items-center justify-center"
+        style={{
+          top: '50%',
+          right: isPropertiesCollapsed ? 0 : PANEL_WIDTH,
+          transform: 'translateY(-50%)',
+        }}
+      >
+        {isPropertiesCollapsed ? (
+          <ChevronLeft size={16} />
+        ) : (
+          <ChevronRight size={16} />
+        )}
+      </button>
+
+      {canvasMenu && (
+        <div
+          style={{
+            position: 'fixed',
+            left:   canvasMenu.x,
+            top:    canvasMenu.y,
+            zIndex: 9999,
           }}
-          onMoveEnd={() => setCurrentZoom(reactFlowInstance?.getZoom() || 1)}
         >
-          {isGridVisible && (
-            <Background
-              color={theme === 'dark' ? '#2f3237' : '#eee'}
-              gap={11}
-              lineWidth={1}
-              variant={BackgroundVariant.Lines}
-            />
-          )}
-        </ReactFlowStyled>
-        {canvasMenu && (
           <CanvasMenu
-            x={canvasMenu.x}
-            y={canvasMenu.y}
-            onMoveToFront={() => moveNodeToFront(canvasMenu.nodeId)}
-            onMoveToBack={() => moveNodeToBack(canvasMenu.nodeId)}
+            onMoveToFront={() => { } }
+            onMoveToBack={() => { } }
             onTerminalDetach={() => handleTerminalDetach(canvasMenu.nodeId)}
             onClose={() => setCanvasMenu(null)}
             nodeType={nodes.find((n) => n.id === canvasMenu.nodeId)?.type}
-            hasParent={!!nodes.find((n) => n.id === canvasMenu.nodeId)?.parentId}
-          />
-        )}
-      </div>
-      <Toolbar isLocked={lockState} onLockToggle={() => setLockState(!lockState)} />
-      <ModellingPanel />
-      <PropertiesPanel selectedElements={selectedElements} />
+            hasParent={Boolean(
+              nodes.find((n) => n.id === canvasMenu.nodeId)?.parentId
+            )} x={0} y={0}          />
+        </div>
+      )}
+
+      <Toolbar isLocked={lockState} onLockToggle={() => setLockState((p) => !p)} />
     </ThemeProvider>
   );
 };
