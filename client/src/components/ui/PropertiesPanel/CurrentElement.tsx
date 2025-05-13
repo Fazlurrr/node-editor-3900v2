@@ -305,11 +305,11 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
       </div>
 
       {/* custom attributes section */}
-      <div className="flex-1 pb-12 px-4 h-96 overflow-hidden">
+      <div className="flex-1 pb-16 px-4 h-96 overflow-hidden">
         <div className="flex justify-between items-center mb-2 relative">
-          <p className="text-black dark:text-white">
-            <div className="font-semibold">Attributes</div>
-          </p>
+          <div className="font-semibold text-black dark:text-white">
+            Attributes
+          </div>
           <div className="relative">
             {!isAttributesVisible ? (
               <button
@@ -455,9 +455,9 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                         )}
                       />
                     </div>
-                    {/* Quantity Datums Section */}
+                    {/* Attribute Qualifier Section */}
                     <div className="mt-4">
-                      <p className="text-sm text-muted-foreground dark:text-white mb-3">Quantity Datums</p>
+                      <p className="text-sm text-muted-foreground dark:text-white mb-3">Attribute Qualifier</p>
                       <div className="grid grid-cols-2 gap-2">
                         <FormField
                           control={form.control}
