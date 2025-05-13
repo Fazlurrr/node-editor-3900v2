@@ -3,7 +3,8 @@ const KeyboardShortcuts = () => {
         <div className="pb-12">
             <div className="p-4 flex flex-row gap-24 justify-center">
                 <div className="text-left">
-                    <div className="space-y-4 max-w-xl mx-auto"> {/* Set a max-width */}
+                    {/* Set a max-height */}
+                    <div className="max-h-[70vh] overflow-y-auto">
                         {/* Shortcut List */}
                         <div className="flex justify-between mb-4">
                             <span className="font-medium">Delete / Backspace</span>
@@ -48,6 +49,14 @@ const KeyboardShortcuts = () => {
                         <div className="flex justify-between mb-4">
                             <span className="font-medium">L</span>
                             <span className="text-gray-600 ml-4">Lock elements</span>
+                        </div>
+                        <div className="flex justify-between mb-4">
+                            <span className="font-medium">Ctrl + Shift + E</span>
+                            <span className="text-gray-600 ml-4">Toggle Modeling Panel</span>
+                        </div>
+                        <div className="flex justify-between mb-4">
+                            <span className="font-medium">Ctrl + Shift + P</span>
+                            <span className="text-gray-600 ml-4">Toggle Properties Panel</span>
                         </div>
                         <div className="flex justify-between mb-4">
                             <span className="font-medium">Ctrl + Shift + G</span>
