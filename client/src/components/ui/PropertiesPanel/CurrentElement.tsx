@@ -455,9 +455,9 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                         )}
                       />
                     </div>
-                    {/* Quantity Datums Section */}
+                    {/* Attribute Qualifier Section */}
                     <div className="mt-4">
-                      <p className="text-sm text-muted-foreground dark:text-white mb-3">Quantity Datums</p>
+                      <p className="text-sm text-muted-foreground dark:text-white mb-3">Attribute Qualifier</p>
                       <div className="grid grid-cols-2 gap-2">
                         <FormField
                           control={form.control}
