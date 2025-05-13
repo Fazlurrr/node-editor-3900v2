@@ -36,9 +36,9 @@ const CurrentMultipleElements: React.FC<CurrentMultipleElementsProps> = ({ selec
 
   return (
     <div className="p-4">
-      <h3 className="text-lg text-black font-bold dark:text-white mb-2 border-b border-[#9facbc] pb-2 -mx-4 px-4">
-        Multiple Elements selected
-      </h3>
+      <div className="text-lg text-black font-semibold dark:text-white mb-2 border-b border-[#9facbc] pb-2 -mx-4 px-4">
+        Selected Elements
+      </div>
       
       {(blocks.length || connectors.length || terminals.length) > 0 && (
         <div className="mb-2">
