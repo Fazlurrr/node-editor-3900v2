@@ -51,41 +51,41 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElements, col
           </h2>
         </div>
         {!collapsed && (
-          <>
+            <>
             <div className="flex-1 overflow-auto">
               {selectedElements.length > 0 ? (
-                isMultiple ? (
-                  <CurrentMultipleElements selectedElements={selectedElements} />
-                ) : singleElement && !isEdgeElement(singleElement) ? (
-                  <CurrentElement currentElement={singleElement} />
-                ) : singleElement && isEdgeElement(singleElement) ? (
-                  <CurrentRelation currentRelation={singleElement} />
-                ) : null
+              isMultiple ? (
+                <CurrentMultipleElements selectedElements={selectedElements} />
+              ) : singleElement && !isEdgeElement(singleElement) ? (
+                <CurrentElement currentElement={singleElement} />
+              ) : singleElement && isEdgeElement(singleElement) ? (
+                <CurrentRelation currentRelation={singleElement} />
+              ) : null
               ) : (
-                <div className="flex items-center justify-center p-4">
-                  <Info className="mr-2" />
-                  <p className="text-black dark:text-white">
-                    No element or relation selected
-                  </p>
-                </div>
+              <div className="flex items-center justify-center p-4">
+                <Info className="mr-2" />
+                <p className="text-black dark:text-white">
+                No element or relation selected
+                </p>
+              </div>
               )}
             </div>
             {isMiniMapVisible && (
               <MiniMapStyled
-                nodeColor={getAspectColor}
-                pannable
-                zoomable
-                zoomStep={0.5}
-                style={{
-                  position: 'relative',
-                  width: 224,
-                  height: 120,
-                  margin: 0,
-                  borderTop: '1px solid #9facbc',
-                }}
+              nodeColor={getAspectColor}
+              pannable
+              zoomable
+              zoomStep={0.5}
+              style={{
+                position: 'relative',
+                width: 224,
+                height: 120,
+                margin: 0,
+                borderTop: '1px solid #9facbc',
+              }}
               />
             )}
-          </>
+            </>
         )}
       </div>
     </MiniMapProvider>
