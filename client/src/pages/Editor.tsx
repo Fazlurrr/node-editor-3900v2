@@ -46,6 +46,7 @@ import { useGridContext } from '@/components/ui/Navbar/ViewMenu/toggleGrid';
 import { useNodeOperations } from '@/hooks/useNodeOperations';
 import { useTogglePanel } from '@/hooks/useTogglePanel';
 import useConnection from '@/hooks/useConnection';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PANEL_WIDTH = 224;
 
@@ -83,7 +84,7 @@ const Editor: React.FC = () => {
   const panOnDrag = [1, 2];
   const { startDraggingRelation, endDraggingRelation } = useConnection();
 
-  const { isModelingPanelCollapsed, isPropertiesPanelCollapsed } = useTogglePanel();
+  const { isModelingPanelCollapsed, isPropertiesPanelCollapsed, toggleModelingPanel, togglePropertiesPanel } = useTogglePanel();
     
   
 
@@ -226,6 +227,38 @@ const Editor: React.FC = () => {
           />
         </div>
       </div>
+      <button
+        title={isModelingPanelCollapsed ? 'Show' : 'Hide'}
+        onClick={toggleModelingPanel}
+        className="fixed z-49 w-3 h-16 bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 rounded-r flex items-center justify-center"
+        style={{
+          top: '50%',
+          left: isModelingPanelCollapsed ? 0 : PANEL_WIDTH,
+          transform: 'translateY(-50%)',
+        }}
+      >
+      {isModelingPanelCollapsed ? (
+          <ChevronRight size={16} />
+        ) : (
+          <ChevronLeft size={16} />
+        )}
+      </button>
+      <button
+        title={isModelingPanelCollapsed ? 'Show' : 'Hide'}
+        onClick={togglePropertiesPanel}
+        className="fixed z-49 w-3 h-16 bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 rounded-l flex items-center justify-center"
+        style={{
+          top: '50%',
+          right: isPropertiesPanelCollapsed ? 0 : PANEL_WIDTH,
+          transform: 'translateY(-50%)',
+        }}
+      >
+        {isPropertiesPanelCollapsed ? (
+          <ChevronLeft size={16} />
+        ) : (
+          <ChevronRight size={16} />
+        )}
+      </button>
 
       {canvasMenu && (
         <div
