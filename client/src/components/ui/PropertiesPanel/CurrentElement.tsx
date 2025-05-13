@@ -307,9 +307,9 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
       {/* custom attributes section */}
       <div className="flex-1 pb-16 px-4 h-96 overflow-hidden">
         <div className="flex justify-between items-center mb-2 relative">
-          <p className="text-black dark:text-white">
-            <div className="font-semibold">Attributes</div>
-          </p>
+          <div className="font-semibold text-black dark:text-white">
+            Attributes
+          </div>
           <div className="relative">
             {!isAttributesVisible ? (
               <button
