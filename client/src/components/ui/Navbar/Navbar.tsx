@@ -137,13 +137,6 @@ const Navbar = () => {
                   >
                     Export File
                   </MenubarItem>
-                  <MenubarItem className="cursor-pointer">
-                    Rename project <MenubarShortcut>Ctrl+N</MenubarShortcut>
-                  </MenubarItem>
-                  <MenubarSeparator />
-                  <MenubarItem className="cursor-pointer">
-                    Print... <MenubarShortcut>Ctrl+P</MenubarShortcut>
-                  </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
               <MenubarMenu>
