@@ -35,7 +35,7 @@ const CurrentMultipleElements: React.FC<CurrentMultipleElementsProps> = ({ selec
   const [collapseRelations] = React.useState(false);
 
   return (
-    <div className="p-4">
+    <div className="px-4">
       <div className="text-lg text-black font-semibold dark:text-white mb-2 border-b border-[#9facbc] pb-2 -mx-4 px-4">
         Selected Elements
       </div>
