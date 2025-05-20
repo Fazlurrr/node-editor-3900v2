@@ -178,27 +178,37 @@ const Block = (props: CustomNodeProps) => {
         className={`border-2 border-black dark:border-white bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
       >
         <header className="flex items-center justify-center h-full w-full">
-          {isEditing ? (
+            {isEditing ? (
             <textarea
               ref={inputRef}
               rows={1}
               onMouseDown={(e) => e.stopPropagation()}
-              className="w-auto h-auto bg-transparent text-center text-black resize-none focus:outline-none overflow-x-hidden break-words"
+              className={`
+              w-auto h-auto bg-transparent text-center resize-none focus:outline-none overflow-x-hidden break-words
+              text-${props.data.aspect}-foreground-light 
+              dark:text-${props.data.aspect}-foreground-dark
+              `}
               value={tempName}
               onChange={(e) => {
-                const value = e.target.value;
-                if (value.length <= 50) setTempName(value);
+              const value = e.target.value;
+              if (value.length <= 50) setTempName(value);
               }}
               onBlur={handleSubmit}
               onKeyDown={handleKeyDown}
             />
-          ) : (
-            <p className="text-center text-black overflow-hidden break-words">
+            ) : (
+            <p
+              className={`
+              text-center overflow-hidden break-words 
+              text-${props.data.aspect}-foreground-light 
+              dark:text-${props.data.aspect}-foreground-dark
+              `}
+            >
               {props.data.customName === ''
-                ? props.data.label
-                : props.data.customName}
+              ? props.data.label
+              : props.data.customName}
             </p>
-          )}
+            )}
         </header>
       </div>
 
