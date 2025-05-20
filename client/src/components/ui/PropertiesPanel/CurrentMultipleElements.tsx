@@ -106,7 +106,7 @@ const CurrentMultipleElements: React.FC<CurrentMultipleElementsProps> = ({ selec
       <div className="mb-2 px-2 pb-2 -mx-4 px-4">
         <details open>
           <summary className="font-semibold flex justify-between items-start cursor-pointer">
-            <span>Edges:</span>
+            <span>Relations:</span>
             {collapseRelations ? (
             <ChevronUp className="text-black-500 w-4 h-4" />
             ) : (
