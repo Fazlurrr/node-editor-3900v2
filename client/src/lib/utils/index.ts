@@ -1,10 +1,8 @@
-import { toast } from 'react-toastify';
-import { type Node, Position } from 'reactflow';
+import { type Node } from 'reactflow';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { v4 as uuidv4 } from 'uuid';
-import { CustomNodeProps, RelationType } from '../types';
-import { useSidebar, useStore } from '@/hooks';
+import { RelationType } from '../types';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -55,32 +53,4 @@ export const generateNewNodeId = (currentId: string): string => {
     return `connector-${uuidv4()}`;
   }
   return `terminal-${uuidv4()}`;
-};
-
-// Triggered when node is clicked in canvas & opens sidebar
-export const displayNode = (nodeId: string) => {
-  const { nodes } = useStore.getState();
-  const { openSidebar, closeSidebar } = useSidebar.getState();
-  const node = nodes.find(n => n.id === nodeId);
-
-  if (!node) {
-    toast.error(`Could not display node ${nodeId}. Refresh page & try again`);
-    return;
-  }
-  closeSidebar();
-  setTimeout(() => {
-    openSidebar({
-      data: node.data,
-      dragging: node.dragging as boolean,
-      id: node.id,
-      isConnectable: true,
-      selected: true,
-      type: node.type as string,
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
-      xPos: node.position.x,
-      yPos: node.position.y,
-      zIndex: 0,
-    } as CustomNodeProps);
-  }, 100);
 };

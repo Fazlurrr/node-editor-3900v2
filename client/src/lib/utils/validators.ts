@@ -22,7 +22,6 @@ export const validateJsonFiles = async (files: File[]): Promise<string | null> =
       return 'Invalid file: Missing or incorrect "edges" array';
     }
 
-    // Validate nodes and edges separately
     validateNodesJson(parsedData.nodes);
     validateEdgesJson(parsedData.edges);
 
@@ -30,7 +29,7 @@ export const validateJsonFiles = async (files: File[]): Promise<string | null> =
     return `Invalid .imf file: ${(error as Error).message}`;
   }
 
-  return null; // No errors
+  return null; 
 };
 
 export const validateNodesJson = (nodes: ValidUploadNode[]) => {

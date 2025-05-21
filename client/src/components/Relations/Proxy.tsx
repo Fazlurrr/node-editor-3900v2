@@ -1,10 +1,8 @@
-import { useSidebar } from '@/hooks';
 import type { CustomEdgeProps } from '@/lib/types';
 import { getStraightPath } from 'reactflow';
-import { selectionColor} from '@/lib/config';
+import { selectionColor } from '@/lib/config';
 
-const Connected = (props: CustomEdgeProps) => {
-  const { openSidebar } = useSidebar();
+const Proxy = (props: CustomEdgeProps) => {
 
   const [pathData] = getStraightPath({
     sourceX: props.sourceX,
@@ -14,7 +12,7 @@ const Connected = (props: CustomEdgeProps) => {
   });
 
   return (
-    <g onClick={() => openSidebar({ ...props, type: 'connected' })}>
+    <g>
       {/* Selection visualizer */}
       <path
         stroke={props.selected ? selectionColor : 'transparent'}
@@ -24,16 +22,15 @@ const Connected = (props: CustomEdgeProps) => {
       />
       {/* Invisible path for larger clickable area */}
       <path
-        
-        stroke='transparent'
+        stroke="transparent"
         strokeWidth="20"
         d={pathData}
         fill="none"
         style={{ cursor: 'pointer' }}
       />
-      <path stroke="currentColor" strokeWidth="2" d={pathData} fill="none" />
+      <path stroke="currentColor" strokeWidth="2" d={pathData} fill="none" strokeDasharray={2}/>
     </g>
   );
 };
 
-export default Connected;
+export default Proxy;

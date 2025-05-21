@@ -3,12 +3,11 @@ const KeyboardShortcuts = () => {
         <div className="pb-12">
             <div className="p-4 flex flex-row gap-24 justify-center">
                 <div className="text-left">
-                    {/* Set a max-height */}
                     <div className="max-h-[70vh] overflow-y-auto">
                         {/* Shortcut List */}
                         <div className="flex justify-between mb-4">
                             <span className="font-medium">Delete / Backspace</span>
-                            <span className="text-gray-600 ml-4">Delete selected element</span> {/* Add left margin */}
+                            <span className="text-gray-600 ml-4">Delete selected element</span> 
                         </div>
                         <div className="flex justify-between mb-4">
                             <span className="font-medium">Ctrl + C / Cmd + C</span>

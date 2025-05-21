@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-
-// your definitions
 const DEFINITIONS: Record<string,string> = {
   Elements: "Elements represent the building-blocks of the model…",
   Relations: "Relations define how elements connect or relate…",
@@ -34,7 +32,6 @@ const DEFINITIONS: Record<string,string> = {
   Regularity: "The consistency or pattern of a value over time.",
 };
 
-// map only those pages you have images for:
 const IMAGES: Record<string, string> = {
     Elements: "/guru-images/Elements.png",
     Aspects: "/guru-images/Aspects.png",

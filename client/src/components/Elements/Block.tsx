@@ -130,7 +130,6 @@ const Block = (props: CustomNodeProps) => {
       });
       onTerminalResizeEnd(props.id, params);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('Error updating node dimensions:', err);
     }
   };

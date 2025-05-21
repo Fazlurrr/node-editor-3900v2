@@ -100,7 +100,6 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     
     const newNodes = clipboardNodes.map(node => {
       const newNode = createNewNode(node, idMap, blockOffsets);
-      // Mark the node as selected so the multi-selection box will highlight it
       newNode.selected = true;
       if (isTerminal(node) && node.data.terminalOf) {
         const newBlockId = idMap[node.data.terminalOf];
@@ -123,7 +122,6 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     
     const newEdges = createNewEdges(clipboardEdges, idMap);
     
-    // Retrieve the current state from the store and update it directly.
     const currentNodes = useStore.getState().nodes;
     setNodes([...currentNodes, ...newNodes]);
     
@@ -132,13 +130,11 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       setEdges([...currentEdges, ...newEdges]);
     }
     
-    // Upload the new elements to the backend.
     await uploadNodes(newNodes);
     if (newEdges.length > 0) {
       await uploadEdges(newEdges);
     }
     
-    // Return combined elements so they can be used for selection update.
     return [...newNodes, ...newEdges];
   };
   
@@ -249,7 +245,7 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       position,
       width: node.width ?? 110,
       height: node.height ?? 66,
-      selected: true, // Ensure this node is marked as selected
+      selected: true, 
       data: {
         ...node.data,
         label: node.data.customName?.trim() ? node.data.customName : node.data.label,
@@ -257,7 +253,6 @@ export const ClipboardProvider: React.FC<{ children: ReactNode }> = ({ children 
       },
     };
   
-    // Log the new node's properties. You can use JSON.stringify for a pretty print.
     console.log("New Node properties:", JSON.stringify(newNode, null, 2));
     console.log("New Node keys:", Object.keys(newNode));
 

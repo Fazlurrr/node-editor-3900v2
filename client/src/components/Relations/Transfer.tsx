@@ -1,10 +1,8 @@
-import { useSidebar } from '@/hooks';
 import type { CustomEdgeProps } from '@/lib/types';
 import { getStraightPath } from 'reactflow';
 import { selectionColor } from '@/lib/config';
 
-const Fulfilled = (props: CustomEdgeProps) => {
-  const { openSidebar } = useSidebar();
+const Transfer = (props: CustomEdgeProps) => {
 
   const [pathData] = getStraightPath({
     sourceX: props.sourceX,
@@ -14,7 +12,7 @@ const Fulfilled = (props: CustomEdgeProps) => {
   });
 
   return (
-    <g onClick={() => openSidebar({ ...props, type: 'fulfilled' })}>
+    <g>
       {/* Selection visualizer */}
       <path
         stroke={props.selected ? selectionColor : 'transparent'}
@@ -32,7 +30,7 @@ const Fulfilled = (props: CustomEdgeProps) => {
       />
       <defs>
         <marker
-        id="fulfilledhead"
+        id="transferhead"
         markerWidth="8"
         markerHeight="5.6"
         refX="6"
@@ -40,7 +38,7 @@ const Fulfilled = (props: CustomEdgeProps) => {
         orient="auto"
         markerUnits="strokeWidth"
         >
-        <polygon points="0 0, 6 2.8, 0 5.6" fill="white" stroke="currentColor" className="dark:fill-black" />
+        <polygon points="0 0, 6 2.8, 0 5.6" fill="currentColor" />
         </marker>
       </defs>
       <path
@@ -48,11 +46,10 @@ const Fulfilled = (props: CustomEdgeProps) => {
         strokeWidth="2"
         d={pathData}
         fill="none"
-        strokeDasharray={5}
-        markerEnd="url(#fulfilledhead)"
+        markerEnd="url(#transferhead)"
       />
     </g>
   );
 };
 
-export default Fulfilled;
+export default Transfer;

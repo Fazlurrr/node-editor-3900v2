@@ -22,7 +22,6 @@ const Connector = (props: CustomNodeProps) => {
 
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-  // build tooltip, skipping any empty fields
   const customAttrTooltip = hasCustomAttributes
     ? (props.data.customAttributes as CustomAttribute[])
         .map((attr) => {

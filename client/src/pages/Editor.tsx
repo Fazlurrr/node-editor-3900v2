@@ -1,5 +1,3 @@
-// src/components/Editor.tsx
-
 import React, {
   useEffect,
   useMemo,
@@ -19,7 +17,7 @@ import {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { shallow } from 'zustand/shallow';
-import { Block, Connector, Terminal } from '@/components/Nodes';
+import { Block, Connector, Terminal } from '@/components/Elements';
 import { onConnect } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
 import {
@@ -31,7 +29,7 @@ import {
   Proxy,
   Projection,
   Specialization,
-} from '@/components/Edges';
+} from '@/components/Relations';
 import { ReactFlowStyled, darkTheme, lightTheme } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
 import ModellingPanel from '@/components/ui/ModellingPanel/ModellingPanel';
