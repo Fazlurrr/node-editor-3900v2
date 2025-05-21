@@ -1,10 +1,8 @@
-import { useSidebar } from '@/hooks';
 import type { CustomEdgeProps } from '@/lib/types';
 import { getStraightPath } from 'reactflow';
 import { selectionColor } from '@/lib/config';
 
 const Equality = (props: CustomEdgeProps) => {
-  const { openSidebar } = useSidebar();
 
   // Distance between the two parallel lines
   const offset = 4;
@@ -30,7 +28,7 @@ const Equality = (props: CustomEdgeProps) => {
   });
 
   return (
-    <g onClick={() => openSidebar({ ...props, type: 'equality' })}>
+    <g>
       {/* Selection visualizer */}
       <path
         stroke={props.selected ? selectionColor : 'transparent'}

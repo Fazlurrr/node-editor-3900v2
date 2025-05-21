@@ -1,10 +1,8 @@
-import { useSidebar } from '@/hooks';
 import type { CustomEdgeProps } from '@/lib/types';
 import { getStraightPath } from 'reactflow';
 import { selectionColor } from '@/lib/config';
 
 const Fulfilled = (props: CustomEdgeProps) => {
-  const { openSidebar } = useSidebar();
 
   const [pathData] = getStraightPath({
     sourceX: props.sourceX,
@@ -14,7 +12,7 @@ const Fulfilled = (props: CustomEdgeProps) => {
   });
 
   return (
-    <g onClick={() => openSidebar({ ...props, type: 'fulfilled' })}>
+    <g>
       {/* Selection visualizer */}
       <path
         stroke={props.selected ? selectionColor : 'transparent'}
