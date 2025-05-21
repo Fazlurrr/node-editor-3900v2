@@ -91,7 +91,7 @@ export const useNodeOperations = (
                   if (n.id === node.id) {
                     return {
                       ...n,
-                      position: snappedPosition,        // Relative position for React Flow
+                      position: snappedPosition,        
                       parentId: blockNode.id,
                       data: {
                         ...n.data,
@@ -144,7 +144,6 @@ export const useNodeOperations = (
                 });
                 setNodes(updatedNodes);
           
-                // Update in backend
                 await updateNode(terminal.id);
               }
             } else if (node.type === "terminal" && node.parentId) {
@@ -158,18 +157,16 @@ export const useNodeOperations = (
                   if (n.id === node.id) {
                     return {
                       ...n,
-                      position: snappedPosition,        // Relative position for React Flow
+                      position: snappedPosition,        
                     };
                   }
                   return n;
                 });
                 setNodes(updatedNodes);
           
-                // Update in backend
                 await updateNode(node.id);
               }
             } else {
-              // For all other nodes
               await updateNode(node.id);
             }
           }
@@ -302,7 +299,6 @@ export const useNodeOperations = (
             }
           };
           
-          // Update the nodes
           const otherNodes = currentElements.filter(n => n.id !== nodeId && n.id !== parentId);
           setNodes([...otherNodes, updatedParent, updatedTerminal]);
       

@@ -19,10 +19,8 @@ const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) =>
   const { handleTriggerDelete } = useClipboard();
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
-    // First, update the edge type on the backend or store
     const updatedEdge = await updateEdge(currentRelation.id, newEdgeType);
     if (updatedEdge) {
-      // After updating the edge, sync the node data
       await updateNodeConnectionData(
         currentRelation.source,
         currentRelation.target,
@@ -31,16 +29,12 @@ const CurrentRelation: React.FC<CurrentRelationProps> = ({ currentRelation }) =>
       );
       currentRelation.type = newEdgeType;
   
-      // Get the updated edges from the store
       const { edges, setEdges } = useStore.getState();
-  
-      // Mark the updated edge as selected
       const updatedEdges = edges.map((edge) => ({
         ...edge,
-        selected: edge.id === currentRelation.id, // Keep the updated edge selected
+        selected: edge.id === currentRelation.id, 
       }));
   
-      // Update the state to keep the selected edge
       setEdges(updatedEdges);
     }
   };

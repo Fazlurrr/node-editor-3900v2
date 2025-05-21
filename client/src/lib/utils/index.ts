@@ -57,7 +57,7 @@ export const generateNewNodeId = (currentId: string): string => {
   return `terminal-${uuidv4()}`;
 };
 
-// Triggered when node is clicked in canvas & opens sidebar
+// TODO: Remove old code
 export const displayNode = (nodeId: string) => {
   const { nodes } = useStore.getState();
   const { openSidebar, closeSidebar } = useSidebar.getState();

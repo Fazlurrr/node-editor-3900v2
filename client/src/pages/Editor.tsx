@@ -1,5 +1,3 @@
-// src/components/Editor.tsx
-
 import React, {
   useEffect,
   useMemo,

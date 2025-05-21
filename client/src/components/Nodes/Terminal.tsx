@@ -1,5 +1,3 @@
-// src/components/Nodes/Terminal.tsx
-
 import Handles from './Handles';
 import type { CustomNodeProps, CustomAttribute } from '@/lib/types';
 import {

@@ -53,8 +53,8 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
 
   useEffect(() => {
     if (editLabel && textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; // reset height
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // fit content
+      textareaRef.current.style.height = 'auto'; 
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; 
     }
   }, [editLabel]);
 
@@ -74,11 +74,11 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // prevents newline in textarea
-      handleUpdateCustomName(); // submits the name
+      e.preventDefault(); 
+      handleUpdateCustomName(); 
     } else if (e.key === 'Escape') {
       setTempName(currentElement.data.customName || currentElement.data.label || '');
-      setEditLabel(false); // exits editing without saving
+      setEditLabel(false); 
     }
   };
 
@@ -206,7 +206,6 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
                     setShowMaxLengthMsg(true);
                   }
 
-                  // Auto-grow as user types
                   if (textareaRef.current) {
                     textareaRef.current.style.height = 'auto';
                     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;

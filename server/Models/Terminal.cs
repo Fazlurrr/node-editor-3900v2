@@ -19,12 +19,11 @@ public class TerminalData : NodeData
 
 public class Terminal : Node
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning disable CS8618 
+#pragma warning disable CS8625 
   private Terminal() : base(null, null, NodeType.Terminal) { }
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
+#pragma warning restore CS8625 
+#pragma warning restore CS8618 
   public TerminalData Data { get; set; }
 
   public Terminal(string id, Position position, TerminalData terminalData)

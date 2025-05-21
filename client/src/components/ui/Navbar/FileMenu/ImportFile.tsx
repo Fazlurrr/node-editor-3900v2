@@ -71,7 +71,7 @@ import { useEffect } from 'react';
       };
   
       try {
-        const file = data.files[0]; // Only one file is expected
+        const file = data.files[0]; 
         const fileContent = await file.text();
         const imfData = JSON.parse(fileContent);
   
