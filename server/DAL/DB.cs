@@ -127,7 +127,12 @@ public class DB : DbContext
             .OwnsOne(e => e.Data);
     }
 
+    internal DB ContextOptions()
+    {
+        throw new NotImplementedException();
+    }
+
     public DbSet<Node> Nodes { get; set; }
-    public DbSet<Edge> Edges { get; set; }
+    public virtual DbSet<Edge> Edges { get; set; }
     public DbSet<User> Users { get; set; }
 }

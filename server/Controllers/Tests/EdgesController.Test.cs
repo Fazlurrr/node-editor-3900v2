@@ -82,6 +82,40 @@ public class EdgesControllerTest
   }
 
   [Fact]
+public async Task FetchEdges_DbUpdateException_ReturnsServerError()
+{
+    // Mock the Edges DbSet to throw DbUpdateException on ToListAsync
+    var mockEdgesDbSet = new Mock<DbSet<Edge>>();
+    mockEdgesDbSet.As<IQueryable<Edge>>().Setup(m => m.Provider).Throws(new DbUpdateException());
+
+    _db.Edges = mockEdgesDbSet.Object;
+
+    // Call the FetchEdges method
+    var result = await _edgesController.FetchEdges("someId");
+
+    var objectResult = Assert.IsType<ObjectResult>(result.Result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("Failed to fetch edges due to database error.", objectResult.Value);
+}
+
+  [Fact]
+public async Task FetchEdges_Exception_ReturnsServerError()
+{
+    // Mock the Edges DbSet to throw general exception on ToListAsync
+    var mockEdgesDbSet = new Mock<DbSet<Edge>>();
+    mockEdgesDbSet.As<IQueryable<Edge>>().Setup(m => m.Provider).Throws(new Exception("Unexpected"));
+
+    _db.Edges = mockEdgesDbSet.Object;
+
+    // Call the FetchEdges method
+    var result = await _edgesController.FetchEdges("someId");
+
+    var objectResult = Assert.IsType<ObjectResult>(result.Result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("An unexpected error occurred.", objectResult.Value);
+}
+
+  [Fact]
   public async Task FetchEdges_UserHasNoEdges_ReturnsOkResultWithEmptyList()
   {
     // Create a user and save it to the database
@@ -287,6 +321,49 @@ public class EdgesControllerTest
   }
 
   [Fact]
+public async Task UploadEdges_ExceptionThrown_ReturnsServerError()
+{
+    // Arrange: create test data
+    var testEdges = new List<Edge>
+    {
+        new Edge
+        {
+            Data = new EdgeData
+            {
+                CreatedBy = "testUser",
+                Id = "dataId",
+                Label = "Edge label",
+                LockConnection = false,
+                CreatedAt = DateTime.Now.Ticks,
+                UpdatedAt = DateTime.Now.Ticks
+            },
+            Id = "edgeId",
+            Source = "source",
+            Target = "target",
+            SourceHandle = "sourceHandle",
+            TargetHandle = "targetHandle",
+            Type = EdgeType.Connected
+        }
+    };
+
+    // Mock the Edges DbSet to throw a general exception
+    var mockEdgesDbSet = new Mock<DbSet<Edge>>();
+    mockEdgesDbSet
+        .Setup(m => m.AddRangeAsync(It.IsAny<IEnumerable<Edge>>(), It.IsAny<CancellationToken>()))
+        .Throws(new Exception("Generic failure"));
+
+    // Insert the mock into the context
+    _db.Edges = mockEdgesDbSet.Object;
+
+    // Act: Call the method
+    var result = await _edgesController.UploadEdges(testEdges);
+
+    // Assert
+    var objectResult = Assert.IsType<ObjectResult>(result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("An unexpected error occurred.", objectResult.Value);
+}
+  [Fact]
   public async Task CreateEdge_EdgeProvided_ReturnsCreatedAtActionResult()
   {
     // Use the first edge from the testEdges list
@@ -367,6 +444,47 @@ public class EdgesControllerTest
     var objectResult = Assert.IsType<ObjectResult>(result);
     Assert.Equal(500, objectResult.StatusCode);
   }
+
+  [Fact]
+public async Task CreateEdge_ExceptionThrown_ReturnsServerError()
+{
+    // Arrange: a valid edge
+    var testEdge = new Edge
+    {
+        Data = new EdgeData
+        {
+            CreatedBy = "user123",
+            Id = "dataId",
+            Label = "New edge",
+            LockConnection = false,
+            CreatedAt = DateTime.Now.Ticks,
+            UpdatedAt = DateTime.Now.Ticks
+        },
+        Id = "edgeId",
+        Source = "source",
+        Target = "target",
+        SourceHandle = "sourceHandle",
+        TargetHandle = "targetHandle",
+        Type = EdgeType.Connected
+    };
+
+    // Mock the Edges DbSet to throw a general exception when AddAsync is called
+    var mockEdgesDbSet = new Mock<DbSet<Edge>>();
+    mockEdgesDbSet
+        .Setup(m => m.AddAsync(It.IsAny<Edge>(), It.IsAny<CancellationToken>()))
+        .Throws(new Exception("Unexpected failure"));
+
+    // Insert the mock into the context
+    _db.Edges = mockEdgesDbSet.Object;
+
+    // Act
+    var result = await _edgesController.CreateEdge(testEdge);
+
+    // Assert
+    var objectResult = Assert.IsType<ObjectResult>(result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("An unexpected error occurred.", objectResult.Value);
+}
 
   [Fact]
   public async Task DeleteEdge_EdgeExists_ReturnsOkResult()
@@ -457,6 +575,88 @@ public class EdgesControllerTest
     Assert.Equal(500, objectResult.StatusCode);
   }
 
+// Mock DbContext to simulate a failure
+// Used to test DbUpdateExeption handling and generic Exception in the controller
+public class FailingDbContext : DB
+{
+    private readonly bool _throwDbUpdateException;
+
+    public FailingDbContext(DbContextOptions<DB> options, bool throwDbUpdateException = true)
+        : base(options)
+    {
+        _throwDbUpdateException = throwDbUpdateException;
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        if (_throwDbUpdateException)
+            throw new DbUpdateException("Simulated DbUpdate failure");
+        else
+            throw new Exception("Simulated general failure");
+    }
+}
+
+  [Fact]
+public async Task DeleteEdge_WhenDbUpdateExceptionThrown_ReturnsServerError()
+{
+    // Arrange
+    var options = new DbContextOptionsBuilder<DB>()
+        .UseInMemoryDatabase(Guid.NewGuid().ToString())
+        .Options;
+
+    // Use normal context to insert a test edge
+    var setupDb = new DB(options);
+    var testEdge = new Edge
+    {
+        Data = new EdgeData
+        {
+            CreatedBy = "user123",
+            Id = "dataId",
+            Label = "Test edge",
+            LockConnection = false,
+            CreatedAt = DateTime.Now.Ticks,
+            UpdatedAt = DateTime.Now.Ticks
+        },
+        Id = "edge123",
+        Source = "source",
+        Target = "target",
+        SourceHandle = "sh",
+        TargetHandle = "th",
+        Type = EdgeType.Connected
+    };
+
+    await setupDb.Edges.AddAsync(testEdge);
+    await setupDb.SaveChangesAsync();
+
+    // Act using failing context
+    var failingDb = new FailingDbContext(options);
+    var controller = new EdgesController(failingDb, _logger);
+    var result = await controller.DeleteEdge(testEdge.Id);
+
+    // Assert
+    var objectResult = Assert.IsType<ObjectResult>(result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("Failed to delete edge due to database error.", objectResult.Value);
+}
+
+  [Fact]
+public async Task DeleteEdges_WhenNoEdgesFound_ThrowsException()
+{
+    // Arrange
+    var userId = "no-match-user";
+    var options = new DbContextOptionsBuilder<DB>()
+        .UseInMemoryDatabase(Guid.NewGuid().ToString())
+        .Options;
+
+    var db = new DB(options);
+    var controller = new EdgesController(db, _logger);
+
+    // Act & Assert
+    var exception = await Assert.ThrowsAsync<Exception>(() => controller.DeleteEdges(userId));
+    Assert.Equal("Edges with id " + userId + " do not exist", exception.Message);
+}
+
+
   [Fact]
   public async Task DeleteEdges_EdgesExist_ReturnsOkResult()
   {
@@ -513,6 +713,21 @@ public class EdgesControllerTest
     var edges = await _db.Edges.Where(e => e.Data.CreatedBy == testEdges[0].Data.CreatedBy).ToListAsync();
     Assert.Empty(edges);
   }
+
+  [Fact]
+public async Task DeleteEdges_WhenNoEdgesMatchUserId_ReturnsServerError()
+{
+    // Arrange: a userId with no edges
+    var userId = "empty-user";
+
+    // Act
+    var result = await _edgesController.DeleteEdges(userId);
+
+    // Assert: hits catch (Exception e)
+    var objectResult = Assert.IsType<ObjectResult>(result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("An unexpected error occurred.", objectResult.Value);
+}
 
   [Fact]
   public async Task DeleteEdges_DatabaseErrorOccurs_ReturnsServerError()
@@ -572,6 +787,74 @@ public class EdgesControllerTest
     var objectResult = Assert.IsType<ObjectResult>(result);
     Assert.Equal(500, objectResult.StatusCode);
   }
+
+  [Fact]
+public async Task DeleteEdges_WhenDbUpdateExceptionThrown_ReturnsServerError()
+{
+    // Arrange
+    var options = new DbContextOptionsBuilder<DB>()
+        .UseInMemoryDatabase(Guid.NewGuid().ToString())
+        .Options;
+
+    // Use a normal context to insert test edges
+    var setupDb = new DB(options);
+    var userId = "user123";
+
+    var edges = new List<Edge>
+    {
+        new Edge
+        {
+            Data = new EdgeData
+            {
+                CreatedBy = userId,
+                Id = "data1",
+                Label = "Edge 1",
+                LockConnection = false,
+                CreatedAt = DateTime.Now.Ticks,
+                UpdatedAt = DateTime.Now.Ticks
+            },
+            Id = "edge1",
+            Source = "source1",
+            Target = "target1",
+            SourceHandle = "sh1",
+            TargetHandle = "th1",
+            Type = EdgeType.Connected
+        },
+        new Edge
+        {
+            Data = new EdgeData
+            {
+                CreatedBy = userId,
+                Id = "data2",
+                Label = "Edge 2",
+                LockConnection = false,
+                CreatedAt = DateTime.Now.Ticks,
+                UpdatedAt = DateTime.Now.Ticks
+            },
+            Id = "edge2",
+            Source = "source2",
+            Target = "target2",
+            SourceHandle = "sh2",
+            TargetHandle = "th2",
+            Type = EdgeType.Connected
+        }
+    };
+
+    await setupDb.Edges.AddRangeAsync(edges);
+    await setupDb.SaveChangesAsync();
+
+    // Use failing context
+    var failingDb = new FailingDbContext(options);
+    var controller = new EdgesController(failingDb, _logger);
+
+    // Act
+    var result = await controller.DeleteEdges(userId);
+
+    // Assert
+    var objectResult = Assert.IsType<ObjectResult>(result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("Failed to delete edges due to database error.", objectResult.Value);
+}
 
   [Fact]
   public async Task UpdateEdge_EdgeExists_ReturnsCreatedAtActionResult()
@@ -688,5 +971,192 @@ public class EdgesControllerTest
     var objectResult = Assert.IsType<ObjectResult>(result);
     Assert.Equal(500, objectResult.StatusCode);
   }
+
+  [Fact]
+public async Task UpdateEdge_WhenExceptionThrown_ReturnsServerError()
+{
+    // Arrange
+    var options = new DbContextOptionsBuilder<DB>()
+        .UseInMemoryDatabase(Guid.NewGuid().ToString())
+        .Options;
+
+    var setupDb = new DB(options);
+    var testEdge = new Edge
+    {
+        Id = "edgeX",
+        Data = new EdgeData
+        {
+            Id = "dataX",
+            CreatedBy = "user123",
+            Label = "Original",
+            LockConnection = false,
+            CreatedAt = DateTime.Now.Ticks,
+            UpdatedAt = DateTime.Now.Ticks
+        },
+        Source = "source1",
+        Target = "target1",
+        SourceHandle = "sh",
+        TargetHandle = "th",
+        Type = EdgeType.Connected
+    };
+
+    await setupDb.Edges.AddAsync(testEdge);
+    await setupDb.SaveChangesAsync();
+
+    testEdge.Data.Label = "Updated Label";
+
+    // Uses FailingDbContext with generic Exception mode
+    var failingDb = new FailingDbContext(options, throwDbUpdateException: false);
+    var controller = new EdgesController(failingDb, _logger);
+
+    // Act
+    var result = await controller.UpdateEdge(testEdge);
+
+    // Assert
+    var objectResult = Assert.IsType<ObjectResult>(result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("An unexpected error occurred.", objectResult.Value);
+}
+
+  [Fact]
+public async Task DeleteEdgesBulk_ValidIds_ReturnsOkResult()
+{
+    var testEdge = new Edge
+    {
+        Id = "edge1",
+        Data = new EdgeData
+        {
+            CreatedBy = "creator",
+            Id = "data1",
+            CreatedAt = DateTime.Now.Ticks,
+            UpdatedAt = DateTime.Now.Ticks,
+            LockConnection = false,
+            Label = "Default Label"
+        },
+        Source = "source1",
+        SourceHandle = "sourceHandle1",
+        Target = "target1",
+        TargetHandle = "targetHandle1",
+        Type = EdgeType.Connected
+    };
+
+    await _db.Edges.AddAsync(testEdge);
+    await _db.SaveChangesAsync();
+
+    var result = await _edgesController.DeleteEdgesBulk(new List<string> { testEdge.Id });
+
+    var okResult = Assert.IsType<OkObjectResult>(result);
+    Assert.Equal("Selected edges have been deleted.", okResult.Value);
+
+    var deleted = await _db.Edges.FindAsync(testEdge.Id);
+    Assert.Null(deleted);
+}
+
+  [Fact]
+public async Task DeleteEdgesBulk_NoIdsProvided_ReturnsBadRequest()
+{
+    var result = await _edgesController.DeleteEdgesBulk(new List<string>());
+
+    var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+    Assert.Equal("No edge IDs provided.", badRequest.Value);
+}
+
+  [Fact]
+public async Task DeleteEdgesBulk_NoEdgesFound_ReturnsNotFound()
+{
+    var result = await _edgesController.DeleteEdgesBulk(new List<string> { "nonExistentId" });
+
+    var notFound = Assert.IsType<NotFoundObjectResult>(result);
+    Assert.Equal("No edges found for the provided IDs.", notFound.Value);
+}
+
+  [Fact]
+public async Task DeleteEdgesBulk_WhenDbUpdateExceptionThrown_ReturnsServerError()
+{
+    // Arrange
+    var options = new DbContextOptionsBuilder<DB>()
+        .UseInMemoryDatabase(Guid.NewGuid().ToString())
+        .Options;
+
+    // Insert one edge normally
+    var setupDb = new DB(options);
+    var testEdge = new Edge
+    {
+        Id = "edge123",
+        Data = new EdgeData
+        {
+            Id = "data123",
+            CreatedBy = "user1",
+            Label = "To be deleted",
+            LockConnection = false,
+            CreatedAt = DateTime.Now.Ticks,
+            UpdatedAt = DateTime.Now.Ticks
+        },
+        Source = "source",
+        Target = "target",
+        SourceHandle = "sh",
+        TargetHandle = "th",
+        Type = EdgeType.Connected
+    };
+
+    await setupDb.Edges.AddAsync(testEdge);
+    await setupDb.SaveChangesAsync();
+
+    // Uses failing DB to throw DbUpdateException
+    var failingDb = new FailingDbContext(options, throwDbUpdateException: true);
+    var controller = new EdgesController(failingDb, _logger);
+
+    // Act
+    var result = await controller.DeleteEdgesBulk(new List<string> { testEdge.Id });
+
+    // Assert
+    var objectResult = Assert.IsType<ObjectResult>(result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("Failed to delete edges due to a database error.", objectResult.Value);
+}
+
+  [Fact]
+public async Task DeleteEdgesBulk_WhenGenericExceptionThrown_ReturnsServerError()
+{
+    // Arrange
+    var options = new DbContextOptionsBuilder<DB>()
+        .UseInMemoryDatabase(Guid.NewGuid().ToString())
+        .Options;
+
+    var setupDb = new DB(options);
+    var testEdge = new Edge
+    {
+        Id = "edge999",
+        Data = new EdgeData
+        {
+            Id = "data999",
+            CreatedBy = "userX",
+            Label = "Label",
+            LockConnection = false,
+            CreatedAt = DateTime.Now.Ticks,
+            UpdatedAt = DateTime.Now.Ticks
+        },
+        Source = "a",
+        Target = "b",
+        SourceHandle = "shX",
+        TargetHandle = "thX",
+        Type = EdgeType.Connected
+    };
+
+    await setupDb.Edges.AddAsync(testEdge);
+    await setupDb.SaveChangesAsync();
+
+    // Uses failing DB that throws generic Exception
+    var failingDb = new FailingDbContext(options, throwDbUpdateException: false);
+    var controller = new EdgesController(failingDb, _logger);
+
+    // Act
+    var result = await controller.DeleteEdgesBulk(new List<string> { testEdge.Id });
+
+    // Assert
+    var objectResult = Assert.IsType<ObjectResult>(result);
+    Assert.Equal(500, objectResult.StatusCode);
+    Assert.Equal("An unexpected error occurred.", objectResult.Value);
+}
 
 }

@@ -140,6 +140,7 @@ public class EdgesController(DB db, ILogger<EdgesController> logger) : Controlle
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
+    
     [HttpDelete("{id}/all")]
     public async Task<IActionResult> DeleteEdges(string id)
     {
@@ -149,10 +150,10 @@ public class EdgesController(DB db, ILogger<EdgesController> logger) : Controlle
         {
             var edges = await _db.Edges.Where(b => b.Data.CreatedBy == id).ToListAsync();
 
-            if (edges == null)
+            if (!edges.Any())
             {
                 throw new Exception("Edges with id " + id + " do not exist");
-            }
+            } 
 
             _db.Edges.RemoveRange(edges);
             await _db.SaveChangesAsync();
