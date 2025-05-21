@@ -361,7 +361,7 @@ const CurrentElement: React.FC<CurrentElementProps> = ({ currentElement }) => {
             {isAttributesVisible && (
               <div className="fixed top-64 right-56 w-80 bg-white dark:bg-[#232528] shadow-xl rounded-lg z-50 border border-[#9facbc]">
                 <div className="flex justify-between items-center mb-4 p-2 pl-4 border-b border-[#9facbc]">
-                  <h2 className="font-semibold">{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h2>
+                  <h1 className="font-semibold">{editingIndex === null ? 'Create Attribute' : 'Edit Attribute'}</h1>
                   <span className="cursor-pointer" title="Close" onClick={() => setIsAttributesVisible(false)}>
                     <X size={18} />
                   </span>

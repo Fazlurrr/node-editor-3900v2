@@ -175,7 +175,7 @@ const Guru: React.FC = () => {
         className="flex-1 p-4 overflow-auto"
         style={{ maxHeight: "80vh" }}
       >
-        <h2 className="text-xl font-semibold mb-2">{selected}</h2>
+        <h1 className="text-xl font-semibold mb-2">{selected}</h1>
         <p className="mb-4">{DEFINITIONS[selected]}</p>
 
         {/* only show if you have an image for this page */}

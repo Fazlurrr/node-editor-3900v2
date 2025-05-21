@@ -46,9 +46,9 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedElements, col
         `}
       >
         <div className="relative pb-2 pl-4 pt-2 mb-2 border-b border-[#9facbc]">
-          <h2 className="text-lg font-semibold text-black dark:text-white">
+          <h1 className="text-lg font-semibold text-black dark:text-white">
             Properties
-          </h2>
+          </h1>
         </div>
         {!collapsed && (
             <>

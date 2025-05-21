@@ -85,13 +85,13 @@ const Navbar = () => {
             {currentPage === AppPage.Dashboard ? (
                 <div className="flex items-center gap-1 font-semibold cursor-pointer hover:bg-muted ml-3 p-1 rounded-md" onClick={() => setDashboard(false)}>
                 <span className="cursor-pointer h-8 flex items-center" onClick={() => setDashboard(false)}>
-                  <img src={`/logo-${theme}.png`} alt="Logo" className="h-8" />
+                  <img src={`/logo-${theme}.png`} alt="IMF Editor Logo" className="h-8" />
                 </span>
                 <ChevronLeft />
                 <span className="flex items-center">Back to Editor</span>
                 </div>
             ) : (
-              <img src={`/logo-${theme}.png`} alt="Logo" className="h-8 mx-4" />
+              <img src={`/logo-${theme}.png`} alt="IMF Editor Logo" className="h-8 mx-4" />
             )}
           {currentPage === AppPage.Editor && (
             <Menubar className="border-none shadow-none bg-transparent">

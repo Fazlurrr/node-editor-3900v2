@@ -18,7 +18,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                             return (
                                 <div className="flex flex-row items-center gap-4 ">
                                     <div className='mb-4 w-1/2'>
-                                        <h2 className="text-lg font-semibold mb-2">Welcome to IMF Editor</h2>
+                                        <h1 className="text-lg font-semibold mb-2">Welcome to IMF Editor</h1>
                                         <p>
                                             IMF Editor is a tool for modelling within the
                                             <a className="text-blue-500 hover:underline cursor-pointer" onClick={() => window.open('https://sirius-labs.no/imf/')} title="sirius-labs.no/imf"> Information Modelling Framework (IMF).</a>
@@ -35,7 +35,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
-                                        <h2 className="text-lg font-semibold mb-2">Creating elements</h2>
+                                        <h1 className="text-lg font-semibold mb-2">Creating elements</h1>
                                         <p>
                                             To create a new element, you can drag an element from the left sidebar onto the middle canvas.
                                         </p>
@@ -50,7 +50,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
-                                        <h2 className="text-lg font-semibold mb-2">Toolbar</h2>
+                                        <h1 className="text-lg font-semibold mb-2">Toolbar</h1>
                                         <p className='mb-4'>
                                             The Toolbar is located at the top of the page, and features functionality for changing modes, clipboard, undo/redo and canvas controls.
                                             <br/><br/>
@@ -67,7 +67,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
-                                        <h2 className="text-lg font-semibold mb-2">Creating relations</h2>
+                                        <h1 className="text-lg font-semibold mb-2">Creating relations</h1>
                                         <p className='mb-4'>Enter selection mode from the toolbar or by selecting a relation type in the left sidebar. Then click and drag between the connection handles on the elements you want to connect.</p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
@@ -79,7 +79,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
-                                        <h2 className="text-lg font-semibold mb-2">Attaching Terminals</h2>
+                                        <h1 className="text-lg font-semibold mb-2">Attaching Terminals</h1>
                                         <p className='mb-4'>To attach a terminal to a block, drag it from the left sidebar and drop it onto the block.</p>
                                     </div>
                                     <div className="w-1/2 border-2 border-black">
@@ -91,7 +91,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
-                                        <h2 className="text-lg font-semibold mb-2">Element Properties</h2>
+                                        <h1 className="text-lg font-semibold mb-2">Element Properties</h1>
                                         <p className='mb-4'>
                                             To view an element or relations properties, simply click on them and they will appear in the right sidebar.
                                             <br/><br/>
@@ -107,7 +107,7 @@ const Tutorial: React.FC<TutorialProps> = ({close}) => {
                             return (
                                 <div className="flex flex-row items-center gap-4">
                                     <div className='mb-4 w-1/2'>
-                                        <h2 className="text-lg font-semibold mb-2">Attributes</h2>
+                                        <h1 className="text-lg font-semibold mb-2">Attributes</h1>
                                         <p className='mb-4'>
                                             To add custom attributes to an element, click on the plus-sign next to "Custom Attributes" in the right sidebar.
                                             <br/><br/>

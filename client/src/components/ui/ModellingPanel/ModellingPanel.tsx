@@ -222,7 +222,7 @@ const ModellingPanel: React.FC<ModellingPanelProps> = () => {
         [scrollbar-color:lightGray_transparent]">
       <div className="pb-2 pl-4 pt-2 mb-2 border-b border-[#9facbc]" onClick={toggleElements}>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg text-black dark:text-white font-semibold">Elements</h2>
+          <h1 className="text-lg text-black dark:text-white font-semibold">Elements</h1>
           {collapseElements
             ? <ChevronUp className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" />
             : <ChevronDown className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" />}
@@ -232,7 +232,7 @@ const ModellingPanel: React.FC<ModellingPanelProps> = () => {
         <>
           {navItems.map((node) => (
             <div key={node.title} className="mb-1 border-b border-[#9facbc]">
-              <h3 className="ml-4 text-sm text-black dark:text-white">{node.title}</h3>
+              <h2 className="ml-4 text-sm text-black dark:text-white">{node.title}</h2>
               <div className="flex justify-center gap-2">
                 {node.children.map((component) => (
                   <span
@@ -275,7 +275,7 @@ const ModellingPanel: React.FC<ModellingPanelProps> = () => {
       )}
       <div className="pt-1 pb-2 pl-4 mt-0 mb-2 border-b border-[#9facbc]" onClick={toggleRelations}>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg text-black dark:text-white font-semibold">Relations</h2>
+          <h1 className="text-lg text-black dark:text-white font-semibold">Relations</h1>
           {collapseRelations
             ? <ChevronUp className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" />
             : <ChevronDown className="text-black dark:text-white size-5 hover:cursor-pointer mr-2" />}
