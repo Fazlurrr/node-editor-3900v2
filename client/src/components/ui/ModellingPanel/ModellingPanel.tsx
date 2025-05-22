@@ -168,7 +168,6 @@ interface ModellingPanelProps {
 
 const ModellingPanel: React.FC<ModellingPanelProps> = () => {
   const onDragStart = (event: React.DragEvent, nodeType: NodeType, aspect: AspectType) => {
-    // Custom drag preview
     const dragPreview = document.createElement("div");
     if (nodeType === NodeType.Block) {
       dragPreview.style.width = "110px";

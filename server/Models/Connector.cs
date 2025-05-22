@@ -19,11 +19,11 @@ public class ConnectorData : NodeData
 
 public class Connector : Node
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning disable CS8618 
+#pragma warning disable CS8625 
   private Connector() : base(null, null, NodeType.Connector) { }
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning restore CS8625 
+#pragma warning restore CS8618 
 
   public ConnectorData Data { get; set; }
 

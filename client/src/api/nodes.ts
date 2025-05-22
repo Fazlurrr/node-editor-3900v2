@@ -110,7 +110,6 @@ export const createNode = async (node: Node): Promise<Node | null> => {
   startLoading();
 
   try {
-    // Prepare node for storage - should already have relative positions if it's a terminal
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
       method: 'POST',
       headers: {
@@ -135,7 +134,6 @@ export const createNode = async (node: Node): Promise<Node | null> => {
     const createdNode = await response.json();
     
     if (createdNode) {
-      // If this is a terminal with a parent, make sure parentId is set for ReactFlow
       if (createdNode.type === 'terminal' && createdNode.data.terminalOf) {
         createdNode.parentId = createdNode.data.terminalOf;
       }
@@ -258,7 +256,6 @@ export const updateNode = async (
 
 
 export const deleteNode = async (nodeToDeleteId: string): Promise<string | null> => {
-  //eslint-disable-next-line no-console
   console.log(`===== STARTING deleteNode for ${nodeToDeleteId} =====`);
   
   const { nodes, setNodes } = useStore.getState();
@@ -306,9 +303,6 @@ export const deleteNode = async (nodeToDeleteId: string): Promise<string | null>
       
       // Filter out the node to delete
       const nodesWithoutDeleted = updatedNodes.filter(n => n.id !== nodeToDeleteId);
-      
-      // Update React state BEFORE making backend calls
-      // This ensures ReactFlow's rendering is consistent
       setNodes(nodesWithoutDeleted);
       
       // Update terminals in the backend
@@ -325,13 +319,11 @@ export const deleteNode = async (nodeToDeleteId: string): Promise<string | null>
               body: JSON.stringify(terminal),
             });
           } catch (error) {
-            //eslint-disable-next-line no-console
             console.warn(`Warning: Error updating terminal ${terminalId}:`, error);
           }
         }
       }
       
-      // Delete the node from API
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.id}`,
         {
@@ -354,7 +346,6 @@ export const deleteNode = async (nodeToDeleteId: string): Promise<string | null>
         return null;
       }
     } else {
-      // For non-block nodes, just update state and call the API
       setNodes(nodes.filter(n => n.id !== nodeToDeleteId));
       
       const response = await fetch(
@@ -380,12 +371,10 @@ export const deleteNode = async (nodeToDeleteId: string): Promise<string | null>
       }
     }
     
-    //eslint-disable-next-line no-console
     console.log(`Node deleted successfully`);
     
     return nodeToDelete.id;
   } catch (error) {
-    //eslint-disable-next-line no-console
     console.error(`Error in deleteNode:`, error);
     toast.error(`Error deleting node: ${(error as Error).message}`);
     throw error;

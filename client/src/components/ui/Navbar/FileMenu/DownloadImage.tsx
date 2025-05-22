@@ -42,7 +42,7 @@ const DownloadImage = ({ fileName, fileType }: DownloadImageProps) => {
         const nodesBounds = getNodesBounds(nodes);
 
         // Calculate image dimensions based on node layout
-        const padding = 50; // Add some padding around nodes
+        const padding = 50; 
         const imageWidth = nodesBounds.width + padding * 2;
         const imageHeight = nodesBounds.height + padding * 2;
 

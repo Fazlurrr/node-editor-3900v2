@@ -9,7 +9,6 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
@@ -23,7 +22,6 @@ builder.Services.AddDbContext<DB>(options =>
     options.UseSqlite(builder.Configuration["ConnectionStrings:DbConnection"]);
 });
 
-// JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -51,10 +49,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var clientUrl = builder.Configuration["ClientUrl"] ?? throw new ArgumentNullException("ClientUrl is not set in appsettings.json");
 
 var loggerConfiguration = new LoggerConfiguration()
-    .MinimumLevel.Information() // levels: Trace < Information < Warning < Error < Fatal
+    .MinimumLevel.Information() 
     .WriteTo.File($"APILogs/app_-{DateTime.UtcNow:yyyy-MM-dd}.log");
 
-// Filter out logs that contain "Executed DbCommand"
 loggerConfiguration.Filter.ByExcluding(e => e.Properties.TryGetValue("SourceContext", out var value) &&
                             e.Level == LogEventLevel.Information &&
                             e.MessageTemplate.Text.Contains("Executed DbCommand"));
@@ -88,11 +85,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 else
-// Configure the HTTP request pipeline.
 {
     DbInit.Seed(app);
     app.UseExceptionHandler("/Editor/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

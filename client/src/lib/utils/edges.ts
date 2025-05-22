@@ -11,11 +11,9 @@ interface SwitchOptions {
   edge: Edge & { type: EdgeType };
 }
 
-// Triggered when a connection is made between two nodes
 export const onConnect = async (params: Edge | Connection) => {
   const { nodes } = useStore.getState();
   const { setParams, startConnection } = useConnection.getState();
-  // Store params in app state to use in other functions
   setParams(params);
 
   if (params.source === params.target) {
@@ -23,11 +21,9 @@ export const onConnect = async (params: Edge | Connection) => {
     return;
   }
 
-  // Set terminalOf property for terminal & terminals array for block
   if (isTerminal(params.target as string) && isBlock(params.source as string)) {
     const terminal = nodes.find(t => t.id === params.target);
 
-    // If terminal is already a terminal of another block
     if (terminal?.data?.terminalOf) {
       const block = nodes.find(b => b.id === terminal?.data?.terminalOf);
       toast.error(
@@ -37,7 +33,6 @@ export const onConnect = async (params: Edge | Connection) => {
     }
   }
 
-  // If none of the above conditions are met, open dialog to select edge type
   return startConnection(
     isBlock(params.source as string) && isBlock(params.target as string)
   );
@@ -57,7 +52,6 @@ export const addEdge = async (
 
   const newEdge = {
     ...params,
-    // Id needs to be this format for reactflow to render the edge between nodes
     id: `reactflow__edge-${params!.source}${params!.sourceHandle}-${params!.target}${params!.targetHandle}`,
     type: edgeType,
     data: {
@@ -70,11 +64,9 @@ export const addEdge = async (
     },
   };
 
-  // /api/edges POST request
   const edge = await createEdge(newEdge as Edge);
 
   if (edge) {
-    // Update node relations with new node relations
     handleNewNodeRelations(newNodeRelations as NodeRelation[]);
   }
 };
@@ -82,15 +74,12 @@ export const addEdge = async (
 export const switchEdgeDirection = async ({
   edge,
 }: SwitchOptions): Promise<Edge | null> => {
-  // 1) remove the old edge on the backend + store
   const deleted = await deleteEdge(edge.id);
   if (!deleted) {
     toast.error('Failed to delete the old edge.');
     return null;
   }
 
-  // 2) build a reversed‐endpoint payload
-  //    swap handles by regex, recompute the ReactFlow id
   const handlePattern = /(.+)_(top|bottom|left|right)_(source|target)$/;
 
   const targetMatch = handlePattern.exec(edge.targetHandle!);
@@ -122,14 +111,12 @@ export const switchEdgeDirection = async ({
     },
   };
 
-  // 3) POST the new edge
   const created = await createEdge(reversed as Edge);
   if (!created) {
     toast.error('Failed to create the reversed edge.');
     return null;
   }
 
-  // 4) sync your per-node metadata
   await updateNodeConnectionData(
     created.source,
     created.target,
@@ -137,7 +124,6 @@ export const switchEdgeDirection = async ({
     edge.type
   );
 
-  // 5) mark the new one as selected (and clear selection on the rest)
   const { edges: allEdges, setEdges } = useStore.getState();
   const updatedEdges = allEdges.map(e => ({
     ...e,

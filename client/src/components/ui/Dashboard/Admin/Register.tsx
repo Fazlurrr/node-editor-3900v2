@@ -7,7 +7,6 @@ import { register } from '@/api/auth';
 import { buttonVariants } from '@/lib/config.ts';
 import { Button } from '@/components/ui/Misc/button';
 
-// Schema for form validation using Zod
 const registerUserSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(5, "Password must be at least 5 characters long"),
@@ -38,7 +37,7 @@ const Register = () => {
     if (registered) {
       toast.success(`User ${values.username} registered successfully`);
       form.reset();
-      window.location.reload(); // Used instead of form.reset() because form.reset() doesn't reset the MUI-elements as intended
+      window.location.reload(); 
     }
   };
 

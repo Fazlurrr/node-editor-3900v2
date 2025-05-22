@@ -182,7 +182,6 @@ export const useKeyboardShortcuts = (
   useHotkeys(
     'd',
     () => {
-      // only detach terminals
       selectedNodes
         .filter(n => n.type === 'terminal')
         .forEach(n => onTerminalDetach(n.id))
