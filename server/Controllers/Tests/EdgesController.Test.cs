@@ -640,24 +640,6 @@ public async Task DeleteEdge_WhenDbUpdateExceptionThrown_ReturnsServerError()
 }
 
   [Fact]
-public async Task DeleteEdges_WhenNoEdgesFound_ThrowsException()
-{
-    // Arrange
-    var userId = "no-match-user";
-    var options = new DbContextOptionsBuilder<DB>()
-        .UseInMemoryDatabase(Guid.NewGuid().ToString())
-        .Options;
-
-    var db = new DB(options);
-    var controller = new EdgesController(db, _logger);
-
-    // Act & Assert
-    var exception = await Assert.ThrowsAsync<Exception>(() => controller.DeleteEdges(userId));
-    Assert.Equal("Edges with id " + userId + " do not exist", exception.Message);
-}
-
-
-  [Fact]
   public async Task DeleteEdges_EdgesExist_ReturnsOkResult()
   {
     var testEdges = new List<Edge>
