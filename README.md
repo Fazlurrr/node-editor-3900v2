@@ -1,6 +1,7 @@
 # <img src="client/public/logo-light.png" alt="Description" width="25"/> IMF Editor 
 
 **Welcome to IMF Editor**, a comprehensive and flexible tool for designing and managing engineering system models within the Information Modelling Framework. This application provides a graphical user interface where users can create and modify elements, as well as their relationships, attributes, and properties.
+
 Built with React and Vite on the frontend and a .NET backend with SQLite, this tool offers a user-friendly interface for designing and managing system models.
 Ideal for engineers, project managers, and system architects, it enables detailed mapping of engineering systems.The application ensures effective collaboration and streamlined information exchange in today’s dynamic engineering environments.
 
